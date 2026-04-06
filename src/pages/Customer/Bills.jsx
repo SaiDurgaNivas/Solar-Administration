@@ -82,7 +82,9 @@ function Bills() {
       
       setTimeout(async () => {
           try {
-              await api.patch(`bills/${bill.id}/`, { status: "Paid" });
+              if (bill.id !== 'demo-bill-1') {
+                  await api.patch(`bills/${bill.id}/`, { status: "Paid" });
+              }
               setBills(bills.map(b => b.id === bill.id ? { ...b, status: "Paid" } : b));
               setPaymentModal(prev => ({ 
                   ...prev, 
@@ -90,6 +92,7 @@ function Bills() {
                   successData: { date: new Date().toLocaleString(), transactionId: 'TXN' + Math.floor(Math.random()*1000000000) } 
               }));
           } catch (err) {
+              console.error(err);
               alert("Failed to process transaction network.");
               setPaymentModal(prev => ({ ...prev, step: 1 }));
           }
