@@ -1,10 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShieldAlert, CheckCircle } from "lucide-react";
+import { ShieldAlert, CheckCircle, Zap } from "lucide-react";
 import { useTickets } from "../context/TicketContext";
+import api from "../api/axiosConfig";
 
 function AgentTickets() {
-  const { tickets, resolveTicket } = useTickets();
+  const { tickets, resolveTicket, assignTicket } = useTickets();
+  const [team, setTeam] = useState([]);
+  const [assignSelect, setAssignSelect] = useState({});
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        if (!user) return;
+        const res = await api.get(`users/?agent_id=${user.id}`);
+        setTeam(res.data || []);
+      } catch (err) {
+        console.error("Agent team fetch err:", err);
+      }
+    };
+    fetchTeam();
+  }, []);
+
+  const handleAssign = (ticketId) => {
+    const workerId = assignSelect[ticketId];
+    if (!workerId) return alert("Please select a worker first.");
+    const worker = team.find(w => w.id.toString() === workerId.toString());
+    assignTicket(ticketId, worker.id, worker.username);
+    alert(`Ticket dispatched to ${worker.username}!`);
+  };
 
   return (
     <div className="min-h-screen bg-[#020617] p-6 text-white font-sans">
@@ -25,7 +50,7 @@ function AgentTickets() {
           </div>
         ) : tickets.map((t, i) => (
           <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className={`border p-6 rounded-2xl transition-all ${t.status === 'Resolved' ? 'bg-green-500/5 border-green-500/20' : 'bg-[#0f172a]/80 border-red-500/30'}`}>
+            className={`border p-6 rounded-2xl flex flex-col transition-all ${t.status === 'Resolved' ? 'bg-green-500/5 border-green-500/20' : 'bg-[#0f172a]/80 border-red-500/30'}`}>
             <div className="flex justify-between items-start mb-2">
               <div>
                 <p className="font-bold text-lg text-white uppercase">{t.type}</p>
@@ -33,21 +58,45 @@ function AgentTickets() {
               </div>
               <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                 t.status === 'Resolved' ? 'text-green-400 border-green-500/30 bg-green-500/10'
+                : t.status === 'Dispatched' ? 'text-blue-400 border-blue-500/30 bg-blue-500/10'
                 : 'text-red-400 border-red-500/30 bg-red-500/10'
               }`}>{t.status}</span>
             </div>
             <p className="text-gray-400 text-sm italic mb-4 border-l-2 border-white/10 pl-3 py-1">"{t.description}"</p>
-            <div className="flex justify-between items-center border-t border-white/5 pt-4">
-              <span className="text-xs text-gray-600 font-mono">ID: {t.id}</span>
-              {t.status !== "Resolved" ? (
-                <button onClick={() => resolveTicket(t.id)}
-                  className="bg-green-500 hover:bg-green-400 text-black text-xs px-4 py-2 rounded-lg uppercase font-bold flex items-center gap-2 transition">
-                  <CheckCircle className="w-4 h-4" /> Resolve
-                </button>
+            
+            <div className="mt-auto pt-4 flex flex-col justify-end">
+              {t.status === "Pending" ? (
+                 <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-2">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Dispatch Field Ops</label>
+                    <div className="flex gap-2">
+                       <select 
+                          className="flex-1 bg-[#020617] border border-white/10 p-2 outline-none focus:border-red-500 rounded-lg text-xs text-white"
+                          value={assignSelect[t.id] || ""}
+                          onChange={(e) => setAssignSelect({...assignSelect, [t.id]: e.target.value})}
+                       >
+                           <option value="">- Select Technician -</option>
+                           {team.map(w => <option key={w.id} value={w.id}>{w.username} ({w.subworker_profile?.job_title})</option>)}
+                       </select>
+                       <button onClick={() => handleAssign(t.id)} className="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-3 rounded-lg transition-all flex items-center justify-center">
+                          <Zap className="w-4 h-4" />
+                       </button>
+                    </div>
+                 </div>
+              ) : t.status === "Dispatched" ? (
+                 <div className="flex justify-between items-center bg-blue-500/5 border border-blue-500/20 p-3 rounded-xl">
+                    <div className="text-xs text-gray-400">Deployed to: <span className="font-bold text-blue-400 capitalize">{t.assignedWorkerName}</span></div>
+                    <button onClick={() => resolveTicket(t.id)}
+                      className="bg-green-500 hover:bg-green-400 text-black text-xs px-4 py-2 rounded-lg uppercase font-bold flex items-center gap-2 transition">
+                      <CheckCircle className="w-4 h-4" /> Force Resolve
+                    </button>
+                 </div>
               ) : (
-                <span className="text-green-400 text-xs font-bold flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3" /> Cleared
-                </span>
+                 <div className="flex justify-between items-center border-t border-white/5 pt-2">
+                   <span className="text-xs text-gray-600 font-mono">ID: {t.id}</span>
+                   <span className="text-green-400 text-xs font-bold flex items-center gap-1">
+                     <CheckCircle className="w-3 h-3" /> Cleared at {t.resolvedAt ? new Date(t.resolvedAt).toLocaleTimeString() : ''}
+                   </span>
+                 </div>
               )}
             </div>
           </motion.div>

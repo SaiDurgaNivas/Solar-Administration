@@ -8,6 +8,7 @@ const Target = MapPin;
 
 function WorkerDashboard() {
   const [tasks, setTasks] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loadingAttendance, setLoadingAttendance] = useState(true);
@@ -33,6 +34,11 @@ function WorkerDashboard() {
     try {
       const res = await api.get(`teamtasks/?sub_worker=${user.id}`);
       setTasks(res.data);
+      
+      // Also fetch local maintenance tickets dispatched to this worker
+      const savedTickets = JSON.parse(sessionStorage.getItem('solar_tickets')) || [];
+      const myTickets = savedTickets.filter(t => t.assignedWorkerId === user.id);
+      setTickets(myTickets);
     } catch (err) {
       console.error(err);
     } finally {
@@ -68,6 +74,16 @@ function WorkerDashboard() {
     } catch (err) {
       alert('Failed to update status.');
     }
+  };
+
+  const markTicketResolved = (ticketId) => {
+    const savedTickets = JSON.parse(sessionStorage.getItem('solar_tickets')) || [];
+    const updated = savedTickets.map(t => 
+      t.id === ticketId ? { ...t, status: 'Resolved', resolvedAt: new Date().toISOString() } : t
+    );
+    sessionStorage.setItem('solar_tickets', JSON.stringify(updated));
+    fetchTasks();
+    alert("Maintenance Ticket Resolved Successfully!");
   };
 
   const postAttendance = async (status) => {
@@ -286,6 +302,40 @@ function WorkerDashboard() {
                           {task.status === 'Completed' && (
                              <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
                                <CheckCircle className="w-6 h-6" /> Installation Cycle Complete
+                             </div>
+                          )}
+                        </div>
+                     </div>
+                  ))}
+                  
+                  {/* Maintenance Tickets Section */}
+                  {tickets.map(ticket => (
+                     <div key={ticket.id} className="bg-gradient-to-b from-red-950/40 to-[#020617] border border-red-500/20 rounded-3xl p-7 shadow-2xl flex flex-col justify-between hover:border-red-500/40 transition-all duration-500">
+                        <div>
+                          <div className="flex justify-between items-start mb-5 gap-4">
+                            <div>
+                              <span className="text-xs font-black uppercase text-red-400 tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">Maintenance: {ticket.type}</span>
+                              <h3 className="text-xl font-bold mt-4">{ticket.customerName}</h3>
+                            </div>
+                            <span className={`px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border shadow-lg ${ticket.status === 'Resolved' ? 'text-green-400 bg-green-500/10 border-green-500/30' : 'text-blue-400 bg-blue-500/10 border-blue-500/30'}`}>
+                              {ticket.status}
+                            </span>
+                          </div>
+
+                          <div className="bg-[#020617] p-5 rounded-2xl flex items-start gap-4 border border-red-500/10 mb-6 shadow-inner text-gray-300 text-sm italic">
+                            "{ticket.description}"
+                          </div>
+                        </div>
+
+                        {/* Action Area */}
+                        <div className="mt-4 pt-6 border-t border-red-500/20">
+                          {ticket.status !== 'Resolved' ? (
+                            <button onClick={() => markTicketResolved(ticket.id)} className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-green-500 to-emerald-400 text-[#020617] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-3">
+                              <CheckCircle className="w-6 h-6" /> Mark Problem Fixed
+                            </button>
+                          ) : (
+                            <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
+                               <CheckCircle className="w-6 h-6" /> Ticket Closed At Site
                              </div>
                           )}
                         </div>

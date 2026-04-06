@@ -42,12 +42,22 @@ export const TicketProvider = ({ children }) => {
     );
   };
 
+  const assignTicket = (id, workerId, workerName) => {
+    setTickets(prev => 
+      prev.map(t => 
+        t.id === id 
+          ? { ...t, status: 'Dispatched', assignedWorkerId: workerId, assignedWorkerName: workerName } 
+          : t
+      )
+    );
+  };
+
   const clearTickets = () => {
     setTickets([]);
   };
 
   return (
-    <TicketContext.Provider value={{ tickets, addTicket, resolveTicket, clearTickets }}>
+    <TicketContext.Provider value={{ tickets, addTicket, resolveTicket, assignTicket, clearTickets }}>
       {children}
     </TicketContext.Provider>
   );
