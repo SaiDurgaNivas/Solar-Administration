@@ -190,6 +190,8 @@ class BookingDocumentViewSet(viewsets.ModelViewSet):
             return BookingDocument.objects.filter(booking_id=booking_id)
         return BookingDocument.objects.all()
 
+from django.utils import timezone
+
 class BillViewSet(viewsets.ModelViewSet):
     queryset = Bill.objects.all()
     serializer_class = BillSerializer
@@ -199,6 +201,18 @@ class BillViewSet(viewsets.ModelViewSet):
         if client_id:
             return Bill.objects.filter(client_id=client_id)
         return Bill.objects.all()
+
+    def perform_create(self, serializer):
+        if serializer.validated_data.get('status') == 'Paid':
+            serializer.save(paid_at=timezone.now())
+        else:
+            serializer.save()
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('status') == 'Paid' and serializer.instance.status != 'Paid':
+            serializer.save(paid_at=timezone.now())
+        else:
+            serializer.save()
 
 class UsageTelemetryViewSet(viewsets.ModelViewSet):
     queryset = UsageTelemetry.objects.all()

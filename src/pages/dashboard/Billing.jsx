@@ -24,11 +24,13 @@ function Billing() {
 
   useEffect(() => {
     fetchBills();
+    const interval = setInterval(() => fetchBills(false), 4000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchBills = async () => {
+  const fetchBills = async (showLoader = true) => {
     try {
-        setLoading(true);
+        if (showLoader) setLoading(true);
         const [billsRes, custRes] = await Promise.all([
             api.get('bills/'),
             api.get('users/?role=customer')
@@ -266,15 +268,22 @@ function Billing() {
                     <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount).toLocaleString()}</td>
                     
                     <td className="p-5 text-center">
-                      <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider uppercase border ${
-                          bill.status === "Paid"
-                            ? "bg-green-500/10 text-green-400 border-green-500/30"
-                            : bill.status?.includes("Slot")
-                            ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-                            : "bg-red-500/10 text-red-500 border-red-500/30"
-                      }`}>
-                        {bill.status}
-                      </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider uppercase border ${
+                            bill.status === "Paid"
+                              ? "bg-green-500/10 text-green-400 border-green-500/30"
+                              : bill.status?.includes("Slot")
+                              ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+                              : "bg-red-500/10 text-red-500 border-red-500/30"
+                        }`}>
+                          {bill.status}
+                        </span>
+                        {bill.status === "Paid" && bill.paid_at && (
+                          <span className="text-[10px] text-gray-500 font-bold font-mono">
+                            {new Date(bill.paid_at).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
+                          </span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

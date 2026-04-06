@@ -87,7 +87,7 @@ class BillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bill
-        fields = ['id', 'client', 'client_name', 'bill_no', 'date', 'units', 'amount', 'loan', 'subsidy', 'downpayment', 'status']
+        fields = ['id', 'client', 'client_name', 'bill_no', 'date', 'paid_at', 'units', 'amount', 'loan', 'subsidy', 'downpayment', 'status']
 
 class UsageTelemetrySerializer(serializers.ModelSerializer):
     class Meta:
