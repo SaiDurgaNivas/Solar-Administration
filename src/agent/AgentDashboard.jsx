@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Users, Wrench, MapPin, CheckCircle, Clock, Save, ShieldAlert, HardHat, PlusCircle, UserPlus, Zap } from "lucide-react";
 import api from "../api/axiosConfig";
 import { useTickets } from "../context/TicketContext";
+import { useLiveTime } from "../hooks/useLiveTime";
 
 const AgentDashboard = () => {
   const [installations, setInstallations] = useState([]);
@@ -20,6 +21,7 @@ const AgentDashboard = () => {
   });
 
   const { tickets, resolveTicket } = useTickets();
+  const { timeString, dateString, greeting } = useLiveTime();
 
   // Fetch real data from Backend
   useEffect(() => {
@@ -249,14 +251,20 @@ const AgentDashboard = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight">
-            Good Morning, <span className="text-orange-500">Agent</span>
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Here is your daily dispatch, active sites, and installation queue.
-          </p>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight">
+              {greeting}, <span className="text-orange-500">Agent</span>
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Here is your daily dispatch, active sites, and installation queue.
+            </p>
+          </div>
+          <div className="bg-[#0f172a]/80 backdrop-blur-md border border-white/10 px-6 py-4 rounded-3xl flex flex-col items-center justify-center min-w-[220px] shadow-2xl">
+             <p className="font-mono text-3xl font-bold tracking-widest text-cyan-400 animate-[pulse_2s_ease-in-out_infinite]">{timeString}</p>
+             <p className="text-xs uppercase text-gray-500 font-bold mt-2 tracking-widest">{dateString}</p>
+          </div>
         </motion.div>
 
         {/* 🔥 Daily Metrics Widget */}

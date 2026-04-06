@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { useLiveTime } from '../hooks/useLiveTime';
 
 const Target = MapPin;
 
@@ -19,6 +20,7 @@ function WorkerDashboard() {
   const user = JSON.parse(sessionStorage.getItem('solar_user')) || {};
   const assignedCount = tasks.filter((task) => ['Dispatched', 'In Progress'].includes(task.status)).length;
   const today = new Date().toISOString().slice(0, 10);
+  const { timeString, dateString, greeting } = useLiveTime();
 
   // Mock Notifications
   const notifications = [
@@ -147,16 +149,17 @@ function WorkerDashboard() {
             </div>
             <div>
               <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-yellow-300">
-                Field Operations
+                {greeting}, {user.username || 'Worker'}
               </h1>
               <p className="text-xs text-gray-400 font-medium tracking-wide">Authorized Worker Portal v2.0</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 bg-[#020617] border border-white/10 px-4 py-2.5 rounded-full shadow-inner">
-              <Clock className="w-4 h-4 text-orange-400 animate-pulse" />
-              <span className="text-sm font-semibold tracking-wider">{today}</span>
+            <div className="hidden bg-[#020617] border border-white/10 px-4 py-2.5 rounded-full shadow-inner md:flex items-center gap-3">
+              <Clock className="w-4 h-4 text-orange-400 animate-[pulse_1.5s_ease-in-out_infinite]" />
+              <span className="text-sm font-semibold tracking-wider font-mono text-cyan-400">{timeString}</span>
+              <span className="text-xs tracking-widest uppercase font-bold text-gray-500 border-l border-white/10 pl-3">{dateString}</span>
             </div>
             <button onClick={handleLogout} className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-6 py-2.5 rounded-full font-bold transition-all shadow-lg hover:shadow-red-500/20">
               <Power className="w-4 h-4" /> Disconnect

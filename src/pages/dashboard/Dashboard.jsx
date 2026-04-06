@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Users, Activity, Zap, CheckCircle, PlusCircle, PenTool, FileText, Bell, AlertTriangle, MapPin, HardHat } from "lucide-react";
 import api from "../../api/axiosConfig";
+import { useLiveTime } from "../../hooks/useLiveTime";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,8 @@ const Dashboard = () => {
   
   const [notifications, setNotifications] = useState([]);
   const [activeOps, setActiveOps] = useState([]);
+
+  const { timeString, dateString, greeting } = useLiveTime();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,24 +105,23 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
-
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 font-sans overflow-x-hidden pb-20">
       
       {/* Dashboard Header */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8" >
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
-          {getGreeting()}, Admin
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Here is what is happening with your solar network today.
-        </p>
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4" >
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
+            {greeting}, Admin
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Here is what is happening with your solar network today.
+          </p>
+        </div>
+        <div className="bg-[#0f172a]/80 border border-white/10 px-6 py-3 rounded-2xl flex flex-col items-center justify-center min-w-[200px]">
+           <p className="font-mono text-2xl font-bold tracking-widest text-[#00ffcc] animate-pulse">{timeString}</p>
+           <p className="text-xs uppercase text-gray-500 font-bold mt-1 tracking-widest">{dateString}</p>
+        </div>
       </motion.div>
 
       {/* Stats Cards */}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../../api/axiosConfig";
 import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert } from "lucide-react";
+import { useLiveTime } from "../../hooks/useLiveTime";
 
 const timeSlots = [
   "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
@@ -24,6 +25,9 @@ function CustomerDashboard() {
     requested_time: "",
     notes: "",
   });
+
+  const { timeString, dateString, greeting } = useLiveTime();
+  const userName = JSON.parse(sessionStorage.getItem("solar_user"))?.first_name || JSON.parse(sessionStorage.getItem("solar_user"))?.username || "Customer";
 
   const fetchBookings = async () => {
     const user = JSON.parse(sessionStorage.getItem("solar_user"));
@@ -133,16 +137,20 @@ function CustomerDashboard() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-blue-500/20 to-cyan-500/5 border border-blue-500/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden"
+        className="bg-gradient-to-r from-blue-500/20 to-cyan-500/5 border border-blue-500/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row justify-between md:items-end gap-6"
       >
-        <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
+        <div className="absolute top-0 right-0 py-8 opacity-20 pointer-events-none">
           <Calendar className="w-48 h-48 text-blue-500 blur-sm" />
         </div>
         <div className="relative z-10">
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Appointment Hub
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent capitalize">
+              {greeting}, {userName}
             </h1>
             <p className="text-gray-400 text-lg mt-2 font-medium">Book a site visit with our Field Agents</p>
+        </div>
+        <div className="relative z-10 bg-[#0f172a]/80 backdrop-blur-md border border-white/10 px-6 py-4 rounded-3xl flex flex-col items-center justify-center min-w-[220px] shadow-2xl">
+           <p className="font-mono text-3xl font-bold tracking-widest text-[#00ffcc] animate-[pulse_2s_ease-in-out_infinite]">{timeString}</p>
+           <p className="text-xs uppercase text-gray-500 font-bold mt-2 tracking-widest">{dateString}</p>
         </div>
       </motion.div>
 
