@@ -5,6 +5,7 @@ import api from "../../api/axiosConfig";
 
 function Installations() {
   const [installations, setInstallations] = useState([]);
+  const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,14 +24,16 @@ function Installations() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [instRes, custRes, agentRes] = await Promise.all([
+      const [instRes, custRes, agentRes, billsRes] = await Promise.all([
         api.get('installations/'),
         api.get('users/?role=customer'),
-        api.get('users/?role=agent')
+        api.get('users/?role=agent'),
+        api.get('bills/')
       ]);
       setInstallations(instRes.data);
       setCustomers(custRes.data);
       setAgents(agentRes.data);
+      setBills(billsRes.data || []);
     } catch (err) {
       console.error("Error fetching installations dataset", err);
     } finally {
@@ -247,47 +250,78 @@ function Installations() {
               <thead>
                 <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5 bg-white/5">
                   <th className="py-5 px-6 font-semibold">Node Client</th>
-                  <th className="py-5 px-6 font-semibold">Geography</th>
                   <th className="py-5 px-6 font-semibold">Topology</th>
-                  <th className="py-5 px-6 font-semibold">Agent Link</th>
-                  <th className="py-5 px-6 font-semibold text-center">Net Status</th>
+                  <th className="py-5 px-6 font-semibold">Handover Agent</th>
+                  <th className="py-5 px-6 font-semibold">Date Completed</th>
+                  <th className="py-5 px-6 font-semibold text-center">Payment</th>
+                  <th className="py-5 px-6 font-semibold text-center">Status</th>
                   <th className="py-5 px-6 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredList.map((item) => (
-                  <motion.tr 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    key={item.id} 
-                    className="hover:bg-white/5 transition"
-                  >
-                    <td className="py-5 px-6 font-medium text-gray-200">{item.client_name}</td>
-                    <td className="py-5 px-6 text-gray-400">{item.location || 'Unknown Sector'}</td>
-                    <td className="py-5 px-6">
-                        <span className="bg-white/5 text-gray-300 px-3 py-1 rounded-lg text-xs font-bold border border-white/10">
-                            {item.system}
-                        </span>
-                    </td>
-                    <td className="py-5 px-6 text-gray-400 text-sm">{item.agent_name || <span className="italic opacity-50">Unlinked</span>}</td>
-                    <td className="py-5 px-6 text-center">
-                      <button 
-                        onClick={() => cycleStatus(item)} 
-                        className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition border ${
-                          item.status === 'Completed' ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20' : 
-                          item.status === 'Follow Up' ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 
-                          item.status === 'In Progress' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20' :
-                          'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20'
-                        }`}
-                      >
-                        {item.status}
-                      </button>
-                    </td>
-                    <td className="py-5 px-6 text-right space-x-4">
-                      <button onClick={() => openEditModal(item)} className="text-gray-400 hover:text-orange-400 font-semibold text-sm transition">Mod</button>
-                      <button onClick={() => handleDelete(item.id)} className="text-gray-600 hover:text-red-500 font-semibold text-sm transition">Purge</button>
-                    </td>
-                  </motion.tr>
-                ))}
+                {filteredList.map((item) => {
+                  const clientBill = bills.find(b => b.client === item.client);
+                  const payStatus = clientBill ? clientBill.status : "No Bill";
+                  
+                  return (
+                    <motion.tr 
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      key={item.id} 
+                      className="hover:bg-white/5 transition"
+                    >
+                      <td className="py-5 px-6 font-medium text-gray-200 line-clamp-1">
+                         <span className="capitalize">{item.client_name}</span>
+                         <div className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">{item.location || 'Unknown Sector'}</div>
+                      </td>
+                      <td className="py-5 px-6">
+                          <span className="bg-white/5 text-gray-300 px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold border border-white/10">
+                              {item.system}
+                          </span>
+                      </td>
+                      <td className="py-5 px-6 font-bold text-blue-400 text-xs tracking-wider uppercase">
+                          {item.agent_name || <span className="italic opacity-50 text-gray-500">Unassigned</span>}
+                      </td>
+                      <td className="py-5 px-6 text-gray-300 font-bold text-xs">
+                          {item.status === 'Completed' ? (
+                             <span className="text-green-400 bg-green-500/10 px-2 py-1 rounded inline-block">{item.date}</span>
+                          ) : (
+                             <span>{item.date} <span className="text-gray-600 text-[10px] uppercase tracking-wider block mt-1">Target</span></span>
+                          )}
+                      </td>
+                      <td className="py-5 px-6 text-center">
+                          <span className={`px-2 py-1 rounded text-[10px] uppercase tracking-widest font-bold ${
+                             payStatus === 'Paid' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 
+                             payStatus === 'Pending' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 
+                             payStatus === 'Unpaid' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                             'bg-gray-500/10 text-gray-400 border border-gray-500/20'
+                          }`}>
+                             {payStatus}
+                          </span>
+                      </td>
+                      <td className="py-5 px-6 text-center">
+                        <button 
+                          onClick={() => cycleStatus(item)} 
+                          className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold cursor-pointer transition border ${
+                            item.status === 'Completed' ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20' : 
+                            item.status === 'Follow Up' ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 
+                            item.status === 'In Progress' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20' :
+                            'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20'
+                          }`}
+                        >
+                          {item.status}
+                        </button>
+                      </td>
+                      <td className="py-5 px-6 text-right space-x-3">
+                        <button onClick={() => openEditModal(item)} className="p-2 bg-blue-500/10 hover:bg-blue-500 border border-blue-500/30 text-blue-400 hover:text-white rounded-lg transition" title="Modify">
+                            <PenTool className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDelete(item.id)} className="text-gray-600 hover:text-red-500 font-semibold text-xs tracking-wider transition underline decoration-gray-700 hover:decoration-red-500 uppercase">
+                           Purge
+                        </button>
+                      </td>
+                    </motion.tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
