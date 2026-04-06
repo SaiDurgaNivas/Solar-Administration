@@ -276,7 +276,7 @@ function Customers() {
                   <th className="py-5 px-6 font-semibold">Customer</th>
                   <th className="py-5 px-6 font-semibold">Email</th>
                   <th className="py-5 px-6 font-semibold">Date & Time</th>
-                  <th className="py-5 px-6 font-semibold">Tier</th>
+                  <th className="py-5 px-6 font-semibold">Contact & Address</th>
                   <th className="py-5 px-6 font-semibold text-center">Status</th>
                   <th className="py-5 px-6 font-semibold text-center">Actions</th>
                 </tr>
@@ -298,7 +298,10 @@ function Customers() {
                       {item.date_joined ? new Date(item.date_joined).toLocaleString() : "N/A"}
                     </td>
                     <td className="py-5 px-6 text-gray-400 text-sm">
-                      <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full font-bold uppercase tracking-widest text-[#9ca3af] text-[10px]">Tier 1</span>
+                      <div className="flex flex-col gap-1">
+                          <span className="text-gray-300 font-medium">{item.customer_profile?.phone || "No Phone"}</span>
+                          <span className="text-xs text-gray-500 truncate max-w-[150px]" title={item.customer_profile?.address || "No Address"}>{item.customer_profile?.address || "No Address Added"}</span>
+                      </div>
                     </td>
                     <td className="py-5 px-6 text-center">
                       <span className="px-3 py-1 rounded-full text-xs font-bold border bg-green-500/10 text-green-400 border-green-500/20">Active</span>

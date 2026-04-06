@@ -24,7 +24,7 @@ function Bills() {
         const billsData = billRes.data;
         // Extract bookings with final invoices and convert to bill-like format
         const invoicesFromBookings = bookingRes.data
-          .filter(b => b.documents?.final_invoice)
+          .filter(b => b.documents?.final_invoice || b.status === 'Loan Approved' || b.status === 'Sanctioned')
           .map(b => ({
             id: `invoice-${b.id}`,
             bill_no: `INV-${b.id}`,
@@ -34,7 +34,7 @@ function Bills() {
             status: "Paid",
             type: "invoice",
             booking_id: b.id,
-            final_invoice: b.documents.final_invoice,
+            final_invoice: b.documents?.final_invoice || '#pending',
             address: b.address
           }));
         
