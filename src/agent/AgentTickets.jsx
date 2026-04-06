@@ -12,9 +12,7 @@ function AgentTickets() {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
-        if (!user) return;
-        const res = await api.get(`users/?agent_id=${user.id}`);
+        const res = await api.get(`users/?role=sub_worker`);
         setTeam(res.data || []);
       } catch (err) {
         console.error("Agent team fetch err:", err);

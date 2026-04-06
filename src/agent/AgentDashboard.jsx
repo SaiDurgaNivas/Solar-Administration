@@ -58,8 +58,7 @@ const AgentDashboard = () => {
 
   const fetchTeam = async () => {
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
-        const res = await api.get(`users/?agent_id=${user.id}`);
+        const res = await api.get(`users/?role=sub_worker`);
         setTeam(res.data);
     } catch(err) {
         console.error(err);
@@ -436,7 +435,7 @@ const AgentDashboard = () => {
                                      value={dispatchInfo[req.id]?.location_link || ''}
                                      onChange={e => setDispatchInfo({...dispatchInfo, [req.id]: {...dispatchInfo[req.id], location_link: e.target.value}})}
                                   />
-                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block pt-1">Assign Lead Lead</label>
+                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block pt-1">Assign Lead Technician</label>
                                   <select 
                                      className="w-full bg-[#020617] border border-white/10 p-2 outline-none focus:border-cyan-500 rounded text-xs text-white"
                                      value={dispatchInfo[req.id]?.sub_worker_id || ''}
