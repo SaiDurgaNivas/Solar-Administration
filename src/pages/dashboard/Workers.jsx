@@ -83,7 +83,8 @@ function Workers() {
       fetchData();
     } catch(error) {
       console.error(error);
-      showToast("Failed to remove worker.");
+      const errMsg = error.response?.data?.detail || error.response?.statusText || "Network Error";
+      showToast(`Failed to remove worker: ${errMsg}`);
     }
   };
 
