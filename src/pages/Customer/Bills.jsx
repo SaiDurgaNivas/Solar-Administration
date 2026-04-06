@@ -9,7 +9,7 @@ function Bills() {
   const [loading, setLoading] = useState(true);
   
   // Payment Modal State
-  const [paymentModal, setPaymentModal] = useState({ open: false, bill: null, step: 1, method: 'upi', successData: null });
+  const [paymentModal, setPaymentModal] = useState({ open: false, bill: null, step: 1, method: 'upi', successData: null, selectedSlot: 'full' });
 
   useEffect(() => {
     const userStr = sessionStorage.getItem("solar_user");
@@ -45,6 +45,19 @@ function Bills() {
           return dateB - dateA;
         });
         
+        if (combined.length === 0) {
+            // Provide a dummy bill so the UI can be tested if user has no records
+            combined.push({
+                id: 'demo-bill-1',
+                bill_no: 'DEMO-INV-001',
+                date: new Date().toISOString().split('T')[0],
+                units: 0,
+                amount: 158000,
+                status: 'Unpaid',
+                type: 'installation'
+            });
+        }
+        
         setBills(combined);
       })
       .catch(err => console.error("Fetch error", err))
@@ -60,7 +73,7 @@ function Bills() {
   const totalPending = bills.filter((b) => b.status === "Unpaid").reduce((sum, b) => sum + parseFloat(b.amount), 0);
 
   const openPaymentGate = (bill) => {
-      setPaymentModal({ open: true, bill, step: 1, method: 'upi', successData: null });
+      setPaymentModal({ open: true, bill, step: 1, method: 'upi', successData: null, selectedSlot: 'full' });
   };
 
   const executePayment = async () => {
@@ -103,24 +116,44 @@ function Bills() {
                         <h2 className="text-2xl font-extrabold mb-1">Checkout</h2>
                         <p className="text-xs text-orange-400 font-bold uppercase tracking-widest mb-8">Secure Payment Gateway</p>
                         
-                        <div className="space-y-4 text-sm font-medium mb-8">
-                            <div className="flex justify-between border-b border-white/10 pb-3">
-                                <span className="opacity-70">Gross System Cost</span>
-                                <span>₹{(parseFloat(paymentModal.bill.amount) + 78000 + 40000).toLocaleString()}</span>
+                        {paymentModal.bill && (
+                            <div className="space-y-4 text-sm font-medium mb-8">
+                                <div className="flex justify-between border-b border-white/10 pb-3">
+                                    <span className="opacity-70">Gross System Cost</span>
+                                    <span>₹{(parseFloat(paymentModal.bill.amount) + 78000 + 40000).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-white/10 pb-3 text-green-400">
+                                    <span>Govt Subsidy Applied</span>
+                                    <span>- ₹78,000</span>
+                                </div>
+                                <div className="flex justify-between border-b border-white/10 pb-3 text-orange-400">
+                                    <span>Financed Loan</span>
+                                    <span>- ₹40,000</span>
+                                </div>
+                                <div className="flex justify-between pt-3 text-xl font-extrabold text-white">
+                                    <span>Total Payable</span>
+                                    <span>₹{parseFloat(paymentModal.bill.amount).toLocaleString()}</span>
+                                </div>
+
+                                <div className="mt-6 pt-4 border-t border-white/10">
+                                    <h4 className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-3">Installment Breakdown</h4>
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex justify-between text-gray-300">
+                                            <span>Slot 1: Advance Booking</span>
+                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-300">
+                                            <span>Slot 2: Hardware Delivery</span>
+                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-300">
+                                            <span>Slot 3: Post-Installation</span>
+                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.34).toFixed(0).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex justify-between border-b border-white/10 pb-3 text-green-400">
-                                <span>Govt Subsidy Applied</span>
-                                <span>- ₹78,000</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/10 pb-3 text-orange-400">
-                                <span>Financed Loan Amount</span>
-                                <span>- ₹40,000</span>
-                            </div>
-                            <div className="flex justify-between pt-3 text-xl font-extrabold text-white">
-                                <span>Downpayment</span>
-                                <span>₹{parseFloat(paymentModal.bill.amount).toLocaleString()}</span>
-                            </div>
-                        </div>
+                        )}
                     </div>
                     
                     <div className="flex items-center gap-2 opacity-50 text-xs font-bold uppercase tracking-widest text-green-400">
@@ -171,8 +204,22 @@ function Bills() {
                                 )}
                             </div>
 
+                            <div className="mb-4">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Select Payment Slot</label>
+                                <select 
+                                    className="w-full bg-[#0f172a] border border-white/20 p-3 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm appearance-none"
+                                    value={paymentModal.selectedSlot}
+                                    onChange={(e) => setPaymentModal({...paymentModal, selectedSlot: e.target.value})}
+                                >
+                                    <option value="full">Pay Full Amount (₹{parseFloat(paymentModal.bill.amount).toLocaleString()})</option>
+                                    <option value="slot1">Slot 1: Advance Booking (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
+                                    <option value="slot2">Slot 2: Hardware Delivery (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
+                                    <option value="slot3">Slot 3: Final Payment (₹{(parseFloat(paymentModal.bill.amount)*0.34).toFixed(0)})</option>
+                                </select>
+                            </div>
+
                             <button onClick={executePayment} className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-extrabold py-4 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] transition uppercase tracking-widest text-sm">
-                                Pay ₹{parseFloat(paymentModal.bill.amount).toLocaleString()}
+                                Pay Now
                             </button>
                         </motion.div>
                     )}
@@ -188,7 +235,7 @@ function Bills() {
                         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center justify-center h-full py-6 text-center pb-10">
                             <CheckCircle className="w-20 h-20 text-green-500 mb-4 shadow-[0_0_30px_rgba(34,197,94,0.4)] rounded-full bg-green-500/10" />
                             <h2 className="text-2xl font-bold text-white mb-2">Payment Successful!</h2>
-                            <p className="text-gray-400 text-xs mb-8">This payment has been sent to Administration digitally.</p>
+                            <p className="text-green-400 font-bold text-xs mb-8 uppercase tracking-widest">Admin Team has been notified</p>
                             
                             <div className="bg-white/5 border border-white/10 p-5 rounded-xl w-full text-left mb-8 text-sm">
                                 <div className="flex justify-between mb-3"><span className="text-gray-500">Transaction ID:</span> <span className="font-mono font-bold text-gray-300">{paymentModal.successData?.transactionId}</span></div>
