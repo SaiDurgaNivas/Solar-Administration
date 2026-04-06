@@ -23,54 +23,26 @@ def login_view(request):
     # Simplified lookup for testing
     user = User.objects.filter(email=email).first()
     
-    # Optional DB check, but if we want to honor our hardcoded demo fallback:
     requested_role = request.data.get('role', 'customer')
-    if requested_role not in ['admin', 'agent', 'sub_worker', 'customer']:
-        requested_role = 'customer'
 
     if not user:
-        if email == "admin@gmail.com":
+        if email == "admin@gmail.com" and password == "admin123":
             user, _ = User.objects.get_or_create(username="Admin", email=email, role="admin")
             user.set_password('admin123')
             user.save()
-        elif email == "agent@gmail.com":
+        elif email == "agent@gmail.com" and password == "agent123":
             user, _ = User.objects.get_or_create(username="Agent", email=email, role="agent")
             user.set_password('agent123')
             user.save()
         else:
-            first = request.data.get('first_name', '')
-            last = request.data.get('last_name', '')
-
-            user, created = User.objects.get_or_create(
-                email=email,
-                defaults={
-                    'username': email.split('@')[0],
-                    'role': requested_role,
-                    'first_name': first,
-                    'last_name': last
-                }
-            )
-
-            user.set_password(password)
-            user.first_name = first if first else user.first_name
-            user.last_name = last if last else user.last_name
-            user.role = requested_role
-            user.save()
-
-            if created and requested_role == 'customer':
-                send_mail(
-                    subject="Welcome to Solar Administration",
-                    message=f"Hello {first} {last},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[email],
-                    fail_silently=True,
-                )
+            return Response({'error': 'No account found with this email. Please register.'}, status=status.HTTP_404_NOT_FOUND)
     else:
-        # If the current user exists as a customer but is logging in as a worker/agent,
-        # allow the role to be corrected for this demo environment.
-        if user.role == 'customer' and requested_role in ['agent', 'sub_worker']:
-            user.role = requested_role
-            user.save()
+        if not user.check_password(password):
+            return Response({'error': 'Incorrect password. Try again.'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        # Ensure user can only login to their specific portal (admins can login anywhere)
+        if user.role != requested_role and user.role != 'admin':
+            return Response({'error': f'Access Denied: You do not have {requested_role} clearance.'}, status=status.HTTP_403_FORBIDDEN)
 
     # Create dummy data on first customer creation
     if user.role == 'customer' and not Installation.objects.filter(client=user).exists():
