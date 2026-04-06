@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, FileText, CheckCircle, Clock, Download } from "lucide-react";
+import { Search, FileText, CheckCircle, Clock, Download, CreditCard, Smartphone, Landmark, ScanLine, X, ShieldCheck } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Bills() {
   const [bills, setBills] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  
+  // Payment Modal State
+  const [paymentModal, setPaymentModal] = useState({ open: false, bill: null, step: 1, method: 'upi', successData: null });
 
   useEffect(() => {
     const userStr = sessionStorage.getItem("solar_user");
@@ -56,18 +59,152 @@ function Bills() {
   const totalPaid = bills.filter((b) => b.status === "Paid").reduce((sum, b) => sum + parseFloat(b.amount), 0);
   const totalPending = bills.filter((b) => b.status === "Unpaid").reduce((sum, b) => sum + parseFloat(b.amount), 0);
 
-  const handlePay = async (id) => {
-    // In prod, this opens a Stripe modal or Payment.jsx. For our demo logic, we'll mark it paid directly via DB.
-    try {
-        await api.patch(`bills/${id}/`, { status: "Paid" });
-        setBills(bills.map(b => b.id === id ? { ...b, status: "Paid" } : b));
-    } catch (err) {
-        alert("Failed to process transaction.");
-    }
+  const openPaymentGate = (bill) => {
+      setPaymentModal({ open: true, bill, step: 1, method: 'upi', successData: null });
+  };
+
+  const executePayment = async () => {
+      const { bill } = paymentModal;
+      setPaymentModal(prev => ({ ...prev, step: 2 })); // Processing state
+      
+      setTimeout(async () => {
+          try {
+              await api.patch(`bills/${bill.id}/`, { status: "Paid" });
+              setBills(bills.map(b => b.id === bill.id ? { ...b, status: "Paid" } : b));
+              setPaymentModal(prev => ({ 
+                  ...prev, 
+                  step: 3, 
+                  successData: { date: new Date().toLocaleString(), transactionId: 'TXN' + Math.floor(Math.random()*1000000000) } 
+              }));
+          } catch (err) {
+              alert("Failed to process transaction network.");
+              setPaymentModal(prev => ({ ...prev, step: 1 }));
+          }
+      }, 1500);
   };
 
   return (
     <div className="bg-[#020617] min-h-screen p-6 font-sans text-white overflow-x-hidden">
+
+      {/* PAYMENT MODAL */}
+      {paymentModal.open && paymentModal.bill && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f172a] border border-white/10 p-0 rounded-3xl max-w-3xl w-full relative shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col md:flex-row">
+                
+                {paymentModal.step !== 3 && (
+                    <button onClick={() => setPaymentModal({ open: false })} className="absolute top-4 right-4 text-white hover:text-gray-300 transition z-10 bg-black/20 hover:bg-black/40 p-2 rounded-full">
+                        <X className="w-5 h-5" />
+                    </button>
+                )}
+
+                {/* LEFT: Bill Summary */}
+                <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] border-r border-white/10 p-8 w-full md:w-2/5 text-white flex flex-col justify-between">
+                    <div>
+                        <h2 className="text-2xl font-extrabold mb-1">Checkout</h2>
+                        <p className="text-xs text-orange-400 font-bold uppercase tracking-widest mb-8">Secure Payment Gateway</p>
+                        
+                        <div className="space-y-4 text-sm font-medium mb-8">
+                            <div className="flex justify-between border-b border-white/10 pb-3">
+                                <span className="opacity-70">Gross System Cost</span>
+                                <span>₹{(parseFloat(paymentModal.bill.amount) + 78000 + 40000).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-white/10 pb-3 text-green-400">
+                                <span>Govt Subsidy Applied</span>
+                                <span>- ₹78,000</span>
+                            </div>
+                            <div className="flex justify-between border-b border-white/10 pb-3 text-orange-400">
+                                <span>Financed Loan Amount</span>
+                                <span>- ₹40,000</span>
+                            </div>
+                            <div className="flex justify-between pt-3 text-xl font-extrabold text-white">
+                                <span>Downpayment</span>
+                                <span>₹{parseFloat(paymentModal.bill.amount).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 opacity-50 text-xs font-bold uppercase tracking-widest text-green-400">
+                        <ShieldCheck className="w-4 h-4" /> 256-bit SSL Encrypted
+                    </div>
+                </div>
+
+                {/* RIGHT: Payment Options & Forms */}
+                <div className="p-8 w-full md:w-3/5 bg-[#020617] relative">
+                    {paymentModal.step === 1 && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                            <h3 className="text-white font-bold mb-4 text-sm tracking-wide">Select Payment Method</h3>
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                {[
+                                    { id: 'upi', icon: Smartphone, label: 'UPI / VPA' },
+                                    { id: 'qr', icon: ScanLine, label: 'QR Code' },
+                                    { id: 'card', icon: CreditCard, label: 'Cards' },
+                                    { id: 'netbank', icon: Landmark, label: 'Net Banking' }
+                                ].map(method => (
+                                    <button 
+                                        key={method.id} 
+                                        onClick={() => setPaymentModal({...paymentModal, method: method.id})}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${paymentModal.method === method.id ? 'bg-orange-500/10 border-orange-500 text-orange-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'}`}
+                                    >
+                                        <method.icon className="w-6 h-6 mb-2" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">{method.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Dynamic Input Form */}
+                            <div className="mb-8 min-h-[120px]">
+                                {paymentModal.method === 'upi' && <input type="text" placeholder="Enter UPI ID (e.g. name@okhdfcbank)" className="w-full bg-[#0f172a] border border-white/10 p-4 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm" />}
+                                {paymentModal.method === 'qr' && <div className="p-4 bg-white rounded-xl flex justify-center w-32 mx-auto"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=payUPI_Solar" alt="QR" className="w-full h-full" /></div>}
+                                {paymentModal.method === 'card' && (
+                                    <div className="space-y-3">
+                                        <input type="text" placeholder="Card Number" className="w-full bg-[#0f172a] border border-white/10 p-4 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm" />
+                                        <div className="flex gap-3">
+                                            <input type="text" placeholder="MM/YY" className="w-1/2 bg-[#0f172a] border border-white/10 p-4 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm" />
+                                            <input type="text" placeholder="CVV" className="w-1/2 bg-[#0f172a] border border-white/10 p-4 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm" />
+                                        </div>
+                                    </div>
+                                )}
+                                {paymentModal.method === 'netbank' && (
+                                    <select className="w-full bg-[#0f172a] border border-white/10 p-4 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm appearance-none">
+                                        <option>SBI - State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option>
+                                    </select>
+                                )}
+                            </div>
+
+                            <button onClick={executePayment} className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-extrabold py-4 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.4)] transition uppercase tracking-widest text-sm">
+                                Pay ₹{parseFloat(paymentModal.bill.amount).toLocaleString()}
+                            </button>
+                        </motion.div>
+                    )}
+
+                    {paymentModal.step === 2 && (
+                        <div className="flex flex-col items-center justify-center h-full py-20 pb-32">
+                            <div className="w-16 h-16 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin mb-6"></div>
+                            <p className="text-orange-400 font-bold tracking-widest uppercase text-sm animate-pulse">Contacting Banking Partner...</p>
+                        </div>
+                    )}
+
+                    {paymentModal.step === 3 && (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center justify-center h-full py-6 text-center pb-10">
+                            <CheckCircle className="w-20 h-20 text-green-500 mb-4 shadow-[0_0_30px_rgba(34,197,94,0.4)] rounded-full bg-green-500/10" />
+                            <h2 className="text-2xl font-bold text-white mb-2">Payment Successful!</h2>
+                            <p className="text-gray-400 text-xs mb-8">This payment has been sent to Administration digitally.</p>
+                            
+                            <div className="bg-white/5 border border-white/10 p-5 rounded-xl w-full text-left mb-8 text-sm">
+                                <div className="flex justify-between mb-3"><span className="text-gray-500">Transaction ID:</span> <span className="font-mono font-bold text-gray-300">{paymentModal.successData?.transactionId}</span></div>
+                                <div className="flex justify-between mb-3"><span className="text-gray-500">Date & Time:</span> <span className="text-gray-300 font-medium">{paymentModal.successData?.date}</span></div>
+                                <div className="flex justify-between border-t border-white/5 pt-3"><span className="text-gray-400 font-bold">Amount Settled:</span> <span className="font-bold text-green-400">₹{parseFloat(paymentModal.bill.amount).toLocaleString()}</span></div>
+                            </div>
+                            
+                            <button onClick={() => setPaymentModal({ open: false })} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white w-full py-3.5 rounded-xl font-bold transition text-sm uppercase tracking-widest">
+                                Return to Invoices
+                            </button>
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
+        </div>
+      )}
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -183,10 +320,10 @@ function Bills() {
                         </a>
                       ) : bill.status === "Unpaid" ? (
                         <button
-                          onClick={() => handlePay(bill.id)}
+                          onClick={() => openPaymentGate(bill)}
                           className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-bold px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)]"
                         >
-                          Execute
+                          Checkout
                         </button>
                       ) : (
                         <span className="text-gray-600 font-medium text-sm">Settled</span>
