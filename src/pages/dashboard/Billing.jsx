@@ -33,7 +33,21 @@ function Billing() {
             api.get('bills/'),
             api.get('users/?role=customer')
         ]);
-        setBills(billsRes.data);
+        let billsData = billsRes.data;
+        const demoStatus = localStorage.getItem('demo_bill_status');
+        if (demoStatus) {
+            billsData = [{
+                id: 'demo-bill-1',
+                bill_no: 'DEMO-INV-001',
+                client_name: 'nivasreddynr',
+                date: new Date().toISOString().split('T')[0],
+                units: 0,
+                amount: 158000,
+                status: demoStatus
+            }, ...billsData];
+        }
+        
+        setBills(billsData);
         setCustomers(custRes.data);
     } catch (err) {
         console.error("Failed to fetch billing data", err);
@@ -243,6 +257,8 @@ function Billing() {
                       <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider uppercase border ${
                           bill.status === "Paid"
                             ? "bg-green-500/10 text-green-400 border-green-500/30"
+                            : bill.status?.includes("Slot")
+                            ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
                             : "bg-red-500/10 text-red-500 border-red-500/30"
                       }`}>
                         {bill.status}

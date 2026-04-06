@@ -89,6 +89,9 @@ function Bills() {
 
               if (bill.id !== 'demo-bill-1') {
                   await api.patch(`bills/${bill.id}/`, { status: newStatus });
+              } else {
+                  // Save dummy bill state for Admin Dashboard sync
+                  localStorage.setItem('demo_bill_status', newStatus);
               }
               setBills(bills.map(b => b.id === bill.id ? { ...b, status: newStatus } : b));
               setPaymentModal(prev => ({ 
