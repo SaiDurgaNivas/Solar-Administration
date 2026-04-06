@@ -1,0 +1,278 @@
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.contrib.auth import authenticate
+from .models import User, CustomerProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate
+from .serializers import UserSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.core.mail import send_mail
+from django.conf import settings
+
+@api_view(['POST'])
+def login_view(request):
+    """
+    Dummy check representing our secure backend login. 
+    In prod, this returns a JWT or sets a session cookie.
+    """
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    if not email or not password:
+        return Response({'error': 'Please provide email and password'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Simplified lookup for testing
+    user = User.objects.filter(email=email).first()
+    
+    # Optional DB check, but if we want to honor our hardcoded demo fallback:
+    requested_role = request.data.get('role', 'customer')
+    if requested_role not in ['admin', 'agent', 'sub_worker', 'customer']:
+        requested_role = 'customer'
+
+    if not user:
+        if email == "admin@gmail.com":
+            user, _ = User.objects.get_or_create(username="Admin", email=email, role="admin")
+            user.set_password('admin123')
+            user.save()
+        elif email == "agent@gmail.com":
+            user, _ = User.objects.get_or_create(username="Agent", email=email, role="agent")
+            user.set_password('agent123')
+            user.save()
+        else:
+            first = request.data.get('first_name', '')
+            last = request.data.get('last_name', '')
+
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email.split('@')[0],
+                    'role': requested_role,
+                    'first_name': first,
+                    'last_name': last
+                }
+            )
+
+            user.set_password(password)
+            user.first_name = first if first else user.first_name
+            user.last_name = last if last else user.last_name
+            user.role = requested_role
+            user.save()
+
+            if created and requested_role == 'customer':
+                send_mail(
+                    subject="Welcome to Solar Administration",
+                    message=f"Hello {first} {last},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=True,
+                )
+    else:
+        # If the current user exists as a customer but is logging in as a worker/agent,
+        # allow the role to be corrected for this demo environment.
+        if user.role == 'customer' and requested_role in ['agent', 'sub_worker']:
+            user.role = requested_role
+            user.save()
+
+    # Create dummy data on first customer creation
+    if user.role == 'customer' and not Installation.objects.filter(client=user).exists():
+        Installation.objects.create(system="5KW Residential Setup", status="Pending", client=user, location="Demo Site")
+        Bill.objects.create(client=user, bill_no="B001", units=120, amount=1500, loan=500, subsidy=200, downpayment=800, status="Paid")
+        Bill.objects.create(client=user, bill_no="B002", units=95, amount=1100, loan=400, subsidy=150, downpayment=550, status="Unpaid")
+        Bill.objects.create(client=user, bill_no="B003", units=140, amount=1800, loan=700, subsidy=300, downpayment=800, status="Paid")
+        UsageTelemetry.objects.create(client=user, monthly_avg=140, total_units=450, efficiency=91)
+
+    serializer = UserSerializer(user)
+    return Response({'user': serializer.data, 'token': 'dummy-token-for-now'})
+
+@api_view(['POST'])
+def register_view(request):
+    """
+    Register a new user account.
+    """
+    email = request.data.get('email')
+    password = request.data.get('password')
+    first_name = request.data.get('first_name', '')
+    last_name = request.data.get('last_name', '')
+    role = request.data.get('role', 'customer')
+
+    if not email or not password:
+        return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(password) < 6:
+        return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create new user
+    user = User.objects.create_user(
+        username=email.split('@')[0],
+        email=email,
+        password=password,
+        first_name=first_name,
+        last_name=last_name,
+        role=role
+    )
+
+    # Create customer profile if role is customer
+    if role == 'customer':
+        CustomerProfile.objects.create(user=user)
+
+        # Send welcome email
+        send_mail(
+            subject="Welcome to Solar Administration",
+            message=f"Hello {first_name} {last_name},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=True,
+        )
+
+    serializer = UserSerializer(user)
+    return Response({
+        'message': 'Registration successful',
+        'user': serializer.data
+    }, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def oauth_login_view(request):
+    """
+    Simulates Google/Email SSO login from Web.
+    """
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'No web email provided for OAuth'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.filter(email=email).first()
+
+    if not user:
+        requested_role = request.data.get('role', 'customer')
+        if requested_role not in ['admin', 'agent', 'sub_worker', 'customer']:
+            requested_role = 'customer'
+
+        user = User.objects.create(
+            username=email,
+            email=email,
+            role=requested_role
+        )
+        user.set_password('oauth_magic_123')
+        user.save()
+
+        # Seed initial data for demo
+        Installation.objects.create(system="10KW Smart Grid SSO", status="Pending", client=user, location="Web Client Area")
+        UsageTelemetry.objects.create(client=user, monthly_avg=100, total_units=200, efficiency=99)
+
+    serializer = UserSerializer(user)
+    return Response({'user': serializer.data, 'token': 'oauth-session-token'})
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        role = self.request.query_params.get('role', None)
+        agent_id = self.request.query_params.get('agent_id', None)
+        
+        if role:
+            queryset = queryset.filter(role=role)
+        if agent_id:
+            # Filter sub workers assigned to this agent
+            queryset = queryset.filter(subworker_profile__agent=agent_id)
+            
+        return queryset
+
+class InstallationViewSet(viewsets.ModelViewSet):
+    queryset = Installation.objects.all()
+    serializer_class = InstallationSerializer
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+    def get_queryset(self):
+        queryset = Booking.objects.all()
+        client_id = self.request.query_params.get('client_id')
+        agent_id = self.request.query_params.get('agent_id')
+        status_filter = self.request.query_params.get('status')
+        
+        if client_id:
+            queryset = queryset.filter(client_id=client_id)
+        if agent_id:
+            queryset = queryset.filter(agent_id=agent_id)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+            
+        return queryset.order_by('-created_at')
+
+class BookingDocumentViewSet(viewsets.ModelViewSet):
+    queryset = BookingDocument.objects.all()
+    serializer_class = BookingDocumentSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    
+    def get_queryset(self):
+        booking_id = self.request.query_params.get('booking_id')
+        if booking_id:
+            return BookingDocument.objects.filter(booking_id=booking_id)
+        return BookingDocument.objects.all()
+
+class BillViewSet(viewsets.ModelViewSet):
+    queryset = Bill.objects.all()
+    serializer_class = BillSerializer
+
+    def get_queryset(self):
+        client_id = self.request.query_params.get('client_id')
+        if client_id:
+            return Bill.objects.filter(client_id=client_id)
+        return Bill.objects.all()
+
+class UsageTelemetryViewSet(viewsets.ModelViewSet):
+    queryset = UsageTelemetry.objects.all()
+    serializer_class = UsageTelemetrySerializer
+
+    def get_queryset(self):
+        client_id = self.request.query_params.get('client_id')
+        if client_id:
+            return UsageTelemetry.objects.filter(client_id=client_id)
+        return UsageTelemetry.objects.all()
+
+from .models import WorkerAttendance, TeamTask
+from .serializers import WorkerAttendanceSerializer, TeamTaskSerializer
+
+class WorkerAttendanceViewSet(viewsets.ModelViewSet):
+    queryset = WorkerAttendance.objects.all()
+    serializer_class = WorkerAttendanceSerializer
+
+    def get_queryset(self):
+        worker_id = self.request.query_params.get('worker_id')
+        if worker_id:
+            return WorkerAttendance.objects.filter(worker_id=worker_id)
+        return WorkerAttendance.objects.all()
+
+class TeamTaskViewSet(viewsets.ModelViewSet):
+    queryset = TeamTask.objects.all()
+    serializer_class = TeamTaskSerializer
+
+    def get_queryset(self):
+        queryset = TeamTask.objects.all().order_by('-updated_at')
+        agent_id = self.request.query_params.get('agent', None)
+        sub_worker_id = self.request.query_params.get('sub_worker', None)
+        status = self.request.query_params.get('status', None)
+        
+        if agent_id:
+            queryset = queryset.filter(agent_id=agent_id)
+        if sub_worker_id:
+            queryset = queryset.filter(sub_worker_id=sub_worker_id)
+        if status:
+            queryset = queryset.filter(status=status)
+            
+        return queryset
+
+class WorkerUpdateViewSet(viewsets.ModelViewSet):
+    queryset = WorkerUpdate.objects.all()
+    serializer_class = WorkerUpdateSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    
+    def get_queryset(self):
+        task_id = self.request.query_params.get('task_id')
+        if task_id:
+            return WorkerUpdate.objects.filter(task_id=task_id)
+        return WorkerUpdate.objects.all()
