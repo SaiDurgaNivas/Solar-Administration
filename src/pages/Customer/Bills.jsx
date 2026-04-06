@@ -69,8 +69,8 @@ function Bills() {
     (bill.address && bill.address.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const totalPaid = bills.filter((b) => b.status === "Paid").reduce((sum, b) => sum + parseFloat(b.amount), 0);
-  const totalPending = bills.filter((b) => b.status === "Unpaid").reduce((sum, b) => sum + parseFloat(b.amount), 0);
+  const totalPaid = bills.filter((b) => b.status === "Paid" || b.status?.includes("Slot")).reduce((sum, b) => sum + parseFloat(b.amount), 0); // Note: Simple sum for now
+  const totalPending = bills.filter((b) => b.status !== "Paid" && b.type !== "invoice").reduce((sum, b) => sum + parseFloat(b.amount), 0);
 
   const openPaymentGate = (bill) => {
       setPaymentModal({ open: true, bill, step: 1, method: 'upi', successData: null, selectedSlot: 'full' });
@@ -82,13 +82,19 @@ function Bills() {
       
       setTimeout(async () => {
           try {
+              let newStatus = "Paid";
+              if (paymentModal.selectedSlot === 'slot1') newStatus = "Slot 1 Paid";
+              else if (paymentModal.selectedSlot === 'slot2') newStatus = "Slot 2 Paid";
+              else if (paymentModal.selectedSlot === 'slot3' || paymentModal.selectedSlot === 'full') newStatus = "Paid";
+
               if (bill.id !== 'demo-bill-1') {
-                  await api.patch(`bills/${bill.id}/`, { status: "Paid" });
+                  await api.patch(`bills/${bill.id}/`, { status: newStatus });
               }
-              setBills(bills.map(b => b.id === bill.id ? { ...b, status: "Paid" } : b));
+              setBills(bills.map(b => b.id === bill.id ? { ...b, status: newStatus } : b));
               setPaymentModal(prev => ({ 
                   ...prev, 
                   step: 3, 
+                  newStatusValue: newStatus,
                   successData: { date: new Date().toLocaleString(), transactionId: 'TXN' + Math.floor(Math.random()*1000000000) } 
               }));
           } catch (err) {
@@ -142,16 +148,16 @@ function Bills() {
                                     <h4 className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-3">Installment Breakdown</h4>
                                     <div className="space-y-2 text-xs">
                                         <div className="flex justify-between text-gray-300">
-                                            <span>Slot 1: Advance Booking</span>
-                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
+                                            <span className={paymentModal.bill.status === "Unpaid" ? "" : "line-through opacity-40 text-green-500"}>Slot 1: Advance Booking</span>
+                                            <span className={paymentModal.bill.status === "Unpaid" ? "" : "line-through opacity-40"}>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
                                         </div>
                                         <div className="flex justify-between text-gray-300">
-                                            <span>Slot 2: Hardware Delivery</span>
-                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
+                                            <span className={["Unpaid", "Slot 1 Paid"].includes(paymentModal.bill.status) ? "" : "line-through opacity-40 text-green-500"}>Slot 2: Hardware Delivery</span>
+                                            <span className={["Unpaid", "Slot 1 Paid"].includes(paymentModal.bill.status) ? "" : "line-through opacity-40"}>₹{(parseFloat(paymentModal.bill.amount) * 0.33).toFixed(0).toLocaleString()}</span>
                                         </div>
                                         <div className="flex justify-between text-gray-300">
-                                            <span>Slot 3: Post-Installation</span>
-                                            <span>₹{(parseFloat(paymentModal.bill.amount) * 0.34).toFixed(0).toLocaleString()}</span>
+                                            <span className={["Unpaid", "Slot 1 Paid", "Slot 2 Paid"].includes(paymentModal.bill.status) ? "" : "line-through opacity-40 text-green-500"}>Slot 3: Post-Installation</span>
+                                            <span className={["Unpaid", "Slot 1 Paid", "Slot 2 Paid"].includes(paymentModal.bill.status) ? "" : "line-through opacity-40"}>₹{(parseFloat(paymentModal.bill.amount) * 0.34).toFixed(0).toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -208,16 +214,27 @@ function Bills() {
                             </div>
 
                             <div className="mb-4">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Select Payment Slot</label>
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Select Payment To Execute</label>
                                 <select 
                                     className="w-full bg-[#0f172a] border border-white/20 p-3 rounded-xl text-white outline-none focus:border-orange-500 transition text-sm appearance-none"
                                     value={paymentModal.selectedSlot}
                                     onChange={(e) => setPaymentModal({...paymentModal, selectedSlot: e.target.value})}
                                 >
-                                    <option value="full">Pay Full Amount (₹{parseFloat(paymentModal.bill.amount).toLocaleString()})</option>
-                                    <option value="slot1">Slot 1: Advance Booking (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
-                                    <option value="slot2">Slot 2: Hardware Delivery (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
-                                    <option value="slot3">Slot 3: Final Payment (₹{(parseFloat(paymentModal.bill.amount)*0.34).toFixed(0)})</option>
+                                    {paymentModal.bill.status === "Unpaid" && (
+                                        <>
+                                            <option value="full">Pay Full Amount (₹{parseFloat(paymentModal.bill.amount).toLocaleString()})</option>
+                                            <option value="slot1">Slot 1: Advance Booking (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
+                                        </>
+                                    )}
+                                    {paymentModal.bill.status === "Slot 1 Paid" && (
+                                        <>
+                                            <option value="slot2">Slot 2: Hardware Delivery (₹{(parseFloat(paymentModal.bill.amount)*0.33).toFixed(0)})</option>
+                                            <option value="full">Pay All Remaining (Slot 2 & 3)</option>
+                                        </>
+                                    )}
+                                    {paymentModal.bill.status === "Slot 2 Paid" && (
+                                        <option value="slot3">Slot 3: Final Payment (₹{(parseFloat(paymentModal.bill.amount)*0.34).toFixed(0)})</option>
+                                    )}
                                 </select>
                             </div>
 
@@ -238,7 +255,11 @@ function Bills() {
                         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center justify-center h-full py-6 text-center pb-10">
                             <CheckCircle className="w-20 h-20 text-green-500 mb-4 shadow-[0_0_30px_rgba(34,197,94,0.4)] rounded-full bg-green-500/10" />
                             <h2 className="text-2xl font-bold text-white mb-2">Payment Successful!</h2>
-                            <p className="text-green-400 font-bold text-xs mb-8 uppercase tracking-widest">Admin Team has been notified</p>
+                            {paymentModal.newStatusValue === "Paid" ? (
+                                <p className="text-green-400 font-bold text-xs mb-8 uppercase tracking-widest">Admin Team has been notified. Invoice will be generated soon.</p>
+                            ) : (
+                                <p className="text-yellow-400 font-bold text-xs mb-8 uppercase tracking-widest">Installment Paid. Remaining slots must be cleared.</p>
+                            )}
                             
                             <div className="bg-white/5 border border-white/10 p-5 rounded-xl w-full text-left mb-8 text-sm">
                                 <div className="flex justify-between mb-3"><span className="text-gray-500">Transaction ID:</span> <span className="font-mono font-bold text-gray-300">{paymentModal.successData?.transactionId}</span></div>
@@ -336,6 +357,8 @@ function Bills() {
                       <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase border ${
                           bill.status === "Paid"
                             ? "bg-green-500/10 text-green-400 border-green-500/20"
+                            : bill.status?.includes("Slot")
+                            ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
                             : "bg-red-500/10 text-red-400 border-red-500/20"
                       }`}>
                         {bill.status}
@@ -368,12 +391,12 @@ function Bills() {
                           <Download className="w-4 h-4" />
                           Download
                         </a>
-                      ) : bill.status === "Unpaid" ? (
+                      ) : (bill.status === "Unpaid" || bill.status === "Slot 1 Paid" || bill.status === "Slot 2 Paid") ? (
                         <button
                           onClick={() => openPaymentGate(bill)}
                           className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-bold px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)]"
                         >
-                          Checkout
+                          {bill.status === "Unpaid" ? "Checkout" : "Pay Next Slot"}
                         </button>
                       ) : (
                         <span className="text-gray-600 font-medium text-sm">Settled</span>
