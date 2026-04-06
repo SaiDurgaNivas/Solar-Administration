@@ -22,13 +22,39 @@ const AgentDashboard = () => {
 
   const { tickets, resolveTicket } = useTickets();
   const { timeString, dateString, greeting } = useLiveTime();
+  
+  // Attendance State
+  const [selfAttendance, setSelfAttendance] = useState(null);
 
   // Fetch real data from Backend
   useEffect(() => {
     fetchInstallations();
     fetchAppointments();
     fetchTeam();
+    fetchSelfAttendance();
   }, []);
+
+  const fetchSelfAttendance = async () => {
+    try {
+        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        const res = await api.get('attendance/');
+        const todayStr = new Date().toISOString().split('T')[0];
+        const record = res.data.find(a => a.worker === user.id && a.date === todayStr);
+        setSelfAttendance(record);
+    } catch(err) { console.error(err); }
+  };
+
+  const logSelfAttendance = async (status) => {
+    try {
+        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        await api.post('attendance/', { worker: user.id, status });
+        alert(`Attendance marked as ${status} for today!`);
+        fetchSelfAttendance();
+    } catch(err) {
+        if(err.response?.status === 400) alert("Attendance already logged.");
+        else alert("Failed to log attendance.");
+    }
+  };
 
   const fetchTeam = async () => {
     try {
@@ -261,9 +287,23 @@ const AgentDashboard = () => {
               Here is your daily dispatch, active sites, and installation queue.
             </p>
           </div>
-          <div className="bg-[#0f172a]/80 backdrop-blur-md border border-white/10 px-6 py-4 rounded-3xl flex flex-col items-center justify-center min-w-[220px] shadow-2xl">
-             <p className="font-mono text-3xl font-bold tracking-widest text-cyan-400 animate-[pulse_2s_ease-in-out_infinite]">{timeString}</p>
-             <p className="text-xs uppercase text-gray-500 font-bold mt-2 tracking-widest">{dateString}</p>
+          <div className="flex bg-[#0f172a]/80 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-2xl min-w-[280px]">
+             <div className="px-6 py-4 flex flex-col justify-center items-center bg-white/5 border-r border-white/10 flex-1">
+                <p className="font-mono text-3xl font-bold tracking-widest text-orange-400 animate-[pulse_2s_ease-in-out_infinite]">{timeString}</p>
+                <p className="text-xs uppercase text-gray-500 font-bold mt-2 tracking-widest">{dateString}</p>
+             </div>
+             <div className="px-5 py-4 flex flex-col justify-center items-center bg-[#020617] relative w-[130px]">
+                {selfAttendance ? (
+                   <div className="flex flex-col items-center">
+                     <CheckCircle className={`w-8 h-8 mb-1 ${selfAttendance.status === 'Present' ? 'text-green-400' : 'text-yellow-400'}`} />
+                     <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Punched In</span>
+                   </div>
+                ) : (
+                   <button onClick={() => logSelfAttendance("Present")} className="w-full h-full bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 font-bold rounded-xl text-xs uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(249,115,22,0.2)] hover:shadow-[0_0_20px_rgba(249,115,22,0.5)]">
+                      Log Shift
+                   </button>
+                )}
+             </div>
           </div>
         </motion.div>
 

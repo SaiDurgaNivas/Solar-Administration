@@ -44,6 +44,7 @@ import AgentDashboard from "../agent/AgentDashboard";
 import AgentCustomers from "../agent/AgentCustomers";
 import AgentInstallations from "../agent/AgentInstallations";
 import AgentTickets from "../agent/AgentTickets";
+import AgentTeamReports from "../agent/AgentTeamReports";
 
 // 👷 Worker Pages
 import WorkerDashboard from "../worker/WorkerDashboard";
@@ -346,6 +347,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/agent-dashboard/customers" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentCustomers /></ProtectedLayout>} />
       <Route path="/agent-dashboard/installations" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentInstallations /></ProtectedLayout>} />
       <Route path="/agent-dashboard/tickets" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentTickets /></ProtectedLayout>} />
+      <Route path="/agent-dashboard/reports" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentTeamReports /></ProtectedLayout>} />
 
       {/* 👷 WORKER */}
       <Route path="/worker-dashboard" element={<ProtectedLayout user={user} onLogout={onLogout} role="sub_worker"><WorkerDashboard /></ProtectedLayout>} />

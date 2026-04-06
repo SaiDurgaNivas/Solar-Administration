@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Wrench, Users, ShieldAlert, LogOut, Zap } from 'lucide-react';
+import { LayoutDashboard, Wrench, Users, ShieldAlert, LogOut, Zap, BarChart2 } from 'lucide-react';
 import UserProfilePhoto from '../UserProfilePhoto';
 
 function AgentSidebar({ user, onLogout }) {
@@ -58,6 +58,11 @@ function AgentSidebar({ user, onLogout }) {
         <NavLink to="/agent-dashboard/tickets" className={linkClass}>
           <ShieldAlert className="w-5 h-5" />
           Maintenance Tickets
+        </NavLink>
+
+        <NavLink to="/agent-dashboard/reports" className={linkClass}>
+          <BarChart2 className="w-5 h-5" />
+          Team Reports & Duty Log
         </NavLink>
 
       </nav>
