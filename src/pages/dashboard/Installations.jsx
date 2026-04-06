@@ -19,11 +19,13 @@ function Installations() {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => fetchData(false), 4000); // Auto-update every 4s
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (showLoader = true) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
       const [instRes, custRes, agentRes, billsRes] = await Promise.all([
         api.get('installations/'),
         api.get('users/?role=customer'),

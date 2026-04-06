@@ -10,14 +10,15 @@ function AdminBookings() {
   const [activeTab, setActiveTab] = useState('new');
   const [verifyModal, setVerifyModal] = useState({ open: false, booking: null, subCategory: '1', generatedForm: false });
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (showLoader = true) => {
     try {
+      if (showLoader) setLoading(true);
       const response = await api.get('bookings/');
       setBookings(response.data);
     } catch (error) {
       console.error("Error fetching pipeline:", error);
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   };
 
@@ -30,6 +31,8 @@ function AdminBookings() {
 
   useEffect(() => {
     fetchBookings();
+    const interval = setInterval(() => fetchBookings(false), 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const updateBookingStatus = async (id, status) => {
