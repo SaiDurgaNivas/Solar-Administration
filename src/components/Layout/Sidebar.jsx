@@ -40,6 +40,10 @@ function Sidebar({ user, onLogout }) {
           Requests
         </NavLink>
 
+        <NavLink to="/agents" className={linkClass}>
+          Agents
+        </NavLink>
+
         <NavLink to="/workers" className={linkClass}>
           Workers
         </NavLink>
