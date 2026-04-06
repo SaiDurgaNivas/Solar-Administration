@@ -67,12 +67,21 @@ function Billing() {
           return;
       }
       try {
-          await api.post('bills/', billForm);
+          const payload = {
+              ...billForm,
+              units: parseFloat(billForm.units) || 0,
+              amount: parseFloat(billForm.amount) || 0,
+              loan: parseFloat(billForm.loan) || 0,
+              subsidy: parseFloat(billForm.subsidy) || 0,
+              downpayment: parseFloat(billForm.downpayment) || 0
+          };
+          await api.post('bills/', payload);
           setIsModalOpen(false);
+          setBillForm({ client: "", bill_no: "", units: 0, amount: 0, loan: 0, subsidy: 0, downpayment: 0, status: "Unpaid" });
           fetchBills();
       } catch (err) {
-           console.error(err);
-           alert("Invoice generation failed.");
+           console.error("Invoice Error:", err.response?.data);
+           alert("Invoice generation failed: " + JSON.stringify(err.response?.data || err.message));
       }
   };
 
