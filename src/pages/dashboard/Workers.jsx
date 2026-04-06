@@ -11,13 +11,13 @@ function Workers() {
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
-  const [newWorker, setNewWorker] = useState({ username: '', email: '', password: '', role: 'agent' });
+  const [newWorker, setNewWorker] = useState({ username: '', email: '', password: '', role: 'sub_worker' });
   const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
     try {
       const [workersRes, attendanceRes] = await Promise.all([
-        api.get('users/?role=agent'),
+        api.get('users/?role=sub_worker'),
         api.get('attendance/')
       ]);
       setWorkers(workersRes.data || []);
@@ -48,7 +48,7 @@ function Workers() {
       await api.post('users/', { ...newWorker, username: safeUsername });
       showToast("Worker added to grid successfully!");
       setShowModal(false);
-      setNewWorker({ username: '', email: '', password: '', role: 'agent' });
+      setNewWorker({ username: '', email: '', password: '', role: 'sub_worker' });
       fetchData();
     } catch (err) {
       console.error("Error creating worker:", err);
@@ -94,6 +94,16 @@ function Workers() {
     return record ? record.status : "Unmarked";
   };
 
+  const generateCredentials = () => {
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    setNewWorker({
+      username: `Worker_${randomId}`,
+      email: `wrk${randomId}@solar.com`,
+      password: `pass${randomId}!`,
+      role: 'sub_worker'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-10 font-sans relative overflow-hidden">
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
@@ -129,24 +139,33 @@ function Workers() {
                 <X className="w-5 h-5 text-gray-400" />
               </button>
               
-              <h2 className="text-2xl font-bold text-white mb-6">Register New Field Worker</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Provision Field Worker</h2>
+              <p className="text-sm text-gray-400 mb-6 font-semibold">Generate an ID & Password block to grant access.</p>
               
+              <button 
+                  type="button" 
+                  onClick={generateCredentials}
+                  className="w-full mb-6 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 font-bold py-3 rounded-xl flex justify-center items-center gap-2 transition"
+              >
+                 <PlusCircle className="w-5 h-5" /> Auto-Generate Credentials
+              </button>
+
               <form onSubmit={handleAddWorker} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Full Name</label>
-                  <input type="text" required value={newWorker.username} onChange={e => setNewWorker({...newWorker, username: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none" placeholder="Ravi Kumar" />
+                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Worker Deployment Name</label>
+                  <input type="text" required value={newWorker.username} onChange={e => setNewWorker({...newWorker, username: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-cyan-500/50 outline-none" placeholder="e.g. Site Supervisor X" />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Email Address</label>
-                  <input type="email" required value={newWorker.email} onChange={e => setNewWorker({...newWorker, email: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none" placeholder="agent@Solar Administration.com" />
+                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Generated ID (Email Login)</label>
+                  <input type="email" required value={newWorker.email} onChange={e => setNewWorker({...newWorker, email: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-cyan-400 font-mono tracking-widest focus:ring-2 focus:ring-cyan-500/50 outline-none" placeholder="worker20@solar.com" />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Temporary Password</label>
-                  <input type="password" required value={newWorker.password} onChange={e => setNewWorker({...newWorker, password: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none" placeholder="••••••••" />
+                  <label className="block text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Access Passcode</label>
+                  <input type="text" required value={newWorker.password} onChange={e => setNewWorker({...newWorker, password: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-cyan-400 font-mono tracking-widest focus:ring-2 focus:ring-cyan-500/50 outline-none" placeholder="••••••••" />
                 </div>
                 
-                <button type="submit" disabled={submitting} className="w-full mt-6 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-extrabold py-4 rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)] transition duration-300 disabled:opacity-50">
-                  {submitting ? "Provisioning..." : "Assign Worker Role"}
+                <button type="submit" disabled={submitting} className="w-full mt-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-extrabold tracking-widest py-4 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition duration-300 disabled:opacity-50 uppercase">
+                  {submitting ? "Deploying..." : "Assign Worker Role"}
                 </button>
               </form>
             </motion.div>
@@ -160,7 +179,7 @@ function Workers() {
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
             <div>
               <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent flex items-center gap-3">
-                 <HardHat className="w-10 h-10 text-orange-400"/> Field Workers & Agents
+                 <HardHat className="w-10 h-10 text-cyan-400"/> Field Workers Roll
               </h1>
               <p className="text-gray-400 text-lg mt-2 font-medium">Manage deployment teams and track daily attendance</p>
             </div>
@@ -168,14 +187,14 @@ function Workers() {
             {/* Quick Stats & Actions */}
             <div className="flex gap-4 items-center">
                <div className="bg-[#0f172a] border border-white/10 px-5 py-3 rounded-2xl flex items-center gap-3 shadow-lg">
-                  <Users className="w-6 h-6 text-blue-400"/>
+                  <Users className="w-6 h-6 text-cyan-400"/>
                   <div>
                      <p className="text-xl font-bold">{workers.length}</p>
-                     <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Total Agents</p>
+                     <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">Active Workers</p>
                   </div>
                </div>
-               <button onClick={() => setShowModal(true)} className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 px-5 py-3.5 rounded-2xl flex items-center gap-2 font-bold transition shadow-inner">
-                  <PlusCircle className="w-5 h-5"/> Add Worker
+               <button onClick={() => setShowModal(true)} className="bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30 px-5 py-3.5 rounded-2xl flex items-center gap-2 font-bold transition shadow-inner">
+                  <PlusCircle className="w-5 h-5"/> Provision Worker
                </button>
             </div>
         </motion.div>
@@ -205,7 +224,7 @@ function Workers() {
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                      <th className="py-4 px-4 font-semibold w-1/3">Agent Name</th>
+                      <th className="py-4 px-4 font-semibold w-1/3">Worker Identity</th>
                       <th className="py-4 px-4 font-semibold">Today's Status</th>
                       <th className="py-4 px-4 font-semibold text-right">Log Attendance</th>
                     </tr>
