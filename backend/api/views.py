@@ -34,6 +34,10 @@ def login_view(request):
             user, _ = User.objects.get_or_create(username="Agent", email=email, role="agent")
             user.set_password('agent123')
             user.save()
+        elif email == "worker@gmail.com" and password == "worker123":
+            user, _ = User.objects.get_or_create(username="Worker", email=email, role="sub_worker")
+            user.set_password('worker123')
+            user.save()
         else:
             return Response({'error': 'No account found with this email. Please register.'}, status=status.HTTP_404_NOT_FOUND)
     else:
