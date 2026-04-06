@@ -12,61 +12,65 @@ function Bills() {
   const [paymentModal, setPaymentModal] = useState({ open: false, bill: null, step: 1, method: 'upi', successData: null, selectedSlot: 'full' });
 
   useEffect(() => {
+    fetchData();
+    const interval = setInterval(() => fetchData(false), 5000); // Polling every 5s
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchData = async (showLoader = true) => {
     const userStr = sessionStorage.getItem("solar_user");
     if (!userStr) return;
     const user = JSON.parse(userStr);
 
-    Promise.all([
-      api.get(`bills/?client_id=${user.id}`),
-      api.get(`bookings/?client_id=${user.id}`)
-    ])
-      .then(([billRes, bookingRes]) => {
-        const billsData = billRes.data;
-        // Extract bookings with final invoices and convert to bill-like format
-        const invoicesFromBookings = bookingRes.data
-          .filter(b => b.documents?.final_invoice || b.status === 'Loan Approved' || b.status === 'Sanctioned')
-          .map(b => ({
-            id: `invoice-${b.id}`,
-            bill_no: `INV-${b.id}`,
-            date: b.confirmed_date || b.created_at?.split('T')[0],
-            units: 0,
-            amount: b.estimated_cost || 0,
-            status: "Paid",
-            type: "invoice",
-            booking_id: b.id,
-            final_invoice: b.documents?.final_invoice || '#pending',
-            address: b.address
-          }));
-        
-        // Combine bills and invoices, sort by date descending
-        const combined = [...billsData, ...invoicesFromBookings].sort((a, b) => {
-          const dateA = new Date(a.date || 0);
-          const dateB = new Date(b.date || 0);
-          return dateB - dateA;
-        });
-        
-        if (combined.length === 0) {
-            // Provide a dummy bill so the UI can be tested if user has no records
-            combined.push({
-                id: 'demo-bill-1',
-                bill_no: 'DEMO-INV-001',
-                date: new Date().toISOString().split('T')[0],
-                units: 0,
-                amount: 158000,
-                status: 'Unpaid',
-                type: 'installation'
-            });
-        }
-        
-        setBills(combined);
-      })
-      .catch(err => console.error("Fetch error", err))
-      .finally(() => setLoading(false));
-  }, []);
+    try {
+      if (showLoader) setLoading(true);
+      const [billRes, bookingRes] = await Promise.all([
+        api.get(`bills/?client_id=${user.id}`),
+        api.get(`bookings/?client_id=${user.id}`)
+      ]);
+
+      const billsData = billRes.data;
+      const invoicesFromBookings = bookingRes.data
+        .filter(b => b.documents?.final_invoice || b.status === 'Loan Approved' || b.status === 'Sanctioned')
+        .map(b => ({
+          id: `inv-${b.id}`,
+          bill_no: `INV-${b.id}`,
+          date: b.confirmed_date || b.created_at?.split('T')[0],
+          units: 0,
+          amount: b.estimated_cost || 0,
+          status: "Paid",
+          type: "invoice",
+          final_invoice: b.documents?.final_invoice,
+          address: b.address
+        }));
+      
+      let combined = [...billsData, ...invoicesFromBookings].sort((a, b) => 
+        new Date(b.date || 0) - new Date(a.date || 0)
+      );
+      
+      if (combined.length === 0) {
+          combined.push({
+              id: 'demo-bill-1',
+              bill_no: 'DEMO-INV-001',
+              date: new Date().toISOString().split('T')[0],
+              units: 0,
+              amount: 158000,
+              status: localStorage.getItem('demo_bill_status') || 'Unpaid',
+              type: 'installation'
+          });
+      }
+      
+      setBills(combined);
+    } catch (err) {
+      console.error("Fetch error", err);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  };
 
   const filteredBills = bills.filter((bill) =>
-    (bill.bill_no && bill.bill_no.toLowerCase().includes(search.toLowerCase())) ||
-    (bill.address && bill.address.toLowerCase().includes(search.toLowerCase()))
+    (bill.bill_no?.toLowerCase().includes(search.toLowerCase())) ||
+    (bill.address?.toLowerCase().includes(search.toLowerCase()))
   );
 
   const totalPaid = bills.filter((b) => b.status === "Paid" || b.status?.includes("Slot")).reduce((sum, b) => sum + parseFloat(b.amount), 0); // Note: Simple sum for now
@@ -303,22 +307,54 @@ function Bills() {
         </motion.div>
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-        {[
-            { tag: "Total Invoices", value: bills.length, icon: FileText, color: "text-gray-300" },
-            { tag: "Cleared", value: bills.filter(b => b.status === "Paid").length, icon: CheckCircle, color: "text-green-400" },
-            { tag: "Outstanding", value: bills.filter(b => b.status === "Unpaid").length, icon: Clock, color: "text-red-400" },
-            { tag: "Gross Paid", value: `₹${totalPaid.toLocaleString()}`, color: "text-blue-400" }
-        ].map((stat, i) => (
-            <motion.div 
-               key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-               className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-xl flex flex-col justify-between"
-            >
-               <p className="text-gray-500 text-xs font-semibold tracking-widest uppercase mb-2">{stat.tag}</p>
-               {loading ? <div className="h-8 w-16 bg-white/5 animate-pulse rounded"></div> : <h2 className={`text-3xl font-extrabold ${stat.color}`}>{stat.value}</h2>}
-            </motion.div>
-        ))}
+      {/* SUMMARY CARDS & COST DISTRIBUTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+              { tag: "Total Invoices", value: bills.length, icon: FileText, color: "text-gray-300" },
+              { tag: "Cleared", value: bills.filter(b => b.status === "Paid").length, icon: CheckCircle, color: "text-green-400" },
+              { tag: "Outstanding", value: bills.filter(b => b.status !== "Paid").length, icon: Clock, color: "text-red-400" },
+              { tag: "Gross Paid", value: `₹${totalPaid.toLocaleString()}`, color: "text-blue-400" }
+          ].map((stat, i) => (
+              <motion.div 
+                key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+                className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-xl flex flex-col justify-between"
+              >
+                <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-2">{stat.tag}</p>
+                {loading ? <div className="h-8 w-16 bg-white/5 animate-pulse rounded"></div> : <h2 className={`text-2xl font-black ${stat.color}`}>{stat.value}</h2>}
+              </motion.div>
+          ))}
+        </div>
+
+        <motion.div 
+           initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+           className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 border border-blue-500/30 p-6 rounded-3xl shadow-2xl relative overflow-hidden backdrop-blur-md"
+        >
+           <div className="absolute top-0 right-0 p-4 opacity-10">
+             <Landmark className="w-20 h-20 text-white" />
+           </div>
+           <h3 className="text-sm font-black uppercase tracking-widest text-blue-400 mb-4 flex items-center gap-2">
+             <ShieldCheck className="w-4 h-4" /> Cost Distribution
+           </h3>
+           <div className="space-y-3">
+             <div className="flex justify-between text-xs font-bold">
+                <span className="text-gray-400">Solar Grid System</span>
+                <span className="text-white">₹2,76,000</span>
+             </div>
+             <div className="flex justify-between text-xs font-bold text-green-400">
+                <span>Govt Subsidy (PM-Surya)</span>
+                <span>- ₹78,000</span>
+             </div>
+             <div className="flex justify-between text-xs font-bold text-orange-400">
+                <span>Bank Loan Sanctioned</span>
+                <span>- ₹40,000</span>
+             </div>
+             <div className="border-t border-white/10 pt-3 flex justify-between text-base font-black text-white">
+                <span>Net Payable</span>
+                <span>₹1,58,000</span>
+             </div>
+           </div>
+        </motion.div>
       </div>
 
       {/* TABLE */}
@@ -351,13 +387,27 @@ function Bills() {
               <tbody className="divide-y divide-white/5">
                 {filteredBills.map((bill) => (
                   <tr key={bill.id} className="hover:bg-white/5 transition group">
-                    <td className="p-5 font-medium text-gray-200">{bill.bill_no}</td>
-                    <td className="p-5 text-gray-500 tracking-wide text-sm">{bill.date}</td>
-                    <td className="p-5 text-gray-300">{bill.units || "-"}</td>
-                    <td className="p-5 font-semibold text-white">₹{parseFloat(bill.amount || 0).toLocaleString()}</td>
+                    <td className="p-5 font-bold text-gray-200">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-orange-400 opacity-60" />
+                        {bill.bill_no}
+                      </div>
+                    </td>
+                    <td className="p-5">
+                      <div className="flex flex-col">
+                        <span className="text-gray-300 text-sm font-medium">{bill.date}</span>
+                        {bill.status === "Paid" && bill.paid_at && (
+                          <span className="text-[10px] text-green-500 font-bold uppercase tracking-widest mt-1">
+                            Cleared @ {new Date(bill.paid_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-5 text-gray-400 text-sm font-mono">{bill.units ? `${bill.units} kWh` : "-"}</td>
+                    <td className="p-5 font-extrabold text-white text-lg">₹{parseFloat(bill.amount || 0).toLocaleString()}</td>
                     
                     <td className="p-5 text-center">
-                      <span className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase border ${
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${
                           bill.status === "Paid"
                             ? "bg-green-500/10 text-green-400 border-green-500/20"
                             : bill.status?.includes("Slot")
@@ -369,18 +419,18 @@ function Bills() {
                     </td>
 
                     <td className="p-5 text-center">
-                      {bill.type === "invoice" && bill.final_invoice ? (
+                      {bill.final_invoice && bill.final_invoice !== '#pending' ? (
                         <a 
                           href={bill.final_invoice} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition font-medium text-sm"
+                          className="inline-flex items-center gap-2 bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white px-3 py-1.5 rounded-lg border border-blue-500/20 transition font-bold text-[10px] uppercase"
                         >
-                          <FileText className="w-4 h-4" />
+                          <ScanLine className="w-4 h-4" />
                           View
                         </a>
                       ) : (
-                        <span className="text-gray-600 text-sm">-</span>
+                        <span className="text-gray-600 text-[10px] font-black uppercase tracking-tighter">Drafting...</span>
                       )}
                     </td>
 
@@ -389,20 +439,24 @@ function Bills() {
                         <a
                           href={bill.final_invoice}
                           download
-                          className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black px-4 py-2 rounded-xl transition shadow-lg shadow-blue-500/20 text-xs uppercase tracking-wider"
                         >
                           <Download className="w-4 h-4" />
-                          Download
+                          Save PDF
                         </a>
                       ) : (bill.status === "Unpaid" || bill.status === "Slot 1 Paid" || bill.status === "Slot 2 Paid") ? (
                         <button
                           onClick={() => openPaymentGate(bill)}
-                          className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-bold px-4 py-2 rounded-xl transition shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+                          className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-black px-4 py-2 rounded-xl transition shadow-lg shadow-orange-500/20 text-xs uppercase tracking-wider"
                         >
-                          {bill.status === "Unpaid" ? "Checkout" : "Pay Next Slot"}
+                          {bill.status === "Unpaid" ? "Pay Now" : "Next Slot"}
                         </button>
                       ) : (
-                        <span className="text-gray-600 font-medium text-sm">Settled</span>
+                        <div className="flex flex-col items-end">
+                           <span className="text-green-400 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1">
+                             <ShieldCheck className="w-3 h-3" /> Settled
+                           </span>
+                        </div>
                       )}
                     </td>
                   </tr>
