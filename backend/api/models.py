@@ -71,6 +71,7 @@ class Bill(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bills')
     bill_no = models.CharField(max_length=20, unique=True)
     date = models.DateField(auto_now_add=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
     units = models.IntegerField(default=0)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     loan = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
