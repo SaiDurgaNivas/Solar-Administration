@@ -5,6 +5,7 @@ import UserProfilePhoto from "../UserProfilePhoto";
 
 function Header({ user, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [showNotifs, setShowNotifs] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -74,12 +75,42 @@ function Header({ user, onLogout }) {
 
           {/* 🔔 Notification */}
           <div className="relative cursor-pointer group">
-            <div className="p-2 rounded-full hover:bg-white/5 transition-colors">
+            <div onClick={() => setShowNotifs(!showNotifs)} className={`p-2 rounded-full transition-colors ${showNotifs ? 'bg-white/10' : 'hover:bg-white/5'}`}>
               <Bell size={20} className="text-gray-300 group-hover:text-white transition-colors" />
             </div>
-            <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#020617]">
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-[#020617] pointer-events-none">
               3
             </span>
+
+            {/* Notifications Dropdown */}
+            {showNotifs && (
+              <div className="absolute right-0 mt-4 w-80 bg-[#0f172a] shadow-2xl rounded-2xl p-5 z-50 border border-white/10 text-left">
+                <div className="flex justify-between items-center mb-4">
+                   <p className="font-bold text-white">Notifications</p>
+                   <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold">3 New</span>
+                </div>
+                <div className="space-y-3">
+                   <div className="p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition">
+                      <p className="text-sm font-bold text-gray-200">New Installation Requested</p>
+                      <p className="text-xs text-gray-400 mt-1">Customer has requested a 5kW setup.</p>
+                      <p className="text-[10px] text-gray-500 mt-2">Just now</p>
+                   </div>
+                   <div className="p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition">
+                      <p className="text-sm font-bold text-gray-200">Invoice Issued</p>
+                      <p className="text-xs text-gray-400 mt-1">A bill of ₹12000 was generated.</p>
+                      <p className="text-[10px] text-gray-500 mt-2">1 hr ago</p>
+                   </div>
+                   <div className="p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition">
+                      <p className="text-sm font-bold text-gray-200">Escalated Appointment</p>
+                      <p className="text-xs text-gray-400 mt-1">Agent forwarded a request requiring check.</p>
+                      <p className="text-[10px] text-gray-500 mt-2">2 hrs ago</p>
+                   </div>
+                </div>
+                <button onClick={() => { setShowNotifs(false); navigate('/dashboard'); }} className="w-full mt-4 text-xs font-bold text-orange-400 hover:text-orange-300 transition py-2 bg-orange-500/10 rounded-lg">
+                  View All Activity
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 👤 Profile */}

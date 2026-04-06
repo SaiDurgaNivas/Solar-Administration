@@ -35,12 +35,17 @@ const Dashboard = () => {
             setActiveOps(opsRes.data);
 
             const activeSystems = installations.filter(item => item.status === "Active" || item.status === "Completed").length;
-            const totalEnergy = installations.reduce((acc, curr) => acc + 5, 0); // Mock 5kW per system
+            
+            // Calculate capacity dynamically from available solar arrays
+            const savedPanels = JSON.parse(sessionStorage.getItem('solar_panels') || "[]");
+            const totalEnergy = savedPanels.length > 0
+                ? savedPanels.reduce((acc, curr) => acc + (parseFloat(curr.capacity) || 0), 0)
+                : installations.reduce((acc, curr) => acc + 5, 0); // Mock 5kW per system fallback
 
             setStats({
                 totalCustomers: customers.length,
                 totalInstallations: installations.length,
-                energyGenerated: totalEnergy,
+                energyGenerated: totalEnergy.toFixed(1).replace(/\.0$/, ''),
                 activeSystems
             });
 
@@ -120,27 +125,29 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
-          { label: "Total Customers", value: stats.totalCustomers, icon: Users, color: "text-orange-400", bg: "bg-orange-500/10" },
-          { label: "Total Installations", value: stats.totalInstallations, icon: PenTool, color: "text-yellow-400", bg: "bg-yellow-500/10" },
-          { label: "Estimated Capacity", value: `${stats.energyGenerated} kW`, icon: Zap, color: "text-green-400", bg: "bg-green-500/10" },
-          { label: "Active Systems", value: stats.activeSystems, icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-500/10" }
+          { label: "Total Customers", value: stats.totalCustomers, icon: Users, color: "text-orange-400", bg: "bg-orange-500/10", route: "/customer" },
+          { label: "Total Installations", value: stats.totalInstallations, icon: PenTool, color: "text-yellow-400", bg: "bg-yellow-500/10", route: "/installations" },
+          { label: "Estimated Capacity", value: `${stats.energyGenerated} kW`, icon: Zap, color: "text-green-400", bg: "bg-green-500/10", route: "/solarpanels" },
+          { label: "Active Systems", value: stats.activeSystems, icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-500/10", route: "/working-status" }
         ].map((stat, i) => (
-          <motion.div 
-            key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-            className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-lg flex items-center gap-4"
-          >
-            <div className={`p-4 rounded-full ${stat.bg}`}>
-              <stat.icon className={`w-8 h-8 ${stat.color}`} />
-            </div>
-            <div>
-              <h2 className="text-gray-400 text-sm font-medium">{stat.label}</h2>
-              {loading ? (
-                <div className="h-8 w-16 bg-white/10 rounded mt-2 animate-pulse"></div>
-              ) : (
-                <p className="text-3xl font-extrabold text-white mt-1">{stat.value}</p>
-              )}
-            </div>
-          </motion.div>
+          <Link to={stat.route} key={i}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+              className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-lg flex items-center gap-4 hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer group"
+            >
+              <div className={`p-4 rounded-full ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className={`w-8 h-8 ${stat.color}`} />
+              </div>
+              <div>
+                <h2 className="text-gray-400 text-sm font-medium group-hover:text-gray-200 transition-colors">{stat.label}</h2>
+                {loading ? (
+                  <div className="h-8 w-16 bg-white/10 rounded mt-2 animate-pulse"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-white mt-1">{stat.value}</p>
+                )}
+              </div>
+            </motion.div>
+          </Link>
         ))}
       </div>
 
