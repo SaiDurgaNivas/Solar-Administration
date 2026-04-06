@@ -342,6 +342,20 @@ function CustomerDashboard() {
                              </div>
                          </div>
                      )}
+
+                     {b.status === 'Completed' && (
+                         <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30 rounded-xl p-5 flex items-start gap-4 mt-4 shadow-[0_0_20px_rgba(34,197,94,0.15)]">
+                             <CheckCircle className="w-8 h-8 text-green-400 shrink-0 mt-1 animate-pulse" />
+                             <div>
+                                 <h4 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 mb-1">
+                                     You have successfully Completed Your solar installation
+                                 </h4>
+                                 <p className="text-xs text-gray-300 font-medium leading-relaxed">
+                                     Welcome to the future of clean energy! Your solar arrays are now active and generating power. You can track your real-time usage and efficiency telemetry from the Analytics module. Enjoy your sustainable independence!
+                                 </p>
+                             </div>
+                         </div>
+                     )}
                  </div>
                  );
              })}
