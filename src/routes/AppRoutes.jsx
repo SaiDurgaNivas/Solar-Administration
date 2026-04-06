@@ -33,6 +33,8 @@ import Settings from "../pages/Settings";
 import AddCustomer from "../pages/dashboard/AddCustomer";
 import AdminBookings from "../pages/dashboard/AdminBookings";
 import Workers from "../pages/dashboard/Workers";
+import AttendanceReport from "../pages/dashboard/AttendanceReport";
+import WorkingStatus from "../pages/dashboard/WorkingStatus";
 
 import NotFound from "../pages/NotFound";
 
@@ -226,6 +228,24 @@ function AppRoutes({ user, onLogin, onLogout }) {
         element={
           <ProtectedLayout user={user} onLogout={onLogout} role="admin">
             <Workers />
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/attendance-report"
+        element={
+          <ProtectedLayout user={user} onLogout={onLogout} role="admin">
+            <AttendanceReport />
+          </ProtectedLayout>
+        }
+      />
+
+      <Route
+        path="/working-status"
+        element={
+          <ProtectedLayout user={user} onLogout={onLogout} role="admin">
+            <WorkingStatus />
           </ProtectedLayout>
         }
       />

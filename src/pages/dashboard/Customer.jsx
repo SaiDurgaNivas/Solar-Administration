@@ -102,7 +102,12 @@ function Customers() {
   const filteredList = customers.filter(c =>
     c.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ).sort((a, b) => {
+    if (a.date_joined && b.date_joined) {
+      return new Date(b.date_joined) - new Date(a.date_joined);
+    }
+    return b.id - a.id;
+  });
 
   return (
     <div className="p-6 bg-[#020617] min-h-screen text-white font-sans overflow-x-hidden">
@@ -270,6 +275,7 @@ function Customers() {
                 <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5 bg-white/5">
                   <th className="py-5 px-6 font-semibold">Customer</th>
                   <th className="py-5 px-6 font-semibold">Email</th>
+                  <th className="py-5 px-6 font-semibold">Date & Time</th>
                   <th className="py-5 px-6 font-semibold">Tier</th>
                   <th className="py-5 px-6 font-semibold text-center">Status</th>
                   <th className="py-5 px-6 font-semibold text-center">Actions</th>
@@ -287,6 +293,9 @@ function Customers() {
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-600" /> {item.email}
                       </div>
+                    </td>
+                    <td className="py-5 px-6 text-gray-400 text-xs font-medium">
+                      {item.date_joined ? new Date(item.date_joined).toLocaleString() : "N/A"}
                     </td>
                     <td className="py-5 px-6 text-gray-400 text-sm">
                       <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full font-bold uppercase tracking-widest text-[#9ca3af] text-[10px]">Tier 1</span>

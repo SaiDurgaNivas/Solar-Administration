@@ -44,6 +44,14 @@ function Sidebar({ user, onLogout }) {
           Workers
         </NavLink>
 
+        <NavLink to="/working-status" className={linkClass}>
+          Working Status
+        </NavLink>
+
+        <NavLink to="/attendance-report" className={linkClass}>
+          Attendance Report
+        </NavLink>
+
         <NavLink to="/solarpanels" className={linkClass}>
           Solar Panels
         </NavLink>
