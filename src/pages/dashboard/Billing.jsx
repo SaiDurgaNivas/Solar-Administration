@@ -201,7 +201,10 @@ function Billing() {
                 />
             </div>
             
-            <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-2xl transition flex items-center gap-2 font-semibold shadow-lg shadow-blue-500/25 shrink-0">
+            <button onClick={() => {
+                setBillForm(prev => ({ ...prev, bill_no: `INV-${Date.now().toString().slice(-6)}` }));
+                setIsModalOpen(true);
+            }} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-2xl transition flex items-center gap-2 font-semibold shadow-lg shadow-blue-500/25 shrink-0">
                <Plus className="w-5 h-5" /> Issue
             </button>
         </motion.div>
