@@ -29,3 +29,10 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Solar Server Scripts (auto-generated)
+.backend.pid
+.frontend.pid
+backend.log
+backend_error.log
+frontend.log
