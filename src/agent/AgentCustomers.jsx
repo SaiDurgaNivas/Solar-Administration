@@ -63,6 +63,32 @@ function AgentCustomers() {
     fetchData();
   }, []);
 
+  const markAsCompleted = async (instId, currentStatus) => {
+    if (currentStatus === "Completed") return;
+    if (!window.confirm("Are you sure you want to mark this site as Completed?")) return;
+    
+    try {
+        await api.patch(`installations/${instId}/`, { status: "Completed" });
+        alert("Site marked as Completed!");
+        // Update local state to reflect the change rather than refetching fully
+        setCustomers(prev => {
+            const updated = prev.map(c => c.id === instId ? { ...c, status: "Completed", completedDate: new Date().toLocaleDateString(), completedTime: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) } : c);
+            // Re-sort so that newly completed goes to the top
+            return updated.sort((a, b) => {
+                if (a.status === 'Completed' && b.status !== 'Completed') return -1;
+                if (a.status !== 'Completed' && b.status === 'Completed') return 1;
+                if (a.status === 'Completed' && b.status === 'Completed') {
+                     return new Date(b.completedDate || 0) - new Date(a.completedDate || 0);
+                }
+                return 0;
+            });
+        });
+    } catch (err) {
+        console.error("Failed to update status", err);
+        alert("Failed to update status.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#020617] p-6 text-white font-sans">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
@@ -99,10 +125,13 @@ function AgentCustomers() {
                 </div>
               )}
             </div>
-            <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-widest uppercase border ${
-              c.status === "Completed" ? "bg-green-500/10 text-green-400 border-green-500/30"
-              : c.status === "Pending" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-              : "bg-orange-500/10 text-orange-400 border-orange-500/30"
+            <span 
+              onClick={() => markAsCompleted(c.id, c.status)}
+              title={c.status !== "Completed" ? "Click to Mark as Completed" : "Already Completed"}
+              className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-widest uppercase border ${
+              c.status === "Completed" ? "bg-green-500/10 text-green-400 border-green-500/30 cursor-default"
+              : c.status === "Pending" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30 cursor-pointer hover:bg-green-500/20 hover:text-green-400 hover:border-green-500/30 transition shadow-[0_0_15px_rgba(234,179,8,0.1)] hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+              : "bg-orange-500/10 text-orange-400 border-orange-500/30 cursor-pointer hover:bg-green-500/20 hover:text-green-400 hover:border-green-500/30 transition shadow-[0_0_15px_rgba(249,115,22,0.1)] hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]"
             }`}>{c.status}</span>
           </motion.div>
         ))}
