@@ -96,7 +96,7 @@ const ProtectedLayout = ({ children, user, onLogout, role }) => {
         {role === "sub_worker" && <WorkerHeader user={user} onLogout={onLogout} />}
 
         <main className="flex-grow p-6">{children}</main>
-        <Footer />
+        <Footer role={role} />
       </div>
     </div>
   );
