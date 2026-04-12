@@ -43,6 +43,14 @@ function AgentCustomers() {
             }
 
             return { ...inst, workersNames, completedDate, completedTime };
+        }).sort((a, b) => {
+            if (a.status === 'Completed' && b.status !== 'Completed') return -1;
+            if (a.status !== 'Completed' && b.status === 'Completed') return 1;
+            // Additional fallback logic if you want to sort by latest completed
+            if (a.status === 'Completed' && b.status === 'Completed') {
+                 return new Date(b.completedDate || 0) - new Date(a.completedDate || 0);
+            }
+            return 0;
         });
 
         setCustomers(unique);
