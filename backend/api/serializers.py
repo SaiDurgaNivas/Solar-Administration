@@ -96,10 +96,9 @@ class UsageTelemetrySerializer(serializers.ModelSerializer):
 
 class WorkerAttendanceSerializer(serializers.ModelSerializer):
     worker_name = serializers.CharField(source='worker.username', read_only=True)
-    
     class Meta:
         model = WorkerAttendance
-        fields = '__all__'
+        fields = ['id', 'worker', 'worker_name', 'date', 'status', 'punch_in_time', 'punch_out_time']
 
 class WorkerUpdateSerializer(serializers.ModelSerializer):
     class Meta:

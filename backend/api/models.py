@@ -97,10 +97,13 @@ class WorkerAttendance(models.Model):
         ('Present', 'Present'),
         ('Absent', 'Absent'),
         ('On Leave', 'On Leave'),
+        ('Shift Ended', 'Shift Ended'),
     )
     worker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendances')
     date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Present')
+    punch_in_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    punch_out_time = models.DateTimeField(null=True, blank=True)
 
     # Ensure a worker only has one attendance record per day.
     class Meta:

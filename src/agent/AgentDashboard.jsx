@@ -67,6 +67,22 @@ const AgentDashboard = () => {
     }
   };
 
+  const handlePunchOut = async () => {
+    if(!window.confirm("Are you sure you want to end your shift? Admin will be notified of your leave time.")) return;
+    try {
+        const leaveTime = new Date().toISOString();
+        await api.patch(`attendance/${selfAttendance.id}/`, { 
+            status: 'Shift Ended',
+            punch_out_time: leaveTime
+        });
+        alert("Shift Ended successfully. Your leave time has been logged.");
+        fetchSelfAttendance();
+    } catch(err) {
+        alert("Failed to punch out.");
+        console.error(err);
+    }
+  };
+
   const fetchTeam = async () => {
     try {
         const res = await api.get(`users/?role=sub_worker`);
@@ -355,12 +371,33 @@ const AgentDashboard = () => {
                 <p className="text-xs uppercase text-gray-500 font-bold mt-2 tracking-widest">{dateString}</p>
              </div>
              <div className="px-5 py-4 flex flex-col justify-center items-center bg-[#020617] relative w-[130px]">
-                {selfAttendance ? (
-                   <div className="flex flex-col items-center">
-                     <CheckCircle className={`w-8 h-8 mb-1 ${selfAttendance.status === 'Present' ? 'text-green-400' : 'text-yellow-400'}`} />
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Punched In</span>
-                   </div>
-                ) : (
+                 {selfAttendance ? (
+                    selfAttendance.status === "Shift Ended" ? (
+                      <div className="flex flex-col items-center">
+                         <div className="w-8 h-8 mb-1 bg-gray-500/20 rounded-full flex items-center justify-center border border-gray-500/50">
+                            <Zap className="w-4 h-4 text-gray-500" />
+                         </div>
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Shift Ended</span>
+                      </div>
+                    ) : (
+                      <div 
+                         className="flex flex-col items-center justify-center w-full h-full cursor-pointer group"
+                         onClick={handlePunchOut}
+                         title="Click to End Shift / Punch Out"
+                      >
+                         <div className="flex flex-col items-center group-hover:hidden">
+                           <CheckCircle className={`w-8 h-8 mb-1 text-green-400`} />
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Punched In</span>
+                         </div>
+                         <div className="hidden flex-col items-center group-hover:flex">
+                           <div className="w-8 h-8 mb-1 bg-red-500/20 rounded-full flex items-center justify-center border border-red-500/50">
+                              <Zap className="w-4 h-4 text-red-500" />
+                           </div>
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-red-500 shadow-sm">End Shift</span>
+                         </div>
+                      </div>
+                    )
+                 ) : (
                    <button onClick={() => logSelfAttendance("Present")} className="w-full h-full bg-orange-500/10 hover:bg-orange-500 hover:text-black border border-orange-500/30 text-orange-400 font-bold rounded-xl text-xs uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(249,115,22,0.2)] hover:shadow-[0_0_20px_rgba(249,115,22,0.5)]">
                       Log Shift
                    </button>
