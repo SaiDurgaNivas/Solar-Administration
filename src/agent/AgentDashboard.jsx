@@ -26,6 +26,7 @@ const AgentDashboard = () => {
   // Attendance State
   const [selfAttendance, setSelfAttendance] = useState(null);
   const [teamAttendance, setTeamAttendance] = useState([]);
+  const [metricsModal, setMetricsModal] = useState({ open: false, title: '', content: null });
 
   // Fetch real data from Backend
   useEffect(() => {
@@ -231,11 +232,49 @@ const AgentDashboard = () => {
     return { id: index + 1, name: name, location: inst.location || "Site Address", status: inst.status };
   });
 
+  const handleMetricClick = (stat) => {
+    let content = null;
+    if (stat.label === "Daily Targets") {
+      content = <div className="text-gray-300">You have achieved 85% of your target installations for this week. Keep up the good work! To boost this, resolve maintenance tickets faster.</div>;
+    } else if (stat.label === "Active Sites") {
+      const activeInst = installations.filter(i => i.status !== "Completed");
+      content = (
+        <ul className="text-left space-y-3 text-gray-300 max-h-60 overflow-y-auto pr-2">
+          {activeInst.length === 0 ? <li>No active sites right now.</li> : activeInst.map(i => <li key={i.id} className="border-b border-white/10 pb-2 flex justify-between items-center"><span>📍 {i.location || "Pending"}</span> <span className="text-orange-400 text-[10px] uppercase font-bold border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 rounded">{i.status}</span></li>)}
+        </ul>
+      );
+    } else if (stat.label === "Completed") {
+      const compInst = installations.filter(i => i.status === "Completed");
+      content = (
+        <ul className="text-left space-y-3 text-gray-300 max-h-60 overflow-y-auto pr-2">
+          {compInst.length === 0 ? <li>No completed sites yet.</li> : compInst.map(i => <li key={i.id} className="border-b border-white/10 pb-2 flex justify-between items-center"><span>✅ {i.location || "Site Registration"}</span> <span className="text-green-400 text-[10px] uppercase font-bold border border-green-500/30 bg-green-500/10 px-2 py-0.5 rounded">Done</span></li>)}
+        </ul>
+      );
+    } else if (stat.label === "Shift Efficiency") {
+      content = <div className="text-gray-300">Your shift productivity is rated at 92% based on active dispatch assignments, response time, and field operations logging.</div>;
+    }
+    setMetricsModal({ open: true, title: stat.label, content });
+  };
+
   return (
     <div className="min-h-screen bg-[#020617] text-white overflow-x-hidden relative">
       
       {/* Background Decor */}
       <div className="absolute top-[10%] left-[-10%] w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+      {metricsModal.open && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-[#0f172a] border border-white/20 p-8 rounded-3xl w-full max-w-md my-auto shadow-2xl relative">
+            <h2 className="text-xl font-bold mb-4 text-white border-b border-white/10 pb-3">{metricsModal.title} Details</h2>
+            <div className="mb-6">
+               {metricsModal.content}
+            </div>
+            <div className="flex justify-end">
+                <button onClick={() => setMetricsModal({open:false, title:'', content:null})} className="px-4 py-2 rounded-xl bg-orange-500/10 text-orange-400 hover:bg-orange-500 hover:text-black hover:shadow-[0_0_15px_rgba(249,115,22,0.5)] transition font-bold tracking-widest uppercase text-[10px]">Close Panel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {configModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
@@ -329,8 +368,12 @@ const AgentDashboard = () => {
             { label: "Completed", value: installations.filter(i => i.status === "Completed").length, color: "text-green-400" },
             { label: "Shift Efficiency", value: "92%", color: "text-purple-400" }
           ].map((stat, i) => (
-            <div key={i} className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col justify-center items-center text-center shadow-lg hover:bg-white/5 transition">
-              <span className={`text-3xl font-black mb-1 ${stat.color}`}>{stat.value}</span>
+            <div 
+               key={i} 
+               onClick={() => handleMetricClick(stat)}
+               className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col justify-center items-center text-center shadow-lg hover:bg-white/5 hover:border-orange-500/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.15)] transition cursor-pointer group"
+            >
+              <span className={`text-3xl font-black mb-1 group-hover:scale-110 transition-transform ${stat.color}`}>{stat.value}</span>
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{stat.label}</span>
             </div>
           ))}
