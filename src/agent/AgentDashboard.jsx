@@ -25,6 +25,7 @@ const AgentDashboard = () => {
   
   // Attendance State
   const [selfAttendance, setSelfAttendance] = useState(null);
+  const [teamAttendance, setTeamAttendance] = useState([]);
 
   // Fetch real data from Backend
   useEffect(() => {
@@ -32,7 +33,16 @@ const AgentDashboard = () => {
     fetchAppointments();
     fetchTeam();
     fetchSelfAttendance();
+    fetchTeamAttendance();
   }, []);
+
+  const fetchTeamAttendance = async () => {
+    try {
+      const res = await api.get('attendance/');
+      const todayStr = new Date().toISOString().split('T')[0];
+      setTeamAttendance(res.data.filter(a => a.date === todayStr));
+    } catch (err) { console.error(err); }
+  };
 
   const fetchSelfAttendance = async () => {
     try {
@@ -619,7 +629,13 @@ const AgentDashboard = () => {
                    </div>
                    <div className="text-xs text-gray-400 pt-3 border-t border-white/5 flex justify-between uppercase font-semibold">
                       <span>Status</span>
-                      <span className="text-blue-400">Deployed</span>
+                      {(() => {
+                        const rec = teamAttendance.find(a => a.worker === member.id);
+                        if(rec?.status === 'Present') return <span className="text-green-400">On Duty</span>;
+                        if(rec?.status === 'Absent') return <span className="text-red-400">Absent</span>;
+                        if(rec?.status === 'On Leave') return <span className="text-yellow-400">On Leave</span>;
+                        return <span className="text-gray-500">Unmarked</span>;
+                      })()}
                    </div>
                 </div>
              ))}
