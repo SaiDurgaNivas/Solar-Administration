@@ -232,10 +232,24 @@ const AgentDashboard = () => {
     return { id: index + 1, name: name, location: inst.location || "Site Address", status: inst.status };
   });
 
+  const completedInstalls = installations.filter(i => i.status === "Completed").length;
+  const totalInstalls = installations.length;
+  const activeInstalls = totalInstalls - completedInstalls;
+  const dailyTargetPerc = totalInstalls > 0 ? Math.round((completedInstalls / totalInstalls) * 100) : 0;
+
+  const totalAppts = appointments.length;
+  const handledAppts = appointments.filter(a => a.status !== "Pending").length;
+  const totalTickets = tickets.length;
+  const handledTickets = tickets.filter(t => t.status === "Resolved").length;
+
+  const totalTasks = totalInstalls + totalAppts + totalTickets;
+  const handledTasks = completedInstalls + handledAppts + handledTickets;
+  const shiftEfficiencyPerc = totalTasks > 0 ? Math.round((handledTasks / totalTasks) * 100) : 100;
+
   const handleMetricClick = (stat) => {
     let content = null;
     if (stat.label === "Daily Targets") {
-      content = <div className="text-gray-300">You have achieved 85% of your target installations for this week. Keep up the good work! To boost this, resolve maintenance tickets faster.</div>;
+      content = <div className="text-gray-300">You have completed {completedInstalls} out of {totalInstalls} assigned installations, achieving a <strong>{dailyTargetPerc}%</strong> success rate! Keep closing those sites.</div>;
     } else if (stat.label === "Active Sites") {
       const activeInst = installations.filter(i => i.status !== "Completed");
       content = (
@@ -251,7 +265,7 @@ const AgentDashboard = () => {
         </ul>
       );
     } else if (stat.label === "Shift Efficiency") {
-      content = <div className="text-gray-300">Your shift productivity is rated at 92% based on active dispatch assignments, response time, and field operations logging.</div>;
+      content = <div className="text-gray-300">Your shift efficiency is rated at <strong>{shiftEfficiencyPerc}%</strong>. This is based on handling {handledTasks} out of {totalTasks} overall tasks (installations, appointments, and maintenance tickets).</div>;
     }
     setMetricsModal({ open: true, title: stat.label, content });
   };
@@ -363,10 +377,10 @@ const AgentDashboard = () => {
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
           {[
-            { label: "Daily Targets", value: "85%", color: "text-blue-400" },
-            { label: "Active Sites", value: installations.length, color: "text-orange-400" },
-            { label: "Completed", value: installations.filter(i => i.status === "Completed").length, color: "text-green-400" },
-            { label: "Shift Efficiency", value: "92%", color: "text-purple-400" }
+            { label: "Daily Targets", value: `${dailyTargetPerc}%`, color: "text-blue-400" },
+            { label: "Active Sites", value: activeInstalls, color: "text-orange-400" },
+            { label: "Completed", value: completedInstalls, color: "text-green-400" },
+            { label: "Shift Efficiency", value: `${shiftEfficiencyPerc}%`, color: "text-purple-400" }
           ].map((stat, i) => (
             <div 
                key={i} 
