@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, MapPin } from "lucide-react";
+import { Users, MapPin, Clock } from "lucide-react";
 import api from "../api/axiosConfig";
 
 function AgentCustomers() {
@@ -8,17 +8,51 @@ function AgentCustomers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('installations/').then(res => {
-      // Derive unique customers from installations
-      const seen = new Set();
-      const unique = res.data.filter(i => {
-        if (seen.has(i.client_name)) return false;
-        seen.add(i.client_name);
-        return true;
-      });
-      setCustomers(unique);
-    }).catch(console.error)
-      .finally(() => setLoading(false));
+    const fetchData = async () => {
+      try {
+        const [instRes, tasksRes] = await Promise.all([
+            api.get('installations/'),
+            api.get('teamtasks/')
+        ]);
+        
+        const tasks = tasksRes.data;
+        const seen = new Set();
+        
+        const unique = instRes.data.filter(i => {
+          if (seen.has(i.client_name)) return false;
+          seen.add(i.client_name);
+          return true;
+        }).map(inst => {
+            // Find tasks relevant to this client
+            const relatedTasks = tasks.filter(t => 
+                (t.booking_details?.client_username === inst.client_name) || 
+                (t.booking_details?.client_name === inst.client_name)
+            );
+            
+            const workersNames = [...new Set(relatedTasks.map(t => t.sub_worker_name))].filter(Boolean).join(', ');
+            
+            let completedDate = inst.date;
+            let completedTime = '';
+            
+            const completedTasks = relatedTasks.filter(t => t.status === 'Completed');
+            if(completedTasks.length > 0) {
+                const lastTask = completedTasks.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
+                const dateObj = new Date(lastTask.updated_at);
+                completedDate = dateObj.toLocaleDateString();
+                completedTime = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
+            return { ...inst, workersNames, completedDate, completedTime };
+        });
+
+        setCustomers(unique);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
@@ -45,11 +79,17 @@ function AgentCustomers() {
         ) : customers.map((c, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-[#0f172a]/80 border border-white/10 p-6 rounded-2xl flex justify-between items-center hover:bg-white/5 transition">
-            <div>
+            <div className="flex-1">
               <p className="font-bold text-lg text-gray-200 capitalize">{c.client_name}</p>
               <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
                 <MapPin className="w-3 h-3" /> {c.location || "Sector Alpha"}
               </p>
+              {(c.workersNames || c.completedDate) && (
+                <div className="mt-3 flex gap-4 text-xs font-semibold tracking-wider text-gray-400">
+                   {c.workersNames && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-blue-400"/> Worker: <span className="text-gray-300">{c.workersNames}</span></span>}
+                   {c.completedDate && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-orange-400"/> Date & Time: <span className="text-gray-300">{c.completedDate} {c.completedTime}</span></span>}
+                </div>
+              )}
             </div>
             <span className={`px-4 py-1.5 rounded-full text-xs font-extrabold tracking-widest uppercase border ${
               c.status === "Completed" ? "bg-green-500/10 text-green-400 border-green-500/30"
