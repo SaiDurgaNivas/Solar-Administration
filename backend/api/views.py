@@ -266,3 +266,17 @@ class WorkerUpdateViewSet(viewsets.ModelViewSet):
         if task_id:
             return WorkerUpdate.objects.filter(task_id=task_id)
         return WorkerUpdate.objects.all()
+
+from .models import CustomerReview
+from .serializers import CustomerReviewSerializer
+
+class CustomerReviewViewSet(viewsets.ModelViewSet):
+    queryset = CustomerReview.objects.all()
+    serializer_class = CustomerReviewSerializer
+
+    def get_queryset(self):
+        queryset = CustomerReview.objects.all().order_by('-created_at')
+        client_id = self.request.query_params.get('client_id')
+        if client_id:
+            queryset = queryset.filter(client_id=client_id)
+        return queryset

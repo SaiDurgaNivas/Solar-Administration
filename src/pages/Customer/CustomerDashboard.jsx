@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../../api/axiosConfig";
-import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert } from "lucide-react";
+import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert, Star } from "lucide-react";
 import { useLiveTime } from "../../hooks/useLiveTime";
 
 const timeSlots = [
@@ -25,6 +25,8 @@ function CustomerDashboard() {
     requested_time: "",
     notes: "",
   });
+  
+  const [reviewModal, setReviewModal] = useState({ open: false, bookingId: null, rating: 5, comment: "" });
 
   const { timeString, dateString, greeting } = useLiveTime();
   const userName = JSON.parse(sessionStorage.getItem("solar_user"))?.first_name || JSON.parse(sessionStorage.getItem("solar_user"))?.username || "Customer";
@@ -47,6 +49,22 @@ function CustomerDashboard() {
       fetchBookings();
     } catch(err) {
       alert("Failed to confirm direct pay.");
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    try {
+        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        await api.post('reviews/', {
+            client: user.id,
+            booking: reviewModal.bookingId,
+            rating: reviewModal.rating,
+            comment: reviewModal.comment
+        });
+        alert("Thank you for your review!");
+        setReviewModal({ open: false, bookingId: null, rating: 5, comment: "" });
+    } catch(err) {
+        alert("Failed to submit review. Try again.");
     }
   };
 
@@ -133,6 +151,33 @@ function CustomerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#020617] p-6 space-y-8 text-white font-sans overflow-x-hidden">
+
+      {reviewModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#0f172a] border border-white/20 p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
+            <h2 className="text-2xl font-bold mb-4 text-white">Rate Your Experience</h2>
+            <div className="flex gap-2 mb-6 justify-center">
+               {[1,2,3,4,5].map(star => (
+                   <Star 
+                     key={star} 
+                     onClick={() => setReviewModal({...reviewModal, rating: star})}
+                     className={`w-10 h-10 cursor-pointer transition ${star <= reviewModal.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
+                   />
+               ))}
+            </div>
+            <textarea
+               className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none h-32 mb-6"
+               placeholder="Tell us about your solar installation experience..."
+               value={reviewModal.comment}
+               onChange={(e) => setReviewModal({...reviewModal, comment: e.target.value})}
+            />
+            <div className="flex justify-end gap-3">
+               <button onClick={() => setReviewModal({open: false, bookingId: null, rating: 5, comment: ""})} className="px-5 py-2 rounded-xl text-gray-400 hover:text-white transition">Cancel</button>
+               <button onClick={handleReviewSubmit} className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold px-6 py-2 rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.3)]">Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -350,9 +395,15 @@ function CustomerDashboard() {
                                  <h4 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 mb-1">
                                      You have successfully Completed Your solar installation
                                  </h4>
-                                 <p className="text-xs text-gray-300 font-medium leading-relaxed">
+                                 <p className="text-xs text-gray-300 font-medium leading-relaxed mb-4">
                                      Welcome to the future of clean energy! Your solar arrays are now active and generating power. You can track your real-time usage and efficiency telemetry from the Analytics module. Enjoy your sustainable independence!
                                  </p>
+                                 <button 
+                                     onClick={() => setReviewModal({open: true, bookingId: b.id, rating: 5, comment: ""})}
+                                     className="bg-green-500/20 hover:bg-green-500 border border-green-500/50 text-green-400 hover:text-black font-bold py-1.5 px-4 rounded-lg text-xs tracking-wider transition uppercase"
+                                 >
+                                     Leave a Review
+                                 </button>
                              </div>
                          </div>
                      )}

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CustomerProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate
+from .models import User, CustomerProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -114,4 +114,10 @@ class TeamTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamTask
+        fields = '__all__'
+
+class CustomerReviewSerializer(serializers.ModelSerializer):
+    client_name = serializers.CharField(source='client.username', read_only=True)
+    class Meta:
+        model = CustomerReview
         fields = '__all__'
