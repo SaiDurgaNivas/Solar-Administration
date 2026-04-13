@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Activity, Zap, TrendingUp, Sun, Leaf, Battery, Download, Wifi, CheckCircle2, Droplets, Factory } from "lucide-react";
+import { Activity, Zap, TrendingUp, Sun, Leaf, Battery, Download, Wifi, CheckCircle2, Droplets, Factory, LayoutGrid } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import api from "../../api/axiosConfig";
 
@@ -43,6 +43,7 @@ function Usage() {
   const treesEquivalent = (telemetry.total_units * 0.02).toFixed(1);
 
   const diagnostics = [
+    { label: "Solar Panel Type", status: "Monocrystalline 550W", icon: <LayoutGrid className="w-5 h-5" />, color: "text-orange-400" },
     { label: "Inverter Status", status: "Nominal", icon: <CheckCircle2 className="w-5 h-5" />, color: "text-green-400" },
     { label: "Battery Health", status: "98%", icon: <Battery className="w-5 h-5" />, color: "text-blue-400" },
     { label: "Grid Connection", status: "Synchronized", icon: <Wifi className="w-5 h-5" />, color: "text-purple-400" },
