@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
-import { Bell, UserCircle, ArrowLeft, Sun, Home } from 'lucide-react';
+import { Bell, ArrowLeft, Sun, Home, AlertCircle } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import UserProfilePhoto from '../UserProfilePhoto';
 
 function WorkerHeader({ user, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [showHomeConfirm, setShowHomeConfirm] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleHomeClick = () => {
+    setShowHomeConfirm(true);
+    setOpen(false);
+  };
+
+  const confirmGoHome = () => {
+    setShowHomeConfirm(false);
+    if (onLogout) onLogout();
+    navigate('/');
+  };
 
   const today = new Date();
   const dateString = today.toLocaleDateString('en-US', {
@@ -41,7 +54,7 @@ function WorkerHeader({ user, onLogout }) {
           </div>
 
           <button
-            onClick={() => navigate('/')}
+            onClick={handleHomeClick}
             className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 hover:text-orange-300 border border-orange-500/20 hover:border-orange-500/40 transition-all shadow-[0_0_15px_rgba(249,115,22,0.1)]"
             title="Go to Public Portal"
           >
@@ -109,6 +122,49 @@ function WorkerHeader({ user, onLogout }) {
         </div>
       </div>
     </header>
+
+      {/* 🔒 Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showHomeConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 30 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center"
+            >
+              <div className="w-14 h-14 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/20">
+                <AlertCircle className="w-7 h-7 text-orange-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Leave Portal?</h2>
+              <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                You are about to leave the <span className="text-orange-400 font-semibold">Worker Portal</span> and return to the public home page.<br />
+                <span className="text-white/60">This will log you out.</span>
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowHomeConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-semibold transition-all text-sm"
+                >
+                  Stay Here
+                </button>
+                <button
+                  onClick={confirmGoHome}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold transition-all text-sm shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                >
+                  Yes, Logout
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
   );
 }
 
