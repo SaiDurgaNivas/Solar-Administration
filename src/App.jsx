@@ -14,26 +14,38 @@ function App() {
     }
   });
 
-  // 🔄 Sync with sessionStorage
+  // 🔄 Sync with sessionStorage Safely
   useEffect(() => {
-    if (user) {
-      sessionStorage.setItem("solar_user", JSON.stringify(user));
-    } else {
-      sessionStorage.removeItem("solar_user");
+    try {
+      if (user) {
+        sessionStorage.setItem("solar_user", JSON.stringify(user));
+      } else {
+        sessionStorage.removeItem("solar_user");
+      }
+    } catch (error) {
+      console.warn("Session storage sync failed:", error);
     }
   }, [user]);
 
   // ✅ LOGIN
   const handleLogin = (userData) => {
     setUser(userData);
-    // 🔥 ensure save immediately
-    sessionStorage.setItem("solar_user", JSON.stringify(userData));
+    try {
+      // 🔥 ensure save immediately for rapid navigation
+      sessionStorage.setItem("solar_user", JSON.stringify(userData));
+    } catch (error) {
+      console.warn("Could not save user session:", error);
+    }
   };
 
   // ✅ LOGOUT
   const handleLogout = () => {
     setUser(null);
-    sessionStorage.removeItem("solar_user"); // 🔥 important
+    try {
+      sessionStorage.removeItem("solar_user"); // 🔥 important
+    } catch (error) {
+      console.warn("Could not remove user session:", error);
+    }
   };
 
   return (
