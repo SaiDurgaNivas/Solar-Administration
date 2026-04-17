@@ -308,3 +308,21 @@ class CustomerReviewViewSet(viewsets.ModelViewSet):
         if client_id:
             queryset = queryset.filter(client_id=client_id)
         return queryset
+from .models import SupportTicket
+from .serializers import SupportTicketSerializer
+
+class SupportTicketViewSet(viewsets.ModelViewSet):
+    queryset = SupportTicket.objects.all()
+    serializer_class = SupportTicketSerializer
+
+    def get_queryset(self):
+        queryset = SupportTicket.objects.all().order_by('-created_at')
+        client_id = self.request.query_params.get('client_id')
+        status = self.request.query_params.get('status')
+        
+        if client_id:
+            queryset = queryset.filter(client_id=client_id)
+        if status:
+            queryset = queryset.filter(status=status)
+            
+        return queryset

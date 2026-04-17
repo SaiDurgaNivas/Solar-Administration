@@ -80,8 +80,8 @@ function Complaints() {
                                 <div className="flex-1 w-full">
                                     <div className="flex justify-between items-start w-full">
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-100">{ticket.id} - {ticket.type.toUpperCase()}</h3>
-                                            <p className="text-xs text-gray-400 font-bold mb-2">Customer: {ticket.customerName} • {new Date(ticket.createdAt).toLocaleString()}</p>
+                                            <h3 className="text-lg font-bold text-gray-100">{ticket.ticket_no} - {ticket.type?.toUpperCase()}</h3>
+                                            <p className="text-xs text-gray-400 font-bold mb-2">Customer: {ticket.client_name} • {new Date(ticket.created_at).toLocaleString()}</p>
                                         </div>
                                         <span className={`px-3 py-1 border rounded-full text-xs font-bold uppercase tracking-wider ${
                                             ticket.status === 'Resolved' 
@@ -97,7 +97,7 @@ function Complaints() {
                                     
                                     {ticket.status === 'Resolved' && (
                                         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5 text-sm font-bold text-green-400">
-                                            <CheckCircle className="w-4 h-4"/> Complaint cleared with proper diagnostic protocol on {new Date(ticket.resolvedAt).toLocaleString()}
+                                            <CheckCircle className="w-4 h-4"/> Complaint cleared with proper diagnostic protocol on {new Date(ticket.resolved_at).toLocaleString()}
                                         </div>
                                     )}
                                 </div>

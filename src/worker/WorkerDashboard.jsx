@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { useTickets } from '../context/TicketContext';
 import { useLiveTime } from '../hooks/useLiveTime';
+
 
 const Target = MapPin;
 
 function WorkerDashboard() {
+  const { tickets: contextTickets, resolveTicket, loading: loadingTicks } = useTickets();
   const [tasks, setTasks] = useState([]);
-  const [tickets, setTickets] = useState([]);
   const [attendance, setAttendance] = useState([]);
+
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loadingAttendance, setLoadingAttendance] = useState(true);
   const [activeTab, setActiveTab] = useState('tasks');
@@ -34,17 +37,16 @@ function WorkerDashboard() {
     try {
       const res = await api.get(`teamtasks/?sub_worker=${user.id}`);
       setTasks(res.data);
-      
-      // Also fetch local maintenance tickets dispatched to this worker
-      const savedTickets = JSON.parse(sessionStorage.getItem('solar_tickets')) || [];
-      const myTickets = savedTickets.filter(t => t.assignedWorkerId === user.id);
-      setTickets(myTickets);
     } catch (err) {
       console.error(err);
     } finally {
       setLoadingTasks(false);
     }
   };
+
+  // Filter context tickets dispatched to this worker
+  const myTickets = contextTickets.filter(t => Number(t.assigned_worker) === Number(user.id));
+
 
   const fetchAttendance = async () => {
     if (!user?.id) return;
@@ -77,12 +79,7 @@ function WorkerDashboard() {
   };
 
   const markTicketResolved = (ticketId) => {
-    const savedTickets = JSON.parse(sessionStorage.getItem('solar_tickets')) || [];
-    const updated = savedTickets.map(t => 
-      t.id === ticketId ? { ...t, status: 'Resolved', resolvedAt: new Date().toISOString() } : t
-    );
-    sessionStorage.setItem('solar_tickets', JSON.stringify(updated));
-    fetchTasks();
+    resolveTicket(ticketId);
     alert("Maintenance Ticket Resolved Successfully!");
   };
 
@@ -309,13 +306,13 @@ function WorkerDashboard() {
                   ))}
                   
                   {/* Maintenance Tickets Section */}
-                  {tickets.map(ticket => (
+                  {myTickets.map(ticket => (
                      <div key={ticket.id} className="bg-gradient-to-b from-red-950/40 to-[#020617] border border-red-500/20 rounded-3xl p-7 shadow-2xl flex flex-col justify-between hover:border-red-500/40 transition-all duration-500">
                         <div>
                           <div className="flex justify-between items-start mb-5 gap-4">
                             <div>
                               <span className="text-xs font-black uppercase text-red-400 tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">Maintenance: {ticket.type}</span>
-                              <h3 className="text-xl font-bold mt-4">{ticket.customerName}</h3>
+                              <h3 className="text-xl font-bold mt-4">{ticket.client_name || 'Customer'}</h3>
                             </div>
                             <span className={`px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border shadow-lg ${ticket.status === 'Resolved' ? 'text-green-400 bg-green-500/10 border-green-500/30' : 'text-blue-400 bg-blue-500/10 border-blue-500/30'}`}>
                               {ticket.status}

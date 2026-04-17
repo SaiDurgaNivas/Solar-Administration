@@ -192,3 +192,20 @@ class CustomerReview(models.Model):
 
     def __str__(self):
         return f"Review by {self.client.username} - {self.rating} Stars"
+class SupportTicket(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Resolved', 'Resolved'),
+        ('Dispatched', 'Dispatched'),
+    )
+    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets')
+    ticket_no = models.CharField(max_length=20, unique=True)
+    type = models.CharField(max_length=50) # Technical, Billing, General
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    assigned_worker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets', limit_choices_to={'role': 'sub_worker'})
+
+    def __str__(self):
+        return f"{self.ticket_no} - {self.client.username}"

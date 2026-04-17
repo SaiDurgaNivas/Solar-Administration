@@ -136,7 +136,7 @@ function Maintenance() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-white uppercase">{req.type}</p>
-                                            <p className="text-xs text-gray-500 font-mono">{req.id} • {new Date(req.createdAt).toLocaleDateString()}</p>
+                                            <p className="text-xs text-gray-500 font-mono">{req.ticket_no} • {new Date(req.created_at).toLocaleDateString()}</p>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1 border rounded-full text-xs font-bold uppercase tracking-wider ${
@@ -149,7 +149,7 @@ function Maintenance() {
                                 </div>
                                 {req.status === 'Resolved' && req.resolvedAt && (
                                     <p className="text-xs text-green-400 border-t border-white/5 pt-2 mt-1">
-                                        Complaint cleared on {new Date(req.resolvedAt).toLocaleString()}
+                                        Complaint cleared on {new Date(req.resolved_at).toLocaleString()}
                                     </p>
                                 )}
                             </div>

@@ -64,7 +64,7 @@ function AgentTickets() {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <p className="font-bold text-lg text-white uppercase">{t.type}</p>
-                <p className="text-gray-500 text-sm">Client: <span className="text-gray-300">{t.customerName}</span></p>
+                <p className="text-gray-500 text-sm">Client: <span className="text-gray-300">{t.client_name}</span></p>
               </div>
               <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                 t.status === 'Resolved' ? 'text-green-400 border-green-500/30 bg-green-500/10'
@@ -102,9 +102,9 @@ function AgentTickets() {
                  </div>
               ) : (
                  <div className="flex justify-between items-center border-t border-white/5 pt-2">
-                   <span className="text-xs text-gray-600 font-mono">ID: {t.id}</span>
+                   <span className="text-xs text-gray-600 font-mono">ID: {t.ticket_no}</span>
                    <span className="text-green-400 text-xs font-bold flex items-center gap-1">
-                     <CheckCircle className="w-3 h-3" /> Cleared at {t.resolvedAt ? new Date(t.resolvedAt).toLocaleTimeString() : ''}
+                     <CheckCircle className="w-3 h-3" /> Cleared at {t.resolved_at ? new Date(t.resolved_at).toLocaleTimeString() : ''}
                    </span>
                  </div>
               )}

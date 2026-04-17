@@ -1,55 +1,72 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../api/axiosConfig';
+
 
 export const TicketContext = createContext();
 
 export const useTickets = () => useContext(TicketContext);
 
 export const TicketProvider = ({ children }) => {
-  const [tickets, setTickets] = useState(() => {
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTickets = async () => {
     try {
-      const saved = sessionStorage.getItem('solar_tickets');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+      const res = await api.get('support-tickets/');
+      setTickets(res.data);
+    } catch (err) {
+      console.error("Failed to fetch tickets:", err);
+    } finally {
+      setLoading(false);
     }
-  });
+  };
 
   useEffect(() => {
-    sessionStorage.setItem('solar_tickets', JSON.stringify(tickets));
-  }, [tickets]);
+    fetchTickets();
+  }, []);
 
-  const addTicket = (customerName, issueType, description) => {
-    const newTicket = {
-      id: 'TKT-' + Math.floor(1000 + Math.random() * 9000),
-      customerName,
-      type: issueType,
-      description,
-      status: 'Pending',
-      createdAt: new Date().toISOString(),
-      resolvedAt: null
-    };
-    setTickets(prev => [newTicket, ...prev]);
-    return newTicket.id;
+
+  const addTicket = async (customerName, issueType, description) => {
+    const user = JSON.parse(sessionStorage.getItem('solar_user'));
+    if (!user) return;
+
+    try {
+      const res = await api.post('support-tickets/', {
+        client: user.id,
+        ticket_no: 'TKT-' + Math.floor(1000 + Math.random() * 9000),
+        type: issueType,
+        description: description,
+        status: 'Pending'
+      });
+      setTickets(prev => [res.data, ...prev]);
+      return res.data.ticket_no;
+    } catch (err) {
+      console.error("Error raising ticket:", err);
+    }
   };
 
-  const resolveTicket = (id) => {
-    setTickets(prev => 
-      prev.map(t => 
-        t.id === id 
-          ? { ...t, status: 'Resolved', resolvedAt: new Date().toISOString() } 
-          : t
-      )
-    );
+  const resolveTicket = async (id) => {
+    try {
+      const res = await api.patch(`support-tickets/${id}/`, {
+        status: 'Resolved',
+        resolved_at: new Date().toISOString()
+      });
+      setTickets(prev => prev.map(t => t.id === id ? res.data : t));
+    } catch (err) {
+      console.error("Error resolving ticket:", err);
+    }
   };
 
-  const assignTicket = (id, workerId, workerName) => {
-    setTickets(prev => 
-      prev.map(t => 
-        t.id === id 
-          ? { ...t, status: 'Dispatched', assignedWorkerId: workerId, assignedWorkerName: workerName } 
-          : t
-      )
-    );
+  const assignTicket = async (id, workerId, workerName) => {
+    try {
+      const res = await api.patch(`support-tickets/${id}/`, {
+        status: 'Dispatched',
+        assigned_worker: workerId
+      });
+      setTickets(prev => prev.map(t => t.id === id ? res.data : t));
+    } catch (err) {
+      console.error("Error assigning ticket:", err);
+    }
   };
 
   const clearTickets = () => {
@@ -57,7 +74,7 @@ export const TicketProvider = ({ children }) => {
   };
 
   return (
-    <TicketContext.Provider value={{ tickets, addTicket, resolveTicket, assignTicket, clearTickets }}>
+    <TicketContext.Provider value={{ tickets, loading, addTicket, resolveTicket, assignTicket, clearTickets, fetchTickets }}>
       {children}
     </TicketContext.Provider>
   );
