@@ -71,7 +71,7 @@ function Features() {
           <div className="bg-[#0f172a] border border-white/5 p-4 rounded-3xl relative overflow-hidden backdrop-blur-xl group order-2 md:order-1">
              <div className="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-all"></div>
              <div className="bg-[#020617] h-80 rounded-2xl border border-white/5 flex items-center justify-center relative z-10 overflow-hidden">
-                <BarChart3 className="w-40 h-40 text-yellow-500/20" />
+                <img src="/images/telemetry_analytics.png" alt="Telemetry Analytics Dashboard" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
              </div>
           </div>
           <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 md:order-2">
