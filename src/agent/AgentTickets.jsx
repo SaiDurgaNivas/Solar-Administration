@@ -8,6 +8,7 @@ function AgentTickets() {
   const { tickets, resolveTicket, assignTicket } = useTickets();
   const [team, setTeam] = useState([]);
   const [assignSelect, setAssignSelect] = useState({});
+  const [activeTab, setActiveTab] = useState("Active"); // "Active" or "History"
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -40,13 +41,24 @@ function AgentTickets() {
         <p className="text-gray-400 text-lg mt-2">Active support and maintenance requests</p>
       </motion.div>
 
-      <div className="grid md:grid-cols-2 gap-4 max-w-5xl mx-auto">
-        {tickets.length === 0 ? (
-          <div className="col-span-2 h-64 flex flex-col items-center justify-center text-center opacity-50 border border-dashed border-white/20 rounded-2xl">
-            <ShieldAlert className="w-12 h-12 mb-2" />
-            <p className="font-semibold text-lg">No Active Tickets</p>
-          </div>
-        ) : tickets.map((t, i) => (
+      <div className="max-w-5xl mx-auto">
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit">
+           <button onClick={() => setActiveTab("Active")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'Active' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'text-gray-400 hover:text-white'}`}>
+              Active Tickets
+           </button>
+           <button onClick={() => setActiveTab("History")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'History' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20' : 'text-gray-400 hover:text-white'}`}>
+              History (Resolved)
+           </button>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          {tickets.filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved').length === 0 ? (
+            <div className="col-span-2 h-64 flex flex-col items-center justify-center text-center opacity-50 border border-dashed border-white/20 rounded-2xl">
+              <ShieldAlert className="w-12 h-12 mb-2" />
+              <p className="font-semibold text-lg">No {activeTab} Tickets</p>
+            </div>
+          ) : tickets.filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved').map((t, i) => (
           <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className={`border p-6 rounded-2xl flex flex-col transition-all ${t.status === 'Resolved' ? 'bg-green-500/5 border-green-500/20' : 'bg-[#0f172a]/80 border-red-500/30'}`}>
             <div className="flex justify-between items-start mb-2">
