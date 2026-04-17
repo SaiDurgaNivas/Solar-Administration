@@ -16,7 +16,7 @@ class SubWorkerProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SubWorkerProfile
-        fields = ['job_title', 'agent', 'agent_name', 'raw_password']
+        fields = ['job_title', 'agent', 'agent_name', 'raw_password', 'phone', 'address', 'experience']
 
 class UserSerializer(serializers.ModelSerializer):
     customer_profile = CustomerProfileSerializer(read_only=True)

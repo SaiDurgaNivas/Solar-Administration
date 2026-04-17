@@ -11,6 +11,8 @@ function Workers() {
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedWorker, setSelectedWorker] = useState(null);
   const [newWorker, setNewWorker] = useState({ username: '', email: '', password: '', role: 'sub_worker' });
   const [submitting, setSubmitting] = useState(false);
   const [visiblePasswords, setVisiblePasswords] = useState({}); // Tracking visibility per worker ID
@@ -118,6 +120,25 @@ function Workers() {
       role: 'sub_worker'
     });
   };
+
+  const handleUpdateWorkerProfile = async (e) => {
+    e.preventDefault();
+    try {
+      await api.patch(`users/${selectedWorker.id}/`, {
+        subworker_profile: {
+          phone: selectedWorker.subworker_profile.phone,
+          address: selectedWorker.subworker_profile.address,
+          experience: selectedWorker.subworker_profile.experience
+        }
+      });
+      showToast("Worker profile updated!");
+      setShowViewModal(false);
+      fetchData();
+    } catch (err) {
+      showToast("Update failed.");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-10 font-sans relative overflow-hidden">
@@ -239,10 +260,10 @@ function Workers() {
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                      <th className="py-4 px-4 font-semibold w-1/4">Worker Identity</th>
-                      <th className="py-4 px-4 font-semibold w-1/4">Credentials (Login)</th>
+                      <th className="py-4 px-4 font-semibold w-1/5">Worker Identity</th>
+                      <th className="py-4 px-4 font-semibold w-1/5">Credentials</th>
                       <th className="py-4 px-4 font-semibold">Today's Status</th>
-                      <th className="py-4 px-4 font-semibold text-right">Log Attendance</th>
+                      <th className="py-4 px-4 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -313,27 +334,27 @@ function Workers() {
                           <td className="py-5 px-4 text-right">
                              <div className="flex justify-end gap-2 items-center">
                                 <button 
+                                    onClick={() => { setSelectedWorker(worker); setShowViewModal(true); }}
+                                    className="px-3 py-2 bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/30 rounded-lg text-xs font-bold transition"
+                                >
+                                    Details
+                                </button>
+                                <div className="h-4 w-[1px] bg-white/10 mx-1"></div>
+                                <button 
                                     onClick={() => markAttendance(worker.id, "Present")}
                                     className="px-3 py-2 hover:bg-green-500 hover:text-white border border-green-500/30 text-green-400 rounded-lg text-xs font-bold transition"
                                 >
-                                    Present
+                                    P
                                 </button>
                                 <button 
                                     onClick={() => markAttendance(worker.id, "Absent")}
                                     className="px-3 py-2 hover:bg-red-500 hover:text-white border border-red-500/30 text-red-400 rounded-lg text-xs font-bold transition"
                                 >
-                                    Absent
-                                </button>
-                                <button 
-                                    onClick={() => markAttendance(worker.id, "On Leave")}
-                                    className="px-3 py-2 hover:bg-yellow-500 hover:text-black border border-yellow-500/30 text-yellow-400 rounded-lg text-xs font-bold transition"
-                                >
-                                    Leave
+                                    A
                                 </button>
                                 <button
                                     onClick={() => handleRemoveWorker(worker.id)}
                                     className="p-2 ml-1 bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/30 text-red-400 rounded-lg transition"
-                                    title="Remove Worker"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
@@ -349,10 +370,68 @@ function Workers() {
             )}
           </div>
         </motion.div>
-
       </div>
+
+      {/* View/Edit Worker Details Modal */}
+      <AnimatePresence>
+        {showViewModal && selectedWorker && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-[#0f172a] border border-white/10 p-8 rounded-[2rem] shadow-2xl w-full max-w-lg relative">
+                <button onClick={() => setShowViewModal(false)} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition"><X className="w-5 h-5"/></button>
+                <div className="flex items-center gap-4 mb-8">
+                   <div className="w-16 h-16 rounded-full bg-cyan-500 flex items-center justify-center text-2xl font-black text-[#020617] shadow-xl">{selectedWorker.username[0].toUpperCase()}</div>
+                   <div>
+                      <h2 className="text-2xl font-bold text-white tracking-tight capitalize">{selectedWorker.username.replace(/_/g, ' ')}</h2>
+                      <p className="text-cyan-400 font-bold text-xs uppercase tracking-widest">{selectedWorker.subworker_profile?.job_title || 'Field Worker'}</p>
+                   </div>
+                </div>
+
+                <form onSubmit={handleUpdateWorkerProfile} className="space-y-4">
+                   <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Phone Number</label>
+                        <input 
+                           type="text" 
+                           value={selectedWorker.subworker_profile?.phone || ''} 
+                           onChange={e => setSelectedWorker({...selectedWorker, subworker_profile: {...selectedWorker.subworker_profile, phone: e.target.value}})}
+                           className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none transition" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Experience</label>
+                        <select 
+                           value={selectedWorker.subworker_profile?.experience || ''} 
+                           onChange={e => setSelectedWorker({...selectedWorker, subworker_profile: {...selectedWorker.subworker_profile, experience: e.target.value}})}
+                           className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none transition"
+                        >
+                           <option value="Junior">Junior</option>
+                           <option value="Intermediate">Intermediate</option>
+                           <option value="Senior">Senior</option>
+                        </select>
+                      </div>
+                   </div>
+                   <div>
+                      <label className="block text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Full Address</label>
+                      <textarea 
+                         value={selectedWorker.subworker_profile?.address || ''} 
+                         onChange={e => setSelectedWorker({...selectedWorker, subworker_profile: {...selectedWorker.subworker_profile, address: e.target.value}})}
+                         className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyan-500 outline-none h-24 resize-none transition" 
+                      />
+                   </div>
+                   <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2">System Login Details</p>
+                      <p className="text-sm font-mono text-cyan-400 border-b border-white/5 pb-1 mb-1">Email: {selectedWorker.email}</p>
+                      <p className="text-sm font-mono text-gray-300">Access: {selectedWorker.subworker_profile?.raw_password || "********"}</p>
+                   </div>
+                   <button type="submit" className="w-full mt-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black py-4 rounded-xl shadow-xl hover:shadow-cyan-500/20 transition-all uppercase tracking-widest">Commit Profile Changes</button>
+                </form>
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
 
 export default Workers;

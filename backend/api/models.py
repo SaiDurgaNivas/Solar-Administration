@@ -128,6 +128,11 @@ class SubWorkerProfile(models.Model):
     job_title = models.CharField(max_length=20, choices=(('technician', 'Technician'), ('worker', 'Worker')))
     raw_password = models.CharField(max_length=100, blank=True, null=True, default="pass123!")
     
+    # New Personal Details
+    phone = models.CharField(max_length=20, blank=True, null=True, default="Not Provided")
+    address = models.TextField(blank=True, null=True, default="No Address Linked")
+    experience = models.CharField(max_length=50, blank=True, null=True, default="Junior")
+    
     def __str__(self):
         return f"{self.user.username} ({self.job_title}) under {self.agent.username}"
 

@@ -12,6 +12,9 @@ function WorkerDashboard() {
   const { tickets: contextTickets, resolveTicket, loading: loadingTicks } = useTickets();
   const [tasks, setTasks] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState({ phone: '', address: '', experience: '' });
+
 
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [loadingAttendance, setLoadingAttendance] = useState(true);
@@ -447,26 +450,70 @@ function WorkerDashboard() {
                     </div>
                  </div>
                  <div className="p-8 pt-20">
-                   <h2 className="text-3xl font-black text-white tracking-tight">{user.first_name || user.username || 'Field Specialist'}</h2>
-                   <p className="text-orange-400 font-black uppercase tracking-widest text-sm mt-1 mb-10 flex items-center gap-2">
-                     <HardHat className="w-4 h-4" /> {user.role || 'Sub Worker'} Division
-                   </p>
+                    <div className="flex justify-between items-center mb-10">
+                       <div>
+                         <h2 className="text-3xl font-black text-white tracking-tight">{user.first_name || user.username || 'Field Specialist'}</h2>
+                         <p className="text-orange-400 font-black uppercase tracking-widest text-sm mt-1 flex items-center gap-2">
+                           <HardHat className="w-4 h-4" /> {user.role || 'Sub Worker'} Division
+                         </p>
+                       </div>
+                       <button 
+                         onClick={() => setShowEditModal(true)}
+                         className="bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-black border border-orange-500/20 px-6 py-2 rounded-xl font-bold transition-all text-sm"
+                       >
+                         Edit Profile
+                       </button>
+                    </div>
 
-                   <div className="space-y-4 border-t border-white/10 pt-8">
-                     {[
-                       { label: 'System ID', value: user.id || 'N/A' },
-                       { label: 'Username', value: user.username || 'N/A' },
-                       { label: 'Email Access', value: user.email || 'Not configured' },
-                       { label: 'Clearance Date', value: user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'Active' },
-                     ].map((info, idx) => (
-                        <div key={idx} className="grid grid-cols-[1fr_2fr] items-center p-5 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl border border-white/5">
-                          <span className="text-gray-400 font-bold text-sm uppercase tracking-wider">{info.label}</span>
-                          <span className="text-white font-bold text-lg">{info.value}</span>
-                        </div>
-                     ))}
-                   </div>
-                 </div>
-               </div>
+                    <div className="space-y-4 border-t border-white/10 pt-8">
+                      {[
+                        { label: 'System ID', value: user.id || 'N/A' },
+                        { label: 'Username', value: user.username || 'N/A' },
+                        { label: 'Email Access', value: user.email || 'Not configured' },
+                        { label: 'Contact Phone', value: user.subworker_profile?.phone || 'Not Provided' },
+                        { label: 'Base Location', value: user.subworker_profile?.address || 'No Address Linked' },
+                        { label: 'Rank/Exp', value: user.subworker_profile?.experience || 'Junior' },
+                        { label: 'Clearance Date', value: user.date_joined ? new Date(user.date_joined).toLocaleDateString() : 'Active' },
+                      ].map((info, idx) => (
+                         <div key={idx} className="grid grid-cols-[1fr_2fr] items-center p-5 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl border border-white/5">
+                           <span className="text-gray-400 font-bold text-sm uppercase tracking-wider">{info.label}</span>
+                           <span className="text-white font-bold text-lg">{info.value}</span>
+                         </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Profile Modal */}
+                <AnimatePresence>
+                  {showEditModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                       <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-[#0f172a] border border-white/10 p-8 rounded-[2rem] shadow-2xl w-full max-w-lg relative">
+                          <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition"><X className="w-5 h-5"/></button>
+                          <h2 className="text-2xl font-bold text-white mb-6">Update Personal Data</h2>
+                          <form onSubmit={handleEditProfile} className="space-y-5">
+                             <div>
+                               <label className="block text-xs text-gray-400 uppercase font-black tracking-widest mb-2">Phone Number</label>
+                               <input type="text" value={editData.phone} onChange={e => setEditData({...editData, phone: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none" placeholder="+91 00000 00000" />
+                             </div>
+                             <div>
+                               <label className="block text-xs text-gray-400 uppercase font-black tracking-widest mb-2">Home Address</label>
+                               <textarea value={editData.address} onChange={e => setEditData({...editData, address: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none h-24 resize-none" placeholder="Enter your full address..." />
+                             </div>
+                             <div>
+                               <label className="block text-xs text-gray-400 uppercase font-black tracking-widest mb-2">Experience Level</label>
+                               <select value={editData.experience} onChange={e => setEditData({...editData, experience: e.target.value})} className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500/50 outline-none appearance-none">
+                                  <option value="Junior">Junior (0-2 Years)</option>
+                                  <option value="Intermediate">Intermediate (2-5 Years)</option>
+                                  <option value="Senior">Senior (5+ Years)</option>
+                               </select>
+                             </div>
+                             <button type="submit" className="w-full mt-4 bg-orange-500 text-black font-black py-4 rounded-xl shadow-xl hover:shadow-orange-500/20 active:scale-[0.98] transition-all uppercase tracking-widest">Update Information</button>
+                          </form>
+                       </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
              </motion.div>
           )}
 
