@@ -96,6 +96,7 @@ function Billing() {
   // 💰 TOTAL PAID
   const totalPaid = bills.filter((b) => b.status === "Paid").reduce((sum, b) => sum + parseFloat(b.amount || 0), 0);
   const totalPending = bills.filter((b) => b.status === "Unpaid").reduce((sum, b) => sum + parseFloat(b.amount || 0), 0);
+  const totalMaterialsCost = bills.reduce((sum, b) => sum + parseFloat(b.amount || 0) + parseFloat(b.subsidy || 0), 0);
 
   return (
     <div className="bg-[#020617] min-h-screen p-6 font-sans text-white overflow-x-hidden">
@@ -215,6 +216,7 @@ function Billing() {
       {/* MACRO SUMMARY CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
+            { tag: "Total Material Cost", value: `₹${totalMaterialsCost.toLocaleString()}`, color: "text-blue-400", sub: "Global hardware valuation" },
             { tag: "Outstanding Debt", value: `₹${totalPending.toLocaleString()}`, color: "text-red-400", sub: `${bills.filter(b => b.status === "Unpaid").length} active ledgers` },
             { tag: "Resolved Revenue", value: `₹${totalPaid.toLocaleString()}`, color: "text-green-400", sub: `${bills.filter(b => b.status === "Paid").length} settled ledgers` },
             { tag: "Network Invoices", value: bills.length, color: "text-white", sub: "Total volume generated" }
@@ -254,6 +256,7 @@ function Billing() {
                   <th className="p-5 font-semibold">Client Link</th>
                   <th className="p-5 font-semibold">Timeline</th>
                   <th className="p-5 font-semibold">KWh Metric</th>
+                  <th className="p-5 font-semibold text-right">Materials (Gross)</th>
                   <th className="p-5 font-semibold text-right">Net Charge</th>
                   <th className="p-5 font-semibold text-center">Clearance</th>
                 </tr>
@@ -265,7 +268,8 @@ function Billing() {
                     <td className="p-5 text-gray-400 font-medium">@{bill.client_name || 'unknown_node'}</td>
                     <td className="p-5 text-gray-500 text-sm tracking-wide">{bill.date || 'Syncing...'}</td>
                     <td className="p-5 text-gray-300">{bill.units} kW</td>
-                    <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount).toLocaleString()}</td>
+                    <td className="p-5 font-bold text-right text-blue-300">₹{(parseFloat(bill.amount || 0) + parseFloat(bill.subsidy || 0)).toLocaleString()}</td>
+                    <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount || 0).toLocaleString()}</td>
                     
                     <td className="p-5 text-center">
                       <div className="flex flex-col items-center gap-1">
