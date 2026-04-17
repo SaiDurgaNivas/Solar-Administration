@@ -27,7 +27,20 @@ function AdminBookings() {
     'Forwarded'
   ].includes(booking.status));
 
-  const displayedBookings = activeTab === 'new' ? newRequests : bookings;
+  const pendingRequests = bookings.filter((booking) => ![
+    'Completed', 
+    'Awaiting Admin', 
+    'Forwarded', 
+    'Loan Rejected'
+  ].includes(booking.status));
+
+  const completedRequests = bookings.filter((booking) => booking.status === 'Completed');
+
+  const displayedBookings = 
+    activeTab === 'new' ? newRequests : 
+    activeTab === 'pending' ? pendingRequests :
+    activeTab === 'completed' ? completedRequests :
+    bookings;
 
   useEffect(() => {
     fetchBookings();
@@ -207,6 +220,8 @@ function AdminBookings() {
         <div className="flex flex-wrap gap-3">
           {[
             { key: 'new', label: 'New Requests', count: newRequests.length },
+            { key: 'pending', label: 'Pending Bookings', count: pendingRequests.length },
+            { key: 'completed', label: 'Completed', count: completedRequests.length },
             { key: 'all', label: 'All Bookings', count: bookings.length }
           ].map((tab) => (
             <button
@@ -304,8 +319,18 @@ function AdminBookings() {
         )) : (
             <div className="text-center py-20 border border-white/5 rounded-3xl bg-[#0f172a]/30">
                 <AlertCircle className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-400">{activeTab === 'new' ? 'No New Admin Requests' : 'No Bookings Found'}</h3>
-                <p className="text-gray-600 mt-2">{activeTab === 'new' ? 'There are currently no appointment requests pending admin review.' : 'No booking records are available at this time.'}</p>
+                <h3 className="text-xl font-bold text-gray-400">
+                    {activeTab === 'new' ? 'No New Admin Requests' : 
+                     activeTab === 'pending' ? 'No Pending Bookings' : 
+                     activeTab === 'completed' ? 'No Completed Bookings' : 
+                     'No Bookings Found'}
+                </h3>
+                <p className="text-gray-600 mt-2">
+                    {activeTab === 'new' ? 'There are currently no appointment requests pending admin review.' : 
+                     activeTab === 'pending' ? 'There are currently no active bookings in progress.' : 
+                     activeTab === 'completed' ? 'No installations have been completed yet.' : 
+                     'No booking records are available at this time.'}
+                </p>
             </div>
         )}
       </div>
