@@ -48,7 +48,7 @@ function WorkerDashboard() {
   };
 
   // Filter context tickets dispatched to this worker
-  const myTickets = contextTickets.filter(t => Number(t.assigned_worker) === Number(user.id));
+  const myTickets = (contextTickets || []).filter(t => Number(t.assigned_worker) === Number(user?.id));
 
 
   const fetchAttendance = async () => {
