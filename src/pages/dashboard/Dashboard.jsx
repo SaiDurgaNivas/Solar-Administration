@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Users, Activity, Zap, CheckCircle, PlusCircle, PenTool, FileText, Bell, AlertTriangle, MapPin, HardHat } from "lucide-react";
+import { Users, Zap, CheckCircle, PlusCircle, FileText, Bell, AlertTriangle, MapPin, HardHat, IndianRupee, Clock } from "lucide-react";
 import api from "../../api/axiosConfig";
 import { useLiveTime } from "../../hooks/useLiveTime";
 
@@ -14,7 +14,7 @@ const Dashboard = () => {
     activeSystems: 0,
   });
   
-  const [notifications, setNotifications] = useState([]);
+  const [recentPayments, setRecentPayments] = useState([]);
   const [activeOps, setActiveOps] = useState([]);
 
   const { timeString, dateString, greeting } = useLiveTime();
@@ -22,28 +22,25 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const [customersRes, installationsRes, billsRes, forwardedRes, opsRes] = await Promise.all([
+            const [customersRes, installationsRes, billsRes, opsRes] = await Promise.all([
                 api.get('users/?role=customer'),
                 api.get('installations/'),
                 api.get('bills/'),
-                api.get('bookings/?status=Forwarded'),
                 api.get('teamtasks/')
             ]);
             
             const customers = customersRes.data;
             const installations = installationsRes.data;
             const bills = billsRes.data;
-            const forwardedBookings = forwardedRes.data;
             
             setActiveOps(opsRes.data);
 
             const activeSystems = installations.filter(item => item.status === "Active" || item.status === "Completed").length;
             
-            // Calculate capacity dynamically from available solar arrays
             const savedPanels = JSON.parse(sessionStorage.getItem('solar_panels') || "[]");
             const totalEnergy = savedPanels.length > 0
                 ? savedPanels.reduce((acc, curr) => acc + (parseFloat(curr.capacity) || 0), 0)
-                : installations.reduce((acc, curr) => acc + 5, 0); // Mock 5kW per system fallback
+                : installations.reduce((acc, curr) => acc + 5, 0);
 
             setStats({
                 totalCustomers: customers.length,
@@ -52,48 +49,11 @@ const Dashboard = () => {
                 activeSystems
             });
 
-            // GENERATE PLAIN ENGLISH NOTIFICATIONS
-            let notifs = [];
-
-            // 1. Installation Notifications
-            installations.forEach(inst => {
-                notifs.push({
-                    id: `inst-${inst.id}`,
-                    icon: PenTool, color: "text-orange-400", bg: "bg-orange-500/10",
-                    title: "New Installation Requested",
-                    message: `Customer ${inst.client_name || 'unknown'} has requested a new solar installation for their property.`,
-                    tag: inst.status
-                });
-            });
-
-            // 2. Billing Notifications
-            bills.forEach(bill => {
-                const isPaid = bill.status === "Paid";
-                notifs.push({
-                    id: `bill-${bill.id}`,
-                    icon: FileText, color: isPaid ? "text-green-400" : "text-blue-400", bg: isPaid ? "bg-green-500/10" : "bg-blue-500/10",
-                    title: isPaid ? "Payment Received" : "Invoice Issued",
-                    message: isPaid 
-                      ? `Customer ${bill.client_name || 'unknown'} successfully paid their bill of ₹${bill.amount}.`
-                      : `A new bill of ₹${bill.amount} was issued to customer ${bill.client_name || 'unknown'}.`,
-                    tag: isPaid ? "Completed" : "Pending"
-                });
-            });
-
-            // 3. Escalated Bookings
-            forwardedBookings.forEach(fb => {
-                notifs.push({
-                    id: `escalated-${fb.id}`,
-                    icon: AlertTriangle, color: "text-purple-400", bg: "bg-purple-500/10",
-                    title: "Escalated Appointment",
-                    message: `Agent ${fb.agent_username ? fb.agent_username.replace('_', ' ') : 'Unknown'} forwarded an appointment request from ${fb.client_name || 'Customer'}.`,
-                    tag: "REQUIRES ADMIN"
-                });
-            });
-
-            // Sort by descending ID to simulate "Most Recent First"
-            notifs.sort((a,b) => b.id.localeCompare(a.id));
-            setNotifications(notifs.slice(0, 5));
+            // Build Recent Payments from paid bills sorted by paid_at desc
+            const paid = bills
+                .filter(b => b.status === 'Paid')
+                .sort((a, b) => new Date(b.paid_at || b.date) - new Date(a.paid_at || a.date));
+            setRecentPayments(paid.slice(0, 8));
 
         } catch (error) {
             console.error("Error fetching admin dashboard data:", error);
@@ -177,47 +137,52 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* System Notifications Feed */}
+        {/* Recent Payments Feed */}
         <div className="lg:col-span-2 bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Bell className="text-orange-400" /> Notifications & Activity
+                <IndianRupee className="text-green-400 w-5 h-5" /> Recent Customer Payments
               </h2>
+              <Link to="/billing" className="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-widest transition">View All →</Link>
           </div>
 
-          <div className="p-6">
+          <div className="divide-y divide-white/5">
             {loading ? (
-                <div className="space-y-4">
-                  {[1,2,3].map(i => <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse"></div>)}
+                <div className="p-6 space-y-4">
+                  {[1,2,3].map(i => <div key={i} className="h-16 bg-white/5 rounded-2xl animate-pulse"></div>)}
                 </div>
-            ) : notifications.length === 0 ? (
+            ) : recentPayments.length === 0 ? (
               <div className="text-center py-12">
-                <Bell className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 font-medium">No recent notifications</p>
+                <IndianRupee className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 font-medium">No payments received yet</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {notifications.map((notif, idx) => (
-                  <motion.div 
-                    key={notif.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex items-start gap-4 bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition"
-                  >
-                     <div className={`p-3 rounded-xl ${notif.bg} shrink-0`}>
-                       <notif.icon className={`w-6 h-6 ${notif.color}`} />
-                     </div>
-                     <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                           <h3 className="font-bold text-gray-100">{notif.title}</h3>
-                           <span className="text-xs font-bold px-2 py-1 bg-white/5 rounded text-gray-400 uppercase tracking-widest">{notif.tag}</span>
-                        </div>
-                        <p className="text-gray-400 text-sm mt-1">{notif.message}</p>
-                     </div>
-                  </motion.div>
-                ))}
-              </div>
+              recentPayments.map((payment, idx) => (
+                <motion.div
+                  key={payment.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition"
+                >
+                  <div className="p-3 bg-green-500/10 rounded-xl shrink-0 border border-green-500/20">
+                    <IndianRupee className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-100 truncate">@{payment.client_name || 'unknown'}</p>
+                    <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                      <Clock className="w-3 h-3" />
+                      {payment.paid_at
+                        ? new Date(payment.paid_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+                        : payment.date || 'Date not recorded'}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-extrabold text-green-400 text-lg">₹{parseFloat(payment.amount).toLocaleString()}</p>
+                    <span className="text-[10px] font-bold text-green-500/70 uppercase tracking-widest">Paid</span>
+                  </div>
+                </motion.div>
+              ))
             )}
           </div>
         </div>
