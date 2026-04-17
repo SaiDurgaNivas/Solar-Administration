@@ -32,7 +32,8 @@ function WorkerHeader({ user, onLogout }) {
   const showBackButton = location.pathname !== '/worker-dashboard';
 
   return (
-    <header className="w-full bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-sm text-white">
+    <>
+      <header className="w-full bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-sm text-white">
       <div className="flex justify-between items-center px-6 py-4">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
@@ -165,6 +166,7 @@ function WorkerHeader({ user, onLogout }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </>
   );
 }
 
