@@ -30,7 +30,7 @@ function Home() {
       {/* ================= NAVBAR ================= */}
       <nav className="flex justify-between items-center px-6 md:px-12 py-6 backdrop-blur-xl bg-[#020617]/50 border-b border-light/5 sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <Link to="/login" title="Portal Login" className="hover:scale-110 transition-transform duration-300">
+          <Link to="/login" state={{ showStaff: true }} title="Portal Login" className="hover:scale-110 transition-transform duration-300">
             <Sun className="w-8 h-8 text-orange-500 cursor-pointer" />
           </Link>
           <h1 className="text-2xl font-bold text-white tracking-wide">
@@ -378,7 +378,9 @@ function Home() {
           {/* Column 1 */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Sun className="w-6 h-6 text-orange-500" />
+              <Link to="/login" state={{ showStaff: true }} title="Portal Login" className="hover:scale-110 transition-transform duration-300">
+                <Sun className="w-6 h-6 text-orange-500 cursor-pointer" />
+              </Link>
               <h2 className="text-xl font-bold tracking-wide text-white">
                 RC Solar<span className="text-orange-500">Solutions</span>
               </h2>

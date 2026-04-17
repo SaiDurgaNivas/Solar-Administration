@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sun, CheckCircle, ArrowRight, Loader2, Eye, EyeOff, Mail, Home, Shield, Lock, Briefcase, HardHat, Users, ChevronLeft } from "lucide-react";
 import api from "../../api/axiosConfig"; // Axios for Django
@@ -14,6 +14,8 @@ function Login({ onLogin }) {
   const [step, setStep] = useState('login'); // 'login' | '2fa'
   const [secretCode, setSecretCode] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const showStaff = location.state?.showStaff || false;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -156,7 +158,7 @@ function Login({ onLogin }) {
             <p className="text-gray-400 text-lg uppercase tracking-widest font-semibold">Select Your Designated Operations Portal</p>
           </motion.div>
 
-          <div className="flex justify-center max-w-sm mx-auto w-full relative z-10 px-4">
+          <div className={`${showStaff ? 'grid md:grid-cols-3 max-w-6xl' : 'flex justify-center max-w-sm'} gap-8 mx-auto w-full relative z-10 px-4`}>
             {/* Customer Portal */}
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('customer')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -165,6 +167,28 @@ function Login({ onLogin }) {
                <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Manage your appointments, billing, and system diagnostics.</p>
                <div className="font-bold text-blue-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
             </motion.button>
+            
+            {showStaff && (
+              <>
+                {/* Agent Portal */}
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('agent')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-orange-500/20 hover:border-orange-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
+                   <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                   <div className="p-4 bg-orange-500/10 rounded-2xl w-fit mb-6 border border-orange-500/20"><Briefcase className="w-8 h-8 text-orange-400" /></div>
+                   <h2 className="text-3xl font-bold mb-3">Agent Terminal</h2>
+                   <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Field coordination, document verification, and deployment queues.</p>
+                   <div className="font-bold text-orange-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
+                </motion.button>
+
+                {/* Worker Portal */}
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('sub_worker')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
+                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                   <div className="p-4 bg-cyan-500/10 rounded-2xl w-fit mb-6 border border-cyan-500/20"><HardHat className="w-8 h-8 text-cyan-400" /></div>
+                   <h2 className="text-3xl font-bold mb-3">Field Ops</h2>
+                   <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Task tracking, site photos, and daily attendance logs.</p>
+                   <div className="font-bold text-cyan-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
+                </motion.button>
+              </>
+            )}
           </div>
 
           <button onClick={() => { setSelectedPortal('admin'); setEmail('admin@solar.com'); setPassword('admin123'); }} className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
