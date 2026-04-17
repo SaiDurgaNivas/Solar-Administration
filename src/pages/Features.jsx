@@ -107,9 +107,9 @@ function Features() {
             </ul>
           </motion.div>
           <div className="bg-[#0f172a] border border-white/5 p-4 rounded-3xl relative overflow-hidden backdrop-blur-xl group">
-             <div className="absolute inset-0 bg-gradient-to-tr from-green-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-all"></div>
+             <div className="absolute inset-0 bg-gradient-to-tr from-green-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-colors"></div>
              <div className="bg-[#020617] h-80 rounded-2xl border border-white/5 flex items-center justify-center relative z-10 overflow-hidden">
-                <FileText className="w-40 h-40 text-green-500/20" />
+                <img src="/images/billing_ui.png" alt="Automated PPA Billing Interface" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
              </div>
           </div>
         </section>
@@ -117,9 +117,9 @@ function Features() {
         {/* Feature 4 */}
         <section id="predictive-alerts" className="grid md:grid-cols-2 gap-12 items-center">
           <div className="bg-[#0f172a] border border-white/5 p-4 rounded-3xl relative overflow-hidden backdrop-blur-xl group order-2 md:order-1">
-             <div className="absolute inset-0 bg-gradient-to-tr from-red-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-all"></div>
+             <div className="absolute inset-0 bg-gradient-to-tr from-red-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-colors"></div>
              <div className="bg-[#020617] h-80 rounded-2xl border border-white/5 flex items-center justify-center relative z-10 overflow-hidden">
-                <ShieldAlert className="w-40 h-40 text-red-500/20" />
+                <img src="/images/alerts_ui.png" alt="Predictive Alerts Interface" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
              </div>
           </div>
           <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="order-1 md:order-2">
