@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, FileText, CheckCircle, Clock, Plus, X, Building } from "lucide-react";
+import { Search, FileText, CheckCircle, Clock, Plus, X, Building, Package, IndianRupee } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Billing() {
   const [bills, setBills] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showMaterials, setShowMaterials] = useState(false);
 
   // Form State for creating a new Invoice
   const [billForm, setBillForm] = useState({
@@ -31,9 +33,10 @@ function Billing() {
   const fetchBills = async (showLoader = true) => {
     try {
         if (showLoader) setLoading(true);
-        const [billsRes, custRes] = await Promise.all([
+        const [billsRes, custRes, bookingsRes] = await Promise.all([
             api.get('bills/'),
-            api.get('users/?role=customer')
+            api.get('users/?role=customer'),
+            api.get('bookings/')
         ]);
         let billsData = billsRes.data;
         const demoStatus = localStorage.getItem('demo_bill_status');
@@ -51,6 +54,7 @@ function Billing() {
         
         setBills(billsData);
         setCustomers(custRes.data);
+        setBookings(bookingsRes.data);
     } catch (err) {
         console.error("Failed to fetch billing data", err);
     } finally {
@@ -93,10 +97,23 @@ function Billing() {
     (bill.client_name?.toLowerCase().includes(search.toLowerCase()))
   );
 
-  // 💰 TOTAL PAID
+  // 💰 TOTALS
   const totalPaid = bills.filter((b) => b.status === "Paid").reduce((sum, b) => sum + parseFloat(b.amount || 0), 0);
   const totalPending = bills.filter((b) => b.status === "Unpaid").reduce((sum, b) => sum + parseFloat(b.amount || 0), 0);
-  const totalMaterialsCost = bills.reduce((sum, b) => sum + parseFloat(b.amount || 0) + parseFloat(b.subsidy || 0), 0);
+
+  // 🔩 MATERIALS COST from bookings (loan = material cost approximation from booking docs)
+  const PANEL_UNIT_COST = 8500;   // ₹ per panel
+  const INVERTER_COST   = 12000;  // ₹ per inverter
+  const BATTERY_COST    = 7000;   // ₹ per battery
+  const ROD_UNIT_COST   = 350;    // ₹ per rod
+  const WIRE_COST       = 2500;   // ₹ flat wiring cost
+
+  const bookingsWithDocs = bookings.filter(b => b.documents);
+  const totalMaterialsCost = bookingsWithDocs.reduce((sum, b) => {
+    const panelCount = parseInt(b.documents?.panel_count || b.documents?.panelCount || 1);
+    const rodCount   = parseInt(b.documents?.rod_count || 0);
+    return sum + PANEL_UNIT_COST * panelCount + INVERTER_COST + BATTERY_COST + ROD_UNIT_COST * rodCount + WIRE_COST;
+  }, 0);
 
   return (
     <div className="bg-[#020617] min-h-screen p-6 font-sans text-white overflow-x-hidden">
@@ -216,10 +233,10 @@ function Billing() {
       {/* MACRO SUMMARY CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
-            { tag: "Total Material Cost", value: `₹${totalMaterialsCost.toLocaleString()}`, color: "text-blue-400", sub: "Global hardware valuation" },
             { tag: "Outstanding Debt", value: `₹${totalPending.toLocaleString()}`, color: "text-red-400", sub: `${bills.filter(b => b.status === "Unpaid").length} active ledgers` },
             { tag: "Resolved Revenue", value: `₹${totalPaid.toLocaleString()}`, color: "text-green-400", sub: `${bills.filter(b => b.status === "Paid").length} settled ledgers` },
-            { tag: "Network Invoices", value: bills.length, color: "text-white", sub: "Total volume generated" }
+            { tag: "Network Invoices", value: bills.length, color: "text-white", sub: "Total volume generated" },
+            { tag: "Total Materials Cost", value: `₹${totalMaterialsCost.toLocaleString()}`, color: "text-orange-400", sub: `${bookingsWithDocs.length} installations tracked` },
         ].map((stat, i) => (
             <motion.div 
                key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
@@ -256,7 +273,6 @@ function Billing() {
                   <th className="p-5 font-semibold">Client Link</th>
                   <th className="p-5 font-semibold">Timeline</th>
                   <th className="p-5 font-semibold">KWh Metric</th>
-                  <th className="p-5 font-semibold text-right">Materials (Gross)</th>
                   <th className="p-5 font-semibold text-right">Net Charge</th>
                   <th className="p-5 font-semibold text-center">Clearance</th>
                 </tr>
@@ -268,8 +284,7 @@ function Billing() {
                     <td className="p-5 text-gray-400 font-medium">@{bill.client_name || 'unknown_node'}</td>
                     <td className="p-5 text-gray-500 text-sm tracking-wide">{bill.date || 'Syncing...'}</td>
                     <td className="p-5 text-gray-300">{bill.units} kW</td>
-                    <td className="p-5 font-bold text-right text-blue-300">₹{(parseFloat(bill.amount || 0) + parseFloat(bill.subsidy || 0)).toLocaleString()}</td>
-                    <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount || 0).toLocaleString()}</td>
+                    <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount).toLocaleString()}</td>
                     
                     <td className="p-5 text-center">
                       <div className="flex flex-col items-center gap-1">
@@ -295,6 +310,82 @@ function Billing() {
             </table>
           </div>
         )}
+      </motion.div>
+
+      {/* MATERIALS COST BREAKDOWN */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+        className="bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-orange-500/20 overflow-hidden mt-8"
+      >
+        <div
+          className="p-6 flex justify-between items-center bg-orange-500/5 border-b border-orange-500/20 cursor-pointer"
+          onClick={() => setShowMaterials(v => !v)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+              <Package className="w-5 h-5 text-orange-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Materials Cost Breakdown</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Per-booking hardware & wiring cost estimates</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-2xl font-extrabold text-orange-400">₹{totalMaterialsCost.toLocaleString()}</span>
+            <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">{showMaterials ? '▲ Collapse' : '▼ Expand'}</span>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showMaterials && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+              {bookingsWithDocs.length === 0 ? (
+                <div className="text-center py-16">
+                  <Package className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+                  <p className="text-gray-500 font-bold">No booking documents available yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-white/5 border-b border-white/10 text-gray-400 text-xs uppercase tracking-widest">
+                        <th className="p-5 font-semibold">Customer</th>
+                        <th className="p-5 font-semibold">Panel Type</th>
+                        <th className="p-5 font-semibold">Inverter</th>
+                        <th className="p-5 font-semibold">Battery</th>
+                        <th className="p-5 font-semibold">Rods</th>
+                        <th className="p-5 font-semibold">Wiring</th>
+                        <th className="p-5 font-semibold text-right">Total Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {bookingsWithDocs.map((b) => {
+                        const panelCount = parseInt(b.documents?.panel_count || b.documents?.panelCount || 1);
+                        const rodCount   = parseInt(b.documents?.rod_count || 0);
+                        const cost = PANEL_UNIT_COST * panelCount + INVERTER_COST + BATTERY_COST + ROD_UNIT_COST * rodCount + WIRE_COST;
+                        return (
+                          <tr key={b.id} className="hover:bg-white/5 transition">
+                            <td className="p-5 font-bold text-gray-200">{b.client_name}</td>
+                            <td className="p-5 text-gray-400 text-sm">{b.documents?.panel_type || 'N/A'} × {panelCount}</td>
+                            <td className="p-5 text-gray-400 text-sm">{b.documents?.inverter_type || 'Standard'}</td>
+                            <td className="p-5 text-gray-400 text-sm">{b.documents?.battery_type || 'Standard'}</td>
+                            <td className="p-5 text-gray-400 text-sm">{rodCount} × {b.documents?.rod_type || 'GI'}</td>
+                            <td className="p-5 text-gray-400 text-sm">{b.documents?.wire_type || 'Standard'}</td>
+                            <td className="p-5 font-extrabold text-right text-orange-400">₹{cost.toLocaleString()}</td>
+                          </tr>
+                        );
+                      })}
+                      <tr className="bg-orange-500/5 border-t-2 border-orange-500/30">
+                        <td colSpan={6} className="p-5 font-extrabold text-orange-300 uppercase tracking-widest text-sm">Grand Total — All Materials</td>
+                        <td className="p-5 font-extrabold text-right text-2xl text-orange-400">₹{totalMaterialsCost.toLocaleString()}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
