@@ -226,8 +226,9 @@ function Agents() {
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                      <th className="py-4 px-4 font-semibold w-1/3">Agent Identity</th>
-                      <th className="py-4 px-4 font-semibold">Today's Presence</th>
+                      <th className="py-4 px-4 font-semibold w-1/4">Agent Identity</th>
+                      <th className="py-4 px-4 font-semibold">Contact & Location</th>
+                      <th className="py-4 px-4 font-semibold text-center">Operational Status</th>
                       <th className="py-4 px-4 font-semibold text-right">Log Attendance</th>
                     </tr>
                   </thead>
@@ -265,8 +266,19 @@ function Agents() {
                           </td>
 
                           <td className="py-5 px-4">
-                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-bold shadow-inner ${badgeColor}`}>
-                               <StatusIcon className="w-4 h-4" /> {todayStatus}
+                             <div className="flex flex-col gap-1">
+                                <p className="text-gray-200 font-medium text-sm">{agent.agent_profile?.phone || '--'}</p>
+                                <p className="text-gray-500 text-xs italic line-clamp-1">{agent.agent_profile?.address || '--'}</p>
+                             </div>
+                          </td>
+
+                          <td className="py-5 px-4 text-center">
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-extrabold uppercase tracking-widest shadow-inner ${
+                               agent.agent_profile?.status === 'ON DUTY' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                               agent.agent_profile?.status === 'OFF DUTY' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                               'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                            }`}>
+                               ● {agent.agent_profile?.status || todayStatus}
                             </div>
                           </td>
 
