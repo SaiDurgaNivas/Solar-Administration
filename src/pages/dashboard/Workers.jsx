@@ -279,11 +279,15 @@ function Workers() {
                                  <div className="flex items-center gap-2">
                                      <span className="text-[10px] text-gray-400 font-bold uppercase">Pass:</span>
                                      <input 
-                                        type="text" 
-                                        defaultValue="pass123!"
-                                        onBlur={(e) => updatePassword(worker.id, e.target.value)}
-                                        className="bg-transparent border-b border-white/10 text-xs text-white font-mono focus:border-cyan-500 outline-none w-32"
-                                        title="Click to edit password"
+                                        type="password" 
+                                        defaultValue="********"
+                                        onBlur={(e) => {
+                                            if (e.target.value !== "********") {
+                                                updatePassword(worker.id, e.target.value);
+                                            }
+                                        }}
+                                        className="bg-transparent border-b border-white/10 text-xs text-white font-mono focus:border-cyan-500 outline-none w-32 tracking-widest"
+                                        title="Click to reset password"
                                      />
                                  </div>
                               </div>
