@@ -113,6 +113,7 @@ function AgentTickets() {
         ))}
       </div>
     </div>
+  </div>
   );
 }
 
