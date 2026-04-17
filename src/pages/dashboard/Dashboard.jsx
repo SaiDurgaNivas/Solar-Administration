@@ -12,6 +12,8 @@ const Dashboard = () => {
     totalInstallations: 0,
     energyGenerated: 0,
     activeSystems: 0,
+    pendingRequests: 0,
+    pendingInstallations: 0,
   });
   
   const [recentPayments, setRecentPayments] = useState([]);
@@ -22,16 +24,18 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const [customersRes, installationsRes, billsRes, opsRes] = await Promise.all([
+            const [customersRes, installationsRes, billsRes, opsRes, bookingsRes] = await Promise.all([
                 api.get('users/?role=customer'),
                 api.get('installations/'),
                 api.get('bills/'),
-                api.get('teamtasks/')
+                api.get('teamtasks/'),
+                api.get('bookings/')
             ]);
             
             const customers = customersRes.data;
             const installations = installationsRes.data;
             const bills = billsRes.data;
+            const bookings = bookingsRes.data;
             
             setActiveOps(opsRes.data);
 
@@ -42,11 +46,16 @@ const Dashboard = () => {
                 ? savedPanels.reduce((acc, curr) => acc + (parseFloat(curr.capacity) || 0), 0)
                 : installations.reduce((acc, curr) => acc + 5, 0);
 
+            const pendingRequests = bookings.filter(b => b.status === 'Pending').length;
+            const pendingInstallations = installations.filter(i => i.status === 'Pending').length;
+
             setStats({
                 totalCustomers: customers.length,
                 totalInstallations: installations.length,
                 energyGenerated: totalEnergy.toFixed(1).replace(/\.0$/, ''),
-                activeSystems
+                activeSystems,
+                pendingRequests,
+                pendingInstallations
             });
 
             // Build Recent Payments from paid bills sorted by paid_at desc
@@ -88,9 +97,9 @@ const Dashboard = () => {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
           { label: "Total Customers", value: stats.totalCustomers, icon: Users, color: "text-orange-400", bg: "bg-orange-500/10", route: "/customer" },
-          { label: "Total Installations", value: stats.totalInstallations, icon: PenTool, color: "text-yellow-400", bg: "bg-yellow-500/10", route: "/installations" },
-          { label: "Estimated Capacity", value: `${stats.energyGenerated} kW`, icon: Zap, color: "text-green-400", bg: "bg-green-500/10", route: "/solarpanels" },
-          { label: "Active Systems", value: stats.activeSystems, icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-500/10", route: "/working-status" }
+          { label: "Pending Requests", value: stats.pendingRequests, icon: Clock, color: "text-red-400", bg: "bg-red-500/10", route: "/bookings" },
+          { label: "Active Systems", value: stats.activeSystems, icon: CheckCircle, color: "text-blue-400", bg: "bg-blue-500/10", route: "/working-status" },
+          { label: "Pending Installs", value: stats.pendingInstallations, icon: AlertTriangle, color: "text-yellow-400", bg: "bg-yellow-500/10", route: "/installations" }
         ].map((stat, i) => (
           <Link to={stat.route} key={i}>
             <motion.div 
