@@ -159,7 +159,7 @@ function Login({ onLogin }) {
           
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 relative z-10 flex flex-col items-center">
             <button 
-              onClick={() => { setSelectedPortal('admin'); setEmail('admin@solar.com'); setPassword('admin123'); }} 
+              onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} 
               className="relative group hover:scale-110 transition-transform duration-300 outline-none focus:outline-none block"
             >
               <Sun className="w-16 h-16 text-orange-500 mb-6 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)] cursor-pointer" />
@@ -212,7 +212,7 @@ function Login({ onLogin }) {
             )}
           </div>
 
-          <button onClick={() => { setSelectedPortal('admin'); setEmail('admin@solar.com'); setPassword('admin123'); }} className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
+          <button onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
             <Lock className="w-4 h-4" /> <span className="text-[10px] uppercase tracking-widest font-bold">Admin Clearance</span>
           </button>
         </div>
@@ -247,8 +247,8 @@ function Login({ onLogin }) {
                         <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Identity verification (Email)</label>
                         <input
                           type="email"
-                          placeholder={selectedPortal === "admin" ? "admin@core.local" : `${selectedPortal}@domain.com`}
-                          className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner"
+                          placeholder="Enter email"
+                          className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-all shadow-inner"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                         />
@@ -259,8 +259,8 @@ function Login({ onLogin }) {
                         <div className="relative">
                           <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all pr-12 shadow-inner"
+                            placeholder="Enter password"
+                            className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-all pr-12 shadow-inner"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                           />
