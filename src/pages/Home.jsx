@@ -52,8 +52,12 @@ function Home() {
       </nav>
 
       {/* ================= HERO SECTION ================= */}
-      <section className="relative px-6 md:px-12 min-h-[80vh] flex flex-col md:flex-row items-center justify-between gap-12">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <section 
+        className="relative px-6 md:px-12 min-h-[80vh] flex flex-col md:flex-row items-center justify-between gap-12 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url("/images/residential_solar_bg.png")' }}
+      >
+        <div className="absolute inset-0 bg-[#020617]/85 pointer-events-none z-0"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
         <motion.div 
           initial={{ opacity: 0, x: -50 }}
