@@ -155,10 +155,15 @@ function Login({ onLogin }) {
       {!selectedPortal ? (
         // ================= GATEWAY SELECTION =================
         <div className="w-full flex flex-col items-center justify-center p-8 relative z-[60] min-h-screen">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-500/10 blur-[150px] rounded-full pointer-events-none"></div>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-500/10 blur-[150px] rounded-full pointer-events-none z-[8]"></div>
           
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 relative z-10">
-            <Sun className="w-16 h-16 text-orange-500 mx-auto mb-6 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]" />
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 relative z-10 flex flex-col items-center">
+            <button 
+              onClick={() => { setSelectedPortal('admin'); setEmail('admin@solar.com'); setPassword('admin123'); }} 
+              className="relative group hover:scale-110 transition-transform duration-300 outline-none focus:outline-none block"
+            >
+              <Sun className="w-16 h-16 text-orange-500 mb-6 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)] cursor-pointer" />
+            </button>
             <h1 className="text-5xl font-black tracking-tight mb-4">Secure Authentication Gateway</h1>
             <p className="text-gray-400 text-lg uppercase tracking-widest font-semibold">Select Your Designated Operations Portal</p>
           </motion.div>
