@@ -283,7 +283,7 @@ function Billing() {
                     <td className="p-5 font-bold text-gray-200">{bill.bill_no}</td>
                     <td className="p-5 text-gray-400 font-medium">@{bill.client_name || 'unknown_node'}</td>
                     <td className="p-5 text-gray-500 text-sm tracking-wide">{bill.date || 'Syncing...'}</td>
-                    <td className="p-5 text-gray-300">{bill.units} kW</td>
+                    <td className="p-5 text-gray-300">{bill.units} kWh</td>
                     <td className="p-5 font-bold text-right text-white">₹{parseFloat(bill.amount).toLocaleString()}</td>
                     
                     <td className="p-5 text-center">
