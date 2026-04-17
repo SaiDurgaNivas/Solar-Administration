@@ -81,7 +81,7 @@ function Home() {
               to="/login"
               className="bg-orange-500 hover:bg-orange-400 text-black px-8 py-4 rounded-full font-bold transition-all shadow-xl flex items-center justify-center gap-2 group"
             >
-              Customer Login 
+              Get Started 
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
 
