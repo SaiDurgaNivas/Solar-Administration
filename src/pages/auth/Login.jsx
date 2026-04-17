@@ -137,7 +137,12 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex text-white bg-[#020617] overflow-hidden relative selection:bg-orange-500/30">
+    <div 
+      className="min-h-screen flex text-white bg-[#020617] overflow-hidden relative selection:bg-orange-500/30 bg-cover bg-center bg-no-repeat w-full"
+      style={{ backgroundImage: 'url("/images/login_bg.png")' }}
+    >
+      {/* Dark transparency overlay to ensure interface readability */}
+      <div className="absolute inset-0 bg-[#020617]/85 pointer-events-none z-[5]"></div>
       
       <Link 
         to="/" 
