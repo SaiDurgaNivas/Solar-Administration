@@ -102,7 +102,15 @@ function Home() {
         >
           <div className="absolute -inset-4 bg-gradient-to-br from-orange-500/30 to-blue-500/20 blur-3xl opacity-50 rounded-[3rem]"></div>
           
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0f172a]/80 backdrop-blur-xl shadow-2xl p-2 md:p-4 rotate-x-6 rotate-y-[-10deg] transform-gpu hover:rotate-0 transition-all duration-700 ease-out">
+          <Link to="/features" className="block relative rounded-2xl overflow-hidden border border-white/10 bg-[#0f172a]/80 backdrop-blur-xl shadow-2xl p-2 md:p-4 rotate-x-6 rotate-y-[-10deg] transform-gpu hover:rotate-0 hover:border-orange-500/50 hover:shadow-orange-500/20 transition-all duration-700 ease-out group">
+             
+             <div className="absolute inset-0 z-30 bg-black/60 opacity-0 group-hover:opacity-100 backdrop-blur-sm transition-all duration-500 flex flex-col items-center justify-center">
+                 <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mb-4 transform scale-50 group-hover:scale-100 transition-transform duration-500 delay-100">
+                     <ArrowRight className="w-8 h-8 text-black" />
+                 </div>
+                 <span className="text-white font-bold text-xl tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-100">Explore How It Works</span>
+             </div>
+          
              <div className="flex items-center gap-2 mb-4 px-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -132,7 +140,7 @@ function Home() {
                    <div className="flex-1 bg-white/5 rounded-xl border border-white/5"></div>
                 </div>
              </div>
-          </div>
+          </Link>
         </motion.div>
       </section>
 
