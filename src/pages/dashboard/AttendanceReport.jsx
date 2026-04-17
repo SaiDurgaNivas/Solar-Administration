@@ -112,54 +112,122 @@ function AttendanceReport() {
                 <h3 className="text-2xl font-bold text-gray-400">No Personnel Found</h3>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[700px]">
-                  <thead>
-                    <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                      <th className="py-4 px-4 font-semibold w-1/3">Name</th>
-                      <th className="py-4 px-4 font-semibold">Role</th>
-                      <th className="py-4 px-4 font-semibold text-center text-green-400">Present (Days)</th>
-                      <th className="py-4 px-4 font-semibold text-center text-red-400">Absent (Days)</th>
-                      <th className="py-4 px-4 font-semibold text-center text-yellow-400">Leaves</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {agents.map((user) => {
-                      const stats = getMonthlyStats(user.id);
-                      
-                      return (
-                        <tr key={user.id} className="hover:bg-white/5 transition group">
-                          <td className="py-5 px-4 flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center font-bold text-white shadow-lg">
-                                {user.username.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <p className="font-bold text-gray-200 capitalize">{user.username.replace(/_/g, ' ')}</p>
-                                <p className="text-xs text-gray-500">{user.email}</p>
-                            </div>
-                          </td>
-                          <td className="py-5 px-4 text-sm font-bold text-gray-300 uppercase tracking-wider">{user.role}</td>
-                          
-                          <td className="py-5 px-4 text-center">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-400 rounded border border-green-500/20 font-bold">
-                                <CheckCircle className="w-4 h-4"/> {stats.present}
-                            </div>
-                          </td>
-                          <td className="py-5 px-4 text-center">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 text-red-400 rounded border border-red-500/20 font-bold">
-                                <XCircle className="w-4 h-4"/> {stats.absent}
-                            </div>
-                          </td>
-                          <td className="py-5 px-4 text-center">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-yellow-500/10 text-yellow-400 rounded border border-yellow-500/20 font-bold">
-                                <AlertCircle className="w-4 h-4"/> {stats.leave}
-                            </div>
-                          </td>
+              <div className="space-y-12">
+                {/* AGENTS SECTION */}
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="h-px flex-1 bg-white/5"></div>
+                     <h3 className="text-sm font-black uppercase tracking-[0.2em] text-cyan-400 bg-cyan-500/10 px-4 py-1.5 rounded-full border border-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.1)]">Agent Personnel</h3>
+                     <div className="h-px flex-1 bg-white/5"></div>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[700px]">
+                      <thead>
+                        <tr className="text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5 bg-white/[0.02]">
+                          <th className="py-4 px-6 font-black w-1/3">Official Name</th>
+                          <th className="py-4 px-4 font-black">Designation</th>
+                          <th className="py-4 px-4 font-black text-center text-green-400">Present (Days)</th>
+                          <th className="py-4 px-4 font-black text-center text-red-400">Absent (Days)</th>
+                          <th className="py-4 px-4 font-black text-center text-yellow-400">Leaves</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {agents.filter(u => u.role === 'agent').length === 0 ? (
+                          <tr><td colSpan="5" className="py-10 text-center text-gray-600 text-sm font-bold">No Agents Logged</td></tr>
+                        ) : agents.filter(u => u.role === 'agent').map((user) => {
+                          const stats = getMonthlyStats(user.id);
+                          return (
+                            <tr key={user.id} className="hover:bg-white/5 transition group">
+                              <td className="py-5 px-6 flex items-center gap-4 border-l-2 border-transparent group-hover:border-blue-500 transition-all">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-black text-white shadow-lg transform group-hover:rotate-6 transition-transform">
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="font-bold text-gray-200 capitalize tracking-tight">{user.username.replace(/_/g, ' ')}</p>
+                                    <p className="text-[10px] text-gray-500 font-mono tracking-widest">{user.email}</p>
+                                </div>
+                              </td>
+                              <td className="py-5 px-4"><span className="text-[10px] font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-md border border-blue-500/20 uppercase tracking-widest shadow-inner">Regional Agent</span></td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20 font-black text-xs shadow-inner">
+                                    <CheckCircle className="w-3.5 h-3.5"/> {stats.present}
+                                </div>
+                              </td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 font-black text-xs shadow-inner">
+                                    <XCircle className="w-3.5 h-3.5"/> {stats.absent}
+                                </div>
+                              </td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 rounded-lg border border-yellow-500/20 font-black text-xs shadow-inner">
+                                    <AlertCircle className="w-3.5 h-3.5"/> {stats.leave}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* WORKERS SECTION */}
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="h-px flex-1 bg-white/5"></div>
+                     <h3 className="text-sm font-black uppercase tracking-[0.2em] text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 shadow-[0_0_15px_rgba(251,146,60,0.1)]">Field Specialists (Workers)</h3>
+                     <div className="h-px flex-1 bg-white/5"></div>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[700px]">
+                      <thead>
+                        <tr className="text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5 bg-white/[0.02]">
+                          <th className="py-4 px-6 font-black w-1/3">Professional Name</th>
+                          <th className="py-4 px-4 font-black">Status Rank</th>
+                          <th className="py-4 px-4 font-black text-center text-green-400">Present (Days)</th>
+                          <th className="py-4 px-4 font-black text-center text-red-400">Absent (Days)</th>
+                          <th className="py-4 px-4 font-black text-center text-yellow-400">Leaves</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {agents.filter(u => u.role === 'sub_worker').length === 0 ? (
+                          <tr><td colSpan="5" className="py-10 text-center text-gray-600 text-sm font-bold">No Workers Logged</td></tr>
+                        ) : agents.filter(u => u.role === 'sub_worker').map((user) => {
+                          const stats = getMonthlyStats(user.id);
+                          return (
+                            <tr key={user.id} className="hover:bg-white/5 transition group">
+                              <td className="py-5 px-6 flex items-center gap-4 border-l-2 border-transparent group-hover:border-orange-500 transition-all">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-700 flex items-center justify-center font-black text-white shadow-lg transform group-hover:-rotate-6 transition-transform">
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="font-bold text-gray-200 capitalize tracking-tight">{user.username.replace(/_/g, ' ')}</p>
+                                    <p className="text-[10px] text-gray-500 font-mono tracking-widest">{user.email}</p>
+                                </div>
+                              </td>
+                              <td className="py-5 px-4"><span className="text-[10px] font-black text-orange-400 bg-orange-500/10 px-3 py-1 rounded-md border border-orange-500/20 uppercase tracking-widest shadow-inner">Field Op</span></td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20 font-black text-xs shadow-inner">
+                                    <CheckCircle className="w-3.5 h-3.5"/> {stats.present}
+                                </div>
+                              </td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg border border-red-500/20 font-black text-xs shadow-inner">
+                                    <XCircle className="w-3.5 h-3.5"/> {stats.absent}
+                                </div>
+                              </td>
+                              <td className="py-5 px-4 text-center">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 rounded-lg border border-yellow-500/20 font-black text-xs shadow-inner">
+                                    <AlertCircle className="w-3.5 h-3.5"/> {stats.leave}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
           </div>
