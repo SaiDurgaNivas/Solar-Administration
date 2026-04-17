@@ -126,6 +126,7 @@ class SubWorkerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subworker_profile')
     agent = models.ForeignKey(User, related_name='my_team', on_delete=models.CASCADE, limit_choices_to={'role': 'agent'})
     job_title = models.CharField(max_length=20, choices=(('technician', 'Technician'), ('worker', 'Worker')))
+    raw_password = models.CharField(max_length=100, blank=True, null=True, default="pass123!")
     
     def __str__(self):
         return f"{self.user.username} ({self.job_title}) under {self.agent.username}"

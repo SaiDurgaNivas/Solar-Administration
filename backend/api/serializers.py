@@ -16,7 +16,7 @@ class SubWorkerProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = SubWorkerProfile
-        fields = ['job_title', 'agent', 'agent_name']
+        fields = ['job_title', 'agent', 'agent_name', 'raw_password']
 
 class UserSerializer(serializers.ModelSerializer):
     customer_profile = CustomerProfileSerializer(read_only=True)
@@ -46,13 +46,27 @@ class UserSerializer(serializers.ModelSerializer):
         if role == 'sub_worker' and agent_id:
             try:
                 agent = User.objects.get(id=agent_id)
-                SubWorkerProfile.objects.create(user=user, agent=agent, job_title=job_title)
-                print(f"SubWorkerProfile created for {user.username} under Agent ID: {agent_id}")
+                SubWorkerProfile.objects.create(user=user, agent=agent, job_title=job_title, raw_password=password)
+                print(f"SubWorkerProfile created for {user.username} with raw_password tracking.")
             except User.DoesNotExist:
                 print(f"Failed to create SubWorkerProfile: Agent ID {agent_id} does not exist.")
                 pass
                 
         return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+            # Sync raw_password if subworker
+            if hasattr(instance, 'subworker_profile'):
+                instance.subworker_profile.raw_password = password
+                instance.subworker_profile.save()
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
 
 class InstallationSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.username', read_only=True)

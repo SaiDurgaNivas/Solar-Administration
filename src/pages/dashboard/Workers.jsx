@@ -283,10 +283,11 @@ function Workers() {
                                      <div className="flex items-center gap-1 border-b border-white/10">
                                          <input 
                                             type={visiblePasswords[worker.id] ? "text" : "password"}
-                                            defaultValue="********"
+                                            defaultValue={worker.subworker_profile?.raw_password || "pass123!"}
                                             onBlur={(e) => {
-                                                if (e.target.value !== "********") {
-                                                    updatePassword(worker.id, e.target.value);
+                                                const newV = e.target.value;
+                                                if (newV && newV !== worker.subworker_profile?.raw_password) {
+                                                    updatePassword(worker.id, newV);
                                                 }
                                             }}
                                             className="bg-transparent text-xs text-white font-mono focus:border-cyan-500 outline-none w-24 tracking-widest"
