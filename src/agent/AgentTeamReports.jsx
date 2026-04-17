@@ -24,7 +24,7 @@ const AgentTeamReports = () => {
       setTeam(teamRes.data || []);
       setAllAttendance(attRes.data || []);
       // Filter tasks managed by this agent
-      setTasks((tasksRes.data || []).filter(t => t.agent === user.id));
+      setTasks((tasksRes.data || []).filter(t => Number(t.agent) === Number(user.id)));
     } catch (err) {
       console.error("Failed to load reports:", err);
     } finally {
@@ -35,7 +35,7 @@ const AgentTeamReports = () => {
   const user = JSON.parse(sessionStorage.getItem("solar_user"));
   
   // ✅ 1. Agent's Own Monthly Attendance
-  const myAttendance = allAttendance.filter(a => a.worker === user.id);
+  const myAttendance = allAttendance.filter(a => Number(a.worker) === Number(user.id));
   const myPresentDays = myAttendance.filter(a => a.status === 'Present').length;
   const myAbsentDays = myAttendance.filter(a => a.status === 'Absent').length;
   
@@ -43,10 +43,10 @@ const AgentTeamReports = () => {
 
   // ✅ 2. Team Performance Aggregation
   const getWorkerStats = (workerId) => {
-    const wAtt = allAttendance.filter(a => a.worker === workerId);
+    const wAtt = allAttendance.filter(a => Number(a.worker) === Number(workerId));
     const present = wAtt.filter(a => a.status === 'Present').length;
     
-    const wTasks = tasks.filter(t => t.sub_worker === workerId);
+    const wTasks = tasks.filter(t => Number(t.sub_worker) === Number(workerId));
     const completed = wTasks.filter(t => t.status === 'Completed').length;
     
     return { present, totalTasks: wTasks.length, completed };
@@ -137,7 +137,7 @@ const AgentTeamReports = () => {
             ) : team.map(worker => {
                const stats = getWorkerStats(worker.id);
                // Find their current duty task if any
-               const activeTask = tasks.find(t => t.sub_worker === worker.id && t.status !== 'Completed');
+               const activeTask = tasks.find(t => Number(t.sub_worker) === Number(worker.id) && t.status !== 'Completed');
 
                return (
                  <div key={worker.id} className="bg-[#020617] border border-white/10 p-5 rounded-2xl flex flex-col md:flex-row gap-6 items-center shadow-lg hover:border-cyan-500/30 transition-all">
