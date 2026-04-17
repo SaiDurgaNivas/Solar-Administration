@@ -458,8 +458,8 @@ function WorkerDashboard() {
                          </p>
                        </div>
                        <button 
-                         onClick={() => setShowEditModal(true)}
-                         className="bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-black border border-orange-500/20 px-6 py-2 rounded-xl font-bold transition-all text-sm"
+                         onClick={(e) => { e.preventDefault(); setShowEditModal(true); }}
+                         className="relative z-[50] bg-orange-500/10 hover:bg-orange-500 text-orange-400 hover:text-black border border-orange-500/20 px-6 py-2 rounded-xl font-bold transition-all text-sm active:scale-95 shadow-lg"
                        >
                          Edit Profile
                        </button>
