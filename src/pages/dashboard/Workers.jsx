@@ -76,6 +76,7 @@ function Workers() {
   };
 
   const handleRemoveWorker = async (id) => {
+    if (!Number.isInteger(id)) return console.error("Invalid ID");
     if (!window.confirm("Are you sure you want to remove this field worker? This cannot be undone.")) return;
     try {
       await api.delete(`users/${id}/`);
@@ -85,6 +86,17 @@ function Workers() {
       console.error(error);
       const errMsg = error.response?.data?.detail || error.response?.statusText || "Network Error";
       showToast(`Failed to remove worker: ${errMsg}`);
+    }
+  };
+
+  const updatePassword = async (id, newPass) => {
+    if (!newPass) return;
+    try {
+      await api.patch(`users/${id}/`, { password: newPass });
+      showToast("Password updated for worker!");
+      fetchData();
+    } catch (err) {
+      showToast("Failed to update password.");
     }
   };
 
@@ -225,7 +237,8 @@ function Workers() {
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                      <th className="py-4 px-4 font-semibold w-1/3">Worker Identity</th>
+                      <th className="py-4 px-4 font-semibold w-1/4">Worker Identity</th>
+                      <th className="py-4 px-4 font-semibold w-1/4">Credentials (Login)</th>
                       <th className="py-4 px-4 font-semibold">Today's Status</th>
                       <th className="py-4 px-4 font-semibold text-right">Log Attendance</th>
                     </tr>
@@ -256,11 +269,24 @@ function Workers() {
                                 <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white shadow-lg">
                                     {worker.username.charAt(0).toUpperCase()}
                                 </div>
-                                <div>
-                                    <p className="font-bold text-gray-200 text-lg capitalize">{worker.username.replace(/_/g, ' ')}</p>
-                                    <p className="text-sm text-gray-500">{worker.email}</p>
-                                </div>
+                                <h3 className="font-bold text-gray-200 text-lg capitalize">{worker.username.replace(/_/g, ' ')}</h3>
                              </div>
+                          </td>
+
+                          <td className="py-5 px-4">
+                              <div className="space-y-1">
+                                 <p className="text-xs text-cyan-400 font-mono italic">ID: {worker.email}</p>
+                                 <div className="flex items-center gap-2">
+                                     <span className="text-[10px] text-gray-400 font-bold uppercase">Pass:</span>
+                                     <input 
+                                        type="text" 
+                                        defaultValue="pass123!"
+                                        onBlur={(e) => updatePassword(worker.id, e.target.value)}
+                                        className="bg-transparent border-b border-white/10 text-xs text-white font-mono focus:border-cyan-500 outline-none w-32"
+                                        title="Click to edit password"
+                                     />
+                                 </div>
+                              </div>
                           </td>
 
                           <td className="py-5 px-4">
