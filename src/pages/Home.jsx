@@ -41,7 +41,7 @@ function Home() {
         <div className="hidden md:flex gap-8 items-center font-medium">
           <Link to="/" className="text-white hover:text-orange-400 transition-colors">Home</Link>
           <Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link>
-          <Link to="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link>
+          <Link to="/login" className="text-gray-400 hover:text-white transition-colors">Customer Login</Link>
           <Link
             to="/register"
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-[0_0_15px_rgba(249,115,22,0.4)]"
@@ -81,7 +81,7 @@ function Home() {
               to="/login"
               className="bg-orange-500 hover:bg-orange-400 text-black px-8 py-4 rounded-full font-bold transition-all shadow-xl flex items-center justify-center gap-2 group"
             >
-              Access Portal 
+              Customer Login 
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
 
@@ -325,7 +325,7 @@ function Home() {
             </div>
             
             <div className="text-center mt-12">
-               <Link to="/customer-login">
+               <Link to="/login">
                   <button className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-medium transition-all flex items-center justify-center gap-2 mx-auto">
                     Submit Your Own Review <ArrowRight className="w-4 h-4" />
                   </button>
