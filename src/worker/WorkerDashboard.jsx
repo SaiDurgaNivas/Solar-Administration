@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays } from 'lucide-react';
+import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays, X } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { useTickets } from '../context/TicketContext';
 import { useLiveTime } from '../hooks/useLiveTime';
