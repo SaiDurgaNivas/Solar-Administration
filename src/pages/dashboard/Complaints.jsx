@@ -1,11 +1,30 @@
 import React from "react";
 import { useTickets } from "../../context/TicketContext";
-import { AlertCircle, CheckCircle, Trash2, ShieldAlert } from "lucide-react";
+import { AlertCircle, CheckCircle, Trash2, ShieldAlert, Zap, HardHat, MapPin, Gauge } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../../api/axiosConfig";
 
 function Complaints() {
   const { tickets, clearTickets } = useTickets();
   const [activeTab, setActiveTab] = React.useState("Active"); // "Active" or "History"
+  const [services, setServices] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await api.get('installations/');
+        setServices(res.data || []);
+      } catch (err) {
+        console.error("Service fetch err:", err);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const getServiceForClient = (clientId) => {
+    return services.find(s => s.client === clientId);
+  };
+
 
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-12 font-sans overflow-hidden relative">
@@ -80,29 +99,64 @@ function Complaints() {
                                 <div className="flex-1 w-full">
                                     <div className="flex justify-between items-start w-full">
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-100">{ticket.ticket_no} - {ticket.type?.toUpperCase()}</h3>
-                                            <p className="text-xs text-gray-400 font-bold mb-2">Customer: {ticket.client_name} • {new Date(ticket.created_at).toLocaleString()}</p>
+                                             <div className="flex items-center gap-2">
+                                                <h3 className="text-xl font-black text-gray-100 uppercase tracking-tight">{ticket.type} Request</h3>
+                                                <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-500 uppercase tracking-widest">{ticket.ticket_no}</span>
+                                             </div>
+                                             <p className="text-xs text-orange-400 font-bold mt-1 uppercase tracking-widest flex items-center gap-2">
+                                                <HardHat className="w-3 h-3"/> Active Client: {ticket.client_name}
+                                             </p>
                                         </div>
-                                        <span className={`px-3 py-1 border rounded-full text-xs font-bold uppercase tracking-wider ${
+                                        <span className={`px-4 py-1.5 border rounded-xl text-[10px] font-black uppercase tracking-[0.15em] shadow-lg ${
                                             ticket.status === 'Resolved' 
                                                 ? 'bg-green-500/10 text-green-400 border-green-500/20' 
-                                                : 'bg-orange-500/10 text-orange-400 border-orange-500/20 shadow-[0_0_10px_rgba(249,115,22,0.5)]'
+                                                : 'bg-orange-500/20 text-orange-400 border-orange-500/30'
                                         }`}>
                                             {ticket.status}
                                         </span>
                                     </div>
-                                    <div className="bg-black/30 p-4 rounded-xl text-gray-300 mt-2 border border-white/5">
-                                        {ticket.description}
+
+                                    {/* Service Context Section */}
+                                    {(() => {
+                                        const service = getServiceForClient(ticket.client);
+                                        return service ? (
+                                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 mb-4">
+                                              <div className="bg-[#020617] p-3 rounded-xl border border-white/5 space-y-1 hover:border-blue-500/30 transition-colors">
+                                                 <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-1.5"><Gauge className="w-3 h-3 text-blue-400"/> System Profile</p>
+                                                 <p className="text-xs font-bold text-gray-200 truncate">{service.solar_panel_model} ({service.capacity})</p>
+                                              </div>
+                                              <div className="bg-[#020617] p-3 rounded-xl border border-white/5 space-y-1 hover:border-yellow-500/30 transition-colors">
+                                                 <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-1.5"><Zap className="w-3 h-3 text-yellow-400"/> Power Core</p>
+                                                 <p className="text-xs font-bold text-gray-200 truncate">{service.inverter_model}</p>
+                                              </div>
+                                              <div className="bg-[#020617] p-3 rounded-xl border border-white/5 space-y-1 hover:border-red-500/30 transition-colors">
+                                                 <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-1.5"><MapPin className="w-3 h-3 text-red-400"/> Deployment</p>
+                                                 <p className="text-xs font-bold text-gray-200 truncate">{service.address}</p>
+                                              </div>
+                                              <div className="bg-[#020617] p-3 rounded-xl border border-white/5 space-y-1 hover:border-green-500/30 transition-colors">
+                                                 <p className="text-[9px] font-black text-gray-500 uppercase flex items-center gap-1.5"><HardHat className="w-3 h-3 text-green-400"/> Lead Agent</p>
+                                                 <p className="text-xs font-bold text-gray-200 truncate capitalize">{service.agent_name}</p>
+                                              </div>
+                                           </div>
+                                        ) : null;
+                                     })()}
+
+                                    <div className="bg-[#020617]/80 p-5 rounded-2xl text-gray-300 mt-2 border border-white/5 shadow-inner italic leading-relaxed text-sm">
+                                        "{ticket.description}"
                                     </div>
                                     
-                                    {ticket.status === 'Resolved' && (
-                                        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5 text-sm font-bold text-green-400">
-                                            <CheckCircle className="w-4 h-4"/> Complaint cleared with proper diagnostic protocol on {new Date(ticket.resolved_at).toLocaleString()}
-                                        </div>
-                                    )}
+                                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
+                                        <p className="text-[10px] text-gray-500 font-bold">Logged at: {new Date(ticket.created_at).toLocaleString()}</p>
+                                        {ticket.status === 'Resolved' && (
+                                            <div className="flex items-center gap-2 text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-500/5 px-3 py-1 rounded-full border border-green-500/10">
+                                                <CheckCircle className="w-3 h-3"/> Diagnostics Cleared {new Date(ticket.resolved_at).toLocaleDateString()}
+                                            </div>
+                                        )}
+                                     </div>
                                 </div>
                             </motion.div>
                         ))}
+}
                     </AnimatePresence>
                 </div>
             )}
