@@ -84,9 +84,7 @@ function Sidebar({ user, onLogout }) {
           Settings
         </NavLink>
        
-        <NavLink to="/customer/about">
-          About Us
-        </NavLink>
+
        
       </nav>
 

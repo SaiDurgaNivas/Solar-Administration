@@ -65,13 +65,7 @@ function Header({ user, onLogout }) {
         {/* 🔹 Right Section */}
         <div className="flex items-center gap-6">
 
-          {/* About Link */}
-          <Link
-            to="/about"
-            className="text-sm font-semibold text-gray-400 hover:text-orange-400 transition-colors"
-          >
-            About Hub
-          </Link>
+
 
           {/* 🔔 Notification */}
           <div className="relative cursor-pointer group">
