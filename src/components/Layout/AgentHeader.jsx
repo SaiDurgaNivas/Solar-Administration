@@ -3,12 +3,39 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, LogOut, ChevronDown, Sun, AlertCircle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import UserProfilePhoto from "../UserProfilePhoto";
+import api from "../../api/axiosConfig";
 
 function AgentHeader({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showProfile, setShowProfile] = useState(false);
   const [showHomeConfirm, setShowHomeConfirm] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    phone: user?.agent_profile?.phone || "",
+    address: user?.agent_profile?.address || "",
+    status: user?.agent_profile?.status || "ON DUTY"
+  });
+
+  const handleEditSubmit = async () => {
+    try {
+      setEditLoading(true);
+      const res = await api.post('agent/update-profile/', {
+        user_id: user.id,
+        ...formData
+      });
+      alert("Profile updated successfully!");
+      setShowEditModal(false);
+      // We should ideally refresh local user state here, but for now we rely on the next refresh/login
+      // In a real app, we'd use a context update function.
+      if (window.location) window.location.reload(); 
+    } catch (err) {
+      alert("Failed to update profile.");
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     if (onLogout) onLogout();
@@ -89,17 +116,23 @@ function AgentHeader({ user, onLogout }) {
                   </div>
                   <div>
                     <span className="block text-xs uppercase tracking-wider text-gray-500">Mobile Number</span>
-                    <span className="font-semibold text-gray-200">{user?.customer_profile?.phone || "Pending Assignment"}</span>
+                    <span className="font-semibold text-gray-200">{user?.agent_profile?.phone || "Pending Assignment"}</span>
                   </div>
                   <div>
                     <span className="block text-xs uppercase tracking-wider text-gray-500">Address</span>
-                    <span className="font-semibold text-gray-200">{user?.customer_profile?.address || "HQ Base Deployment"}</span>
+                    <span className="font-semibold text-gray-200">{user?.agent_profile?.address || "HQ Base Deployment"}</span>
                   </div>
                   <div>
                     <span className="block text-xs uppercase tracking-wider text-gray-500">Status</span>
-                    <span className="text-orange-400 font-bold text-xs uppercase tracking-widest">● On Duty</span>
+                    <span className="text-orange-400 font-bold text-xs uppercase tracking-widest">● {user?.agent_profile?.status || "ON DUTY"}</span>
                   </div>
                 </div>
+                <button 
+                  onClick={() => { setShowEditModal(true); setShowProfile(false); }}
+                  className="w-full mt-6 bg-white/5 hover:bg-white/10 text-white font-bold py-2 rounded-xl border border-white/10 transition"
+                >
+                  Edit Profile
+                </button>
               </div>
             )}
           </div>
@@ -164,6 +197,63 @@ function AgentHeader({ user, onLogout }) {
                   Yes, Logout
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 📝 Edit Profile Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-[#0f172a] border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+               <h2 className="text-2xl font-bold mb-6 text-white bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">Modify Agent Credentials</h2>
+               
+               <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-2 ml-1">Contact Telemetry</label>
+                    <input 
+                      type="text" 
+                      className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-white outline-none focus:border-orange-500 transition"
+                      placeholder="Enter mobile number"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-2 ml-1">Current Sector/Address</label>
+                    <textarea 
+                      className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-white outline-none focus:border-orange-500 transition h-24 resize-none"
+                      placeholder="Enter physical address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-2 ml-1">Operational Status</label>
+                    <select 
+                      className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-white outline-none focus:border-orange-500 transition"
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    >
+                        <option value="ON DUTY">ON DUTY</option>
+                        <option value="OFF DUTY">OFF DUTY</option>
+                        <option value="FIELD DEPLOYED">FIELD DEPLOYED</option>
+                        <option value="IDLE">IDLE</option>
+                    </select>
+                  </div>
+               </div>
+
+               <div className="flex gap-4 mt-8">
+                  <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-gray-400 font-bold hover:bg-white/5 hover:text-white transition">Cancel</button>
+                  <button 
+                    onClick={handleEditSubmit} 
+                    disabled={editLoading}
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-extrabold shadow-lg shadow-orange-500/20 active:scale-95 transition disabled:opacity-50"
+                  >
+                    {editLoading ? "Syncing..." : "Update Vault"}
+                  </button>
+               </div>
             </motion.div>
           </motion.div>
         )}

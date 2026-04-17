@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, CustomerProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate
-from .serializers import UserSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate
+from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.mail import send_mail
 from django.conf import settings
@@ -138,7 +138,35 @@ def oauth_login_view(request):
 
     serializer = UserSerializer(user)
     return Response({'user': serializer.data, 'token': 'oauth-session-token'})
+@api_view(['POST'])
+def update_agent_profile(request):
+    """
+    Update the logged-in agent's profile details.
+    """
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'User ID required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = User.objects.filter(id=user_id).first()
+    if not user or user.role != 'agent':
+        return Response({'error': 'Agent not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    profile, _ = AgentProfile.objects.get_or_create(user=user)
+    
+    # Update fields
+    if 'phone' in request.data: profile.phone = request.data['phone']
+    if 'address' in request.data: profile.address = request.data['address']
+    if 'status' in request.data: profile.status = request.data['status']
+    if 'profile_photo' in request.FILES: profile.profile_photo = request.FILES['profile_photo']
+    
+    profile.save()
+    
+    return Response({'message': 'Profile updated successfully', 'agent_profile': AgentProfileSerializer(profile).data})
 
+class AgentProfileViewSet(viewsets.ModelViewSet):
+    queryset = AgentProfile.objects.all()
+    serializer_class = AgentProfileSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

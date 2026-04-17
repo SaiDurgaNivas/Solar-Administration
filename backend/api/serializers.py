@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from .models import User, CustomerProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerProfile
         fields = ['address', 'phone']
+
+class AgentProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgentProfile
+        fields = ['phone', 'address', 'status', 'profile_photo']
 
 class SubWorkerProfileSerializer(serializers.ModelSerializer):
     agent_name = serializers.CharField(source='agent.username', read_only=True)
@@ -16,6 +21,7 @@ class SubWorkerProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     customer_profile = CustomerProfileSerializer(read_only=True)
     subworker_profile = SubWorkerProfileSerializer(read_only=True)
+    agent_profile = AgentProfileSerializer(read_only=True)
     password = serializers.CharField(write_only=True, required=False)
     
     # Used for agent assigning sub worker during registration
@@ -24,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name', 'password', 'customer_profile', 'subworker_profile', 'agent_id', 'job_title', 'date_joined']
+        fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name', 'password', 'customer_profile', 'subworker_profile', 'agent_profile', 'agent_id', 'job_title', 'date_joined']
 
     def create(self, validated_data):
         password = validated_data.pop('password', 'default123')

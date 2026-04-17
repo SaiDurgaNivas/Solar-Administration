@@ -13,10 +13,12 @@ router.register(r'teamtasks', views.TeamTaskViewSet)
 router.register(r'bookingdocs', views.BookingDocumentViewSet)
 router.register(r'workerupdates', views.WorkerUpdateViewSet)
 router.register(r'reviews', views.CustomerReviewViewSet)
+router.register(r'agentprofiles', views.AgentProfileViewSet)
 
 urlpatterns = [
     path('auth/login/', views.login_view, name='login'),
     path('auth/register/', views.register_view, name='register'),
     path('auth/oauth/', views.oauth_login_view, name='oauth_login'),
+    path('agent/update-profile/', views.update_agent_profile, name='update_agent_profile'),
     path('', include(router.urls)),
 ]
