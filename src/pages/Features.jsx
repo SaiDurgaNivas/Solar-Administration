@@ -61,7 +61,7 @@ function Features() {
           <div className="bg-[#0f172a] border border-white/5 p-4 rounded-3xl relative overflow-hidden backdrop-blur-xl group">
              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-all"></div>
              <div className="bg-[#020617] h-80 rounded-2xl border border-white/5 flex items-center justify-center relative z-10 overflow-hidden">
-                <Globe className="w-40 h-40 text-blue-500/20 animate-spin-slow" />
+                <img src="/images/customer_portal.png" alt="Customer Portal Interface" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
              </div>
           </div>
         </section>
