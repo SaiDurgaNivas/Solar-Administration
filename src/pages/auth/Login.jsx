@@ -158,15 +158,16 @@ function Login({ onLogin }) {
             <p className="text-gray-400 text-lg uppercase tracking-widest font-semibold">Select Your Designated Operations Portal</p>
           </motion.div>
 
-          <div className={`${showStaff ? 'grid md:grid-cols-3 max-w-6xl' : 'flex justify-center max-w-sm'} gap-8 mx-auto w-full relative z-10 px-4`}>
-            {/* Customer Portal */}
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('customer')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
-               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-               <div className="p-4 bg-blue-500/10 rounded-2xl w-fit mb-6 border border-blue-500/20"><Users className="w-8 h-8 text-blue-400" /></div>
-               <h2 className="text-3xl font-bold mb-3">Customer Hub</h2>
-               <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Manage your appointments, billing, and system diagnostics.</p>
-               <div className="font-bold text-blue-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
-            </motion.button>
+          <div className={`${showStaff ? 'grid md:grid-cols-2 max-w-4xl' : 'flex justify-center max-w-sm'} gap-8 mx-auto w-full relative z-10 px-4`}>
+            {!showStaff && (
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('customer')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
+                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                 <div className="p-4 bg-blue-500/10 rounded-2xl w-fit mb-6 border border-blue-500/20"><Users className="w-8 h-8 text-blue-400" /></div>
+                 <h2 className="text-3xl font-bold mb-3">Customer Hub</h2>
+                 <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Manage your appointments, billing, and system diagnostics.</p>
+                 <div className="font-bold text-blue-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
+              </motion.button>
+            )}
             
             {showStaff && (
               <>
