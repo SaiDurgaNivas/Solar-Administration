@@ -35,7 +35,8 @@ function AgentHeader({ user, onLogout }) {
   });
 
   return (
-    <header className="w-full bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40 shadow-sm text-white">
+    <>
+      <header className="w-full bg-[#020617]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40 shadow-sm text-white">
       <div className="flex justify-between items-center px-6 py-4">
 
         {/* 🔹 Left: Branding & Date */}
@@ -167,6 +168,7 @@ function AgentHeader({ user, onLogout }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </>
   );
 }
 
