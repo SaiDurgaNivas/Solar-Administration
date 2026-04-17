@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function Complaints() {
   const { tickets, clearTickets } = useTickets();
+  const [activeTab, setActiveTab] = React.useState("Active"); // "Active" or "History"
 
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-12 font-sans overflow-hidden relative">
@@ -32,23 +33,34 @@ function Complaints() {
             </button>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 bg-white/5 p-1.5 rounded-2xl border border-white/10 w-fit">
+           <button onClick={() => setActiveTab("Active")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'Active' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-gray-400 hover:text-white'}`}>
+              Active Issues
+           </button>
+           <button onClick={() => setActiveTab("History")} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'History' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20' : 'text-gray-400 hover:text-white'}`}>
+              Resolution History
+           </button>
+        </div>
+
         {/* Complaints Feed */}
         <div className="bg-[#0f172a]/80 backdrop-blur-3xl p-6 md:p-8 rounded-[2rem] border border-white/10 shadow-2xl relative">
             <div className="absolute top-0 right-10 w-32 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-50"></div>
 
-            {tickets.length === 0 ? (
+
+            {tickets.filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved').length === 0 ? (
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center py-32 text-center"
+                    className="flex flex-col items-center justify-center py-32 text-center opacity-50"
                 >
-                    <CheckCircle className="w-20 h-20 text-green-500/50 mb-6" />
-                    <h2 className="text-2xl font-bold text-gray-300">All Clear!</h2>
-                    <p className="text-gray-500 mt-2 max-w-sm">There are no active customer maintenance requests.</p>
+                    <CheckCircle className="w-20 h-20 text-gray-500 mb-6" />
+                    <h2 className="text-2xl font-bold text-gray-300">No {activeTab} Records</h2>
+                    <p className="text-gray-500 mt-2 max-w-sm">The complaint registry for this category is currently empty.</p>
                 </motion.div>
             ) : (
                 <div className="space-y-4">
-                    <AnimatePresence>
-                        {tickets.map((ticket, i) => (
+                    <AnimatePresence mode="popLayout">
+                        {tickets.filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved').map((ticket, i) => (
                             <motion.div 
                                 key={ticket.id}
                                 layout
