@@ -150,9 +150,15 @@ class CustomerReviewSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SupportTicketSerializer(serializers.ModelSerializer):
-    client_name = serializers.CharField(source='client.username', read_only=True)
-    assigned_worker_name = serializers.CharField(source='assigned_worker.username', read_only=True)
+    client_name = serializers.SerializerMethodField()
+    assigned_worker_name = serializers.SerializerMethodField()
 
     class Meta:
         model = SupportTicket
-        fields = '__all__'
+        fields = ['id', 'client', 'client_name', 'ticket_no', 'type', 'description', 'status', 'created_at', 'resolved_at', 'assigned_worker', 'assigned_worker_name']
+
+    def get_client_name(self, obj):
+        return obj.client.username if obj.client else "Unknown"
+
+    def get_assigned_worker_name(self, obj):
+        return obj.assigned_worker.username if obj.assigned_worker else "Not Assigned"

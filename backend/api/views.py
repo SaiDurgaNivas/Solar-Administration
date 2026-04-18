@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate
-from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask
+from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.mail import send_mail
 from django.conf import settings
@@ -252,8 +252,8 @@ class UsageTelemetryViewSet(viewsets.ModelViewSet):
             return UsageTelemetry.objects.filter(client_id=client_id)
         return UsageTelemetry.objects.all()
 
-from .models import WorkerAttendance, TeamTask
-from .serializers import WorkerAttendanceSerializer, TeamTaskSerializer
+# ViewSets for Worker and Support models
+
 
 class WorkerAttendanceViewSet(viewsets.ModelViewSet):
     queryset = WorkerAttendance.objects.all()
@@ -295,8 +295,8 @@ class WorkerUpdateViewSet(viewsets.ModelViewSet):
             return WorkerUpdate.objects.filter(task_id=task_id)
         return WorkerUpdate.objects.all()
 
-from .models import CustomerReview
-from .serializers import CustomerReviewSerializer
+# Review and Support Views
+
 
 class CustomerReviewViewSet(viewsets.ModelViewSet):
     queryset = CustomerReview.objects.all()
@@ -308,8 +308,7 @@ class CustomerReviewViewSet(viewsets.ModelViewSet):
         if client_id:
             queryset = queryset.filter(client_id=client_id)
         return queryset
-from .models import SupportTicket
-from .serializers import SupportTicketSerializer
+
 
 class SupportTicketViewSet(viewsets.ModelViewSet):
     queryset = SupportTicket.objects.all()
