@@ -70,10 +70,12 @@ function Login({ onLogin }) {
       if (typeof errorData === 'string') {
         errorMessage = errorData;
       } else if (errorData && typeof errorData === 'object') {
-        errorMessage = Object.values(errorData).flat().join(" ") || JSON.stringify(errorData);
+        errorMessage = Object.values(errorData)
+          .map(val => Array.isArray(val) ? val.join(" ") : (typeof val === 'object' ? JSON.stringify(val) : val))
+          .join(" ");
       }
       
-      setError(errorMessage);
+      setError(errorMessage || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

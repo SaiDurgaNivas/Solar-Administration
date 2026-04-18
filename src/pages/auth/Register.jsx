@@ -62,16 +62,17 @@ function Register() {
     } catch (err) {
       console.error('Registration error:', err);
       const errorData = err.response?.data;
-      let errorMessage = "Registration failed. Server may be offline.";
+      let errorMessage = "Invalid Credentials or Server Offline.";
       
       if (typeof errorData === 'string') {
         errorMessage = errorData;
       } else if (errorData && typeof errorData === 'object') {
-        // Handle Django DRF style errors: { email: ["msg"], non_field_errors: ["msg"] }
-        errorMessage = Object.values(errorData).flat().join(" ") || JSON.stringify(errorData);
+        errorMessage = Object.values(errorData)
+          .map(val => Array.isArray(val) ? val.join(" ") : (typeof val === 'object' ? JSON.stringify(val) : val))
+          .join(" ");
       }
       
-      setError(errorMessage);
+      setError(errorMessage || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
