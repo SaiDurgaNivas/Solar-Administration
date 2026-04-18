@@ -8,7 +8,8 @@ function App() {
   // 🔐 USER STATE (from sessionStorage)
   const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(sessionStorage.getItem("solar_user"));
+      const savedUser = sessionStorage.getItem("solar_user");
+      return savedUser ? JSON.parse(savedUser) : null;
     } catch {
       return null;
     }

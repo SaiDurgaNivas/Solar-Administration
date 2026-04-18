@@ -29,10 +29,18 @@ function CustomerDashboard() {
   const [reviewModal, setReviewModal] = useState({ open: false, bookingId: null, rating: 5, comment: "" });
 
   const { timeString, dateString, greeting } = useLiveTime();
-  const userName = JSON.parse(sessionStorage.getItem("solar_user"))?.first_name || JSON.parse(sessionStorage.getItem("solar_user"))?.username || "Customer";
+  const getUser = () => {
+    try {
+      const u = sessionStorage.getItem("solar_user");
+      return u ? JSON.parse(u) : null;
+    } catch { return null; }
+  };
+
+  const user = getUser();
+  const userName = user?.first_name || user?.username || "Customer";
 
   const fetchBookings = async () => {
-    const user = JSON.parse(sessionStorage.getItem("solar_user"));
+    const user = getUser();
     if (!user) return;
     try {
         const res = await api.get(`bookings/?client_id=${user.id}`);
@@ -52,9 +60,15 @@ function CustomerDashboard() {
     }
   };
 
+  const fetchInstallations = async () => {
+    const user = getUser();
+    if (!user?.id) return;
+  };
+
   const handleReviewSubmit = async () => {
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        const user = getUser();
+        if (!user?.id) return;
         await api.post('reviews/', {
             client: user.id,
             booking: reviewModal.bookingId,
@@ -69,18 +83,17 @@ function CustomerDashboard() {
   };
 
   useEffect(() => {
-    const userStr = sessionStorage.getItem("solar_user");
-    if (!userStr) {
+    const user = getUser();
+    if (!user) {
       navigate("/login"); return;
     }
-    const user = JSON.parse(userStr);
     if (user.role !== "customer") {
       navigate("/login"); return;
     }
     // Set default name and phone
     setForm(prev => ({
         ...prev,
-        client_name: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.username,
+        client_name: user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.username || ""),
         phone: user.customer_profile?.phone || ""
     }));
     
@@ -93,8 +106,13 @@ function CustomerDashboard() {
         return;
     }
     
+    const fetchUsage = async () => {
+        const user = getUser();
+        if (!user?.id) return;
+    };
+
     setLoading(true);
-    const user = JSON.parse(sessionStorage.getItem("solar_user"));
+    const user = getUser();
     
     // Convert "10:00 AM" to "10:00:00", "02:00 PM" to "14:00:00" for Django TimeField
     const convertTime = (timeStr) => {

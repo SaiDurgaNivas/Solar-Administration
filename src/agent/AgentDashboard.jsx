@@ -45,10 +45,17 @@ const AgentDashboard = () => {
     } catch (err) { console.error(err); }
   };
 
+  const getUser = () => {
+    try {
+      const u = sessionStorage.getItem("solar_user");
+      return u ? JSON.parse(u) : null;
+    } catch { return null; }
+  };
+
   const fetchSelfAttendance = async () => {
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
-        const res = await api.get('attendance/');
+        const user = getUser();
+        if (!user) return;
         const todayStr = new Date().toISOString().split('T')[0];
         const record = res.data.find(a => a.worker === user.id && a.date === todayStr);
         setSelfAttendance(record);
@@ -57,8 +64,8 @@ const AgentDashboard = () => {
 
   const logSelfAttendance = async (status) => {
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
-        await api.post('attendance/', { worker: user.id, status });
+        const user = getUser();
+        if (!user) return;
         alert(`Attendance marked as ${status} for today!`);
         fetchSelfAttendance();
     } catch(err) {
@@ -94,15 +101,8 @@ const AgentDashboard = () => {
 
   const handleAddWorker = async () => {
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
-        await api.post('users/', {
-            username: newWorkerFields.username,
-            email: newWorkerFields.email,
-            password: newWorkerFields.password,
-            role: 'sub_worker',
-            agent_id: user.id,
-            job_title: newWorkerFields.job_title
-        });
+        const user = getUser();
+        if (!user) return;
         setNewWorkerFields({ username: '', email: '', password: '', job_title: 'worker' });
         fetchTeam();
         alert("Worker added to your team!");
@@ -112,13 +112,10 @@ const AgentDashboard = () => {
   };
 
   const handleDispatchTeam = async (bookingId) => {
-    const info = dispatchInfo[bookingId];
-    if (!info || !info.sub_worker_id || !info.location_link) {
-        alert("Please set Location & Assign a Lead Worker.");
-        return;
-    }
+    ...
     try {
-        const user = JSON.parse(sessionStorage.getItem("solar_user"));
+        const user = getUser();
+        if (!user) return;
         await api.post('teamtasks/', {
             booking: bookingId,
             agent: user.id,
@@ -148,7 +145,8 @@ const AgentDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const user = JSON.parse(sessionStorage.getItem("solar_user"));
+      const user = getUser();
+      if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const res = await api.get('bookings/');
       const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || b.agent === user.id);
