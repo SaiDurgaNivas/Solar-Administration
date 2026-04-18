@@ -1,6 +1,6 @@
        import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, UserCheck, UserX, UserMinus, Briefcase, PlusCircle, CheckCircle, X, Trash2 } from "lucide-react";
+import { Users, UserCheck, UserX, UserMinus, Briefcase, PlusCircle, CheckCircle, X, Trash2, AlertCircle } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Agents() {
@@ -33,8 +33,8 @@ function Agents() {
     fetchData();
   }, []);
 
-  const showToast = (msg) => {
-    setToast(msg);
+  const showToast = (msg, type = "success") => {
+    setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
 
@@ -54,7 +54,7 @@ function Agents() {
         last_name: newAgent.username.trim().split(' ')[1] || '',
         role: 'agent'
       });
-      showToast("Agent provisioned successfully!");
+      showToast("Agent provisioned successfully!", "success");
       setShowModal(false);
       setNewAgent({ username: '', email: '', password: '', role: 'agent' });
       fetchData();
@@ -64,9 +64,9 @@ function Agents() {
       let errMsg = "Network Error";
       if (typeof errData === 'string') errMsg = errData;
       else if (errData && typeof errData === 'object') {
-        errMsg = Object.values(errData).map(v => Array.isArray(v) ? v.join(' ') : String(v)).join(' ');
+        errMsg = Object.values(errData).flat().map(v => String(v)).join(' ');
       }
-      showToast(`Failed: ${errMsg}`);
+      showToast(`Failed: ${errMsg}`, "error");
     } finally {
       setSubmitting(false);
     }
@@ -78,13 +78,13 @@ function Agents() {
         worker: agentId,  // backend still uses 'worker' foreign key name
         status: status
       });
-      showToast(`Successfully marked ${status}!`);
+      showToast(`Successfully marked ${status}!`, "success");
       fetchData(); // Refresh to show updated log
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        showToast("Attendance already logged for today!");
+        showToast("Attendance already logged for today!", "error");
       } else {
-        showToast("Error processing attendance.");
+        showToast("Error processing attendance.", "error");
       }
     }
   };
@@ -93,12 +93,12 @@ function Agents() {
     if (!window.confirm("Are you sure you want to remove this Agent? This cannot be undone.")) return;
     try {
       await api.delete(`users/${id}/`);
-      showToast("Agent removed successfully!");
+      showToast("Agent removed successfully!", "success");
       fetchData();
     } catch(error) {
       console.error(error);
       const errMsg = error.response?.data?.detail || error.response?.statusText || "Network Error";
-      showToast(`Failed to remove agent: ${errMsg}`);
+      showToast(`Failed to remove agent: ${errMsg}`, "error");
     }
   };
 
@@ -128,10 +128,14 @@ function Agents() {
         {toast && (
             <motion.div 
                 initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-                className="fixed top-10 left-1/2 -translate-x-1/2 z-50 bg-gray-900 border border-white/20 px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 bg-gray-900 border ${toast.type === 'error' ? 'border-red-500/50' : 'border-white/20'} px-6 py-3 rounded-full flex items-center gap-3 shadow-[0_0_20px_rgba(255,255,255,0.1)]`}
             >
-                <CheckCircle className="w-5 h-5 text-green-400" />
-                <span className="font-bold text-gray-200">{toast}</span>
+                {toast.type === 'error' ? (
+                    <AlertCircle className="w-5 h-5 text-red-400" />
+                ) : (
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                )}
+                <span className={`font-bold ${toast.type === 'error' ? 'text-red-200' : 'text-gray-200'}`}>{toast.msg}</span>
             </motion.div>
         )}
       </AnimatePresence>

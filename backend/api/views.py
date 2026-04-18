@@ -62,67 +62,22 @@ def login_view(request):
 @api_view(['POST'])
 def register_view(request):
     """
-    Register a new user account.
+    Register a new user account using the UserSerializer for consistency.
     """
-    email = request.data.get('email')
-    password = request.data.get('password')
-    first_name = request.data.get('first_name', '')
-    last_name = request.data.get('last_name', '')
-    role = request.data.get('role', 'customer')
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            user = serializer.save()
+            return Response({
+                'message': 'Registration successful',
+                'user': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"Registration save error: {str(e)}")
+            return Response({'error': f'Server Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if not email or not password:
-        return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-    if len(password) < 6:
-        return Response({'error': 'Password must be at least 6 characters'}, status=status.HTTP_400_BAD_REQUEST)
-
-    if User.objects.filter(email=email).exists():
-        return Response({'error': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        # Use provided username or derive from email
-        username = request.data.get('username') or email.split('@')[0]
-        # Make username unique if it already exists
-        base_username = username
-        counter = 1
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
-
-        # Create new user
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role=role
-        )
-
-        # Create profile based on role
-        if role == 'customer':
-            CustomerProfile.objects.create(user=user)
-            send_mail(
-                subject="Welcome to Solar Administration",
-                message=f"Hello {first_name} {last_name},\n\nYour account has been successfully created!\n\nThank you for choosing Solar Administration.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=True,
-            )
-        elif role == 'agent':
-            from .models import AgentProfile
-            AgentProfile.objects.get_or_create(user=user)
-        elif role == 'sub_worker':
-            pass  # SubWorkerProfile handled separately by agent
-
-        serializer = UserSerializer(user)
-        return Response({
-            'message': 'Registration successful',
-            'user': serializer.data
-        }, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        print(f"Registration error trace: {str(e)}")
-        return Response({'error': f'Server Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
