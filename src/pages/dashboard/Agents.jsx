@@ -42,18 +42,31 @@ function Agents() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // Django's strict username validator blocks spaces
+      // Safe username (no spaces)
       const safeUsername = newAgent.username.trim().replace(/\s+/g, '_').toLowerCase();
       
-      await api.post('users/', { ...newAgent, username: safeUsername });
+      // Use the secure register endpoint so password is properly hashed
+      await api.post('auth/register/', {
+        username: safeUsername,
+        email: newAgent.email,
+        password: newAgent.password,
+        first_name: newAgent.username.trim().split(' ')[0],
+        last_name: newAgent.username.trim().split(' ')[1] || '',
+        role: 'agent'
+      });
       showToast("Agent provisioned successfully!");
       setShowModal(false);
       setNewAgent({ username: '', email: '', password: '', role: 'agent' });
       fetchData();
     } catch (err) {
       console.error("Error creating agent:", err);
-      const errMsg = err.response?.data?.detail || err.response?.statusText || "Network Error";
-      showToast(`Failed to create agent: ${errMsg}`);
+      const errData = err.response?.data;
+      let errMsg = "Network Error";
+      if (typeof errData === 'string') errMsg = errData;
+      else if (errData && typeof errData === 'object') {
+        errMsg = Object.values(errData).map(v => Array.isArray(v) ? v.join(' ') : String(v)).join(' ');
+      }
+      showToast(`Failed: ${errMsg}`);
     } finally {
       setSubmitting(false);
     }

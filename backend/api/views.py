@@ -80,9 +80,18 @@ def register_view(request):
         return Response({'error': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
+        # Use provided username or derive from email
+        username = request.data.get('username') or email.split('@')[0]
+        # Make username unique if it already exists
+        base_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
         # Create new user
         user = User.objects.create_user(
-            username=email.split('@')[0],
+            username=username,
             email=email,
             password=password,
             first_name=first_name,
@@ -90,18 +99,21 @@ def register_view(request):
             role=role
         )
 
-        # Create customer profile if role is customer
+        # Create profile based on role
         if role == 'customer':
             CustomerProfile.objects.create(user=user)
-
-            # Send welcome email
             send_mail(
                 subject="Welcome to Solar Administration",
-                message=f"Hello {first_name} {last_name},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
+                message=f"Hello {first_name} {last_name},\n\nYour account has been successfully created!\n\nThank you for choosing Solar Administration.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 fail_silently=True,
             )
+        elif role == 'agent':
+            from .models import AgentProfile
+            AgentProfile.objects.get_or_create(user=user)
+        elif role == 'sub_worker':
+            pass  # SubWorkerProfile handled separately by agent
 
         serializer = UserSerializer(user)
         return Response({
@@ -111,6 +123,7 @@ def register_view(request):
     except Exception as e:
         print(f"Registration error trace: {str(e)}")
         return Response({'error': f'Server Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(['POST'])
 def oauth_login_view(request):
