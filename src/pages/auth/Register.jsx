@@ -45,6 +45,7 @@ function Register() {
     
     try {
       const response = await api.post('auth/register/', { 
+        username: email, 
         email, 
         password,
         first_name: firstName,
@@ -68,15 +69,25 @@ function Register() {
         errorMessage = "Server error or offline. Please try again.";
       } else if (typeof errorData === 'string') {
         errorMessage = errorData;
-      } else if (typeof errorData === 'object') {
-        // Correctly handle standard DRF error objects
-        errorMessage = Object.values(errorData)
-          .map(v => {
-            if (Array.isArray(v)) return v.join(" ");
-            if (typeof v === 'object' && v !== null) return JSON.stringify(v);
-            return String(v);
+      } else if (typeof errorData === 'object' && errorData !== null) {
+        // Map backend field names to user-friendly labels
+        const fieldLabels = {
+          username: "Email",
+          email: "Email Address",
+          password: "Password",
+          first_name: "First Name",
+          last_name: "Last Name"
+        };
+
+        errorMessage = Object.entries(errorData)
+          .map(([key, v]) => {
+            const label = fieldLabels[key] || key.replace(/_/g, " ");
+            const messages = Array.isArray(v) ? v.join(" ") : String(v);
+            // Clean up messages that mention 'username' if we're showing it as 'Email'
+            const cleanMessage = messages.replace(/username/gi, "email");
+            return `${label}: ${cleanMessage}`;
           })
-          .join(" ");
+          .join(" | ");
       } else {
         errorMessage = String(errorData);
       }
@@ -163,11 +174,16 @@ function Register() {
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                   <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
                     <input
                       type="text"
                       name="lastName"
                       placeholder="Doe"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                       value={formData.lastName}
                       onChange={handleChange}
                     />
@@ -235,10 +251,17 @@ function Register() {
                     type={showPassword ? "text" : "password"}
                     name="confirmPassword"
                     placeholder="Confirm your password"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                   />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
                 </div>
               </div>
 

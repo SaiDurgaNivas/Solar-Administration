@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
     customer_profile = CustomerProfileSerializer(read_only=True)
     subworker_profile = SubWorkerProfileSerializer(read_only=True)
     agent_profile = AgentProfileSerializer(read_only=True)
+    username = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(write_only=True, required=False)
     
     # Used for agent assigning sub worker during registration
@@ -33,6 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name', 'password', 'customer_profile', 'subworker_profile', 'agent_profile', 'agent_id', 'job_title', 'date_joined']
 
     def create(self, validated_data):
+        email = validated_data.get('email')
+        if not validated_data.get('username'):
+            validated_data['username'] = email
+            
         password = validated_data.pop('password', 'default123')
         role = validated_data.pop('role', 'customer')
         agent_id = validated_data.pop('agent_id', None)
