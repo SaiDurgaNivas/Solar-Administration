@@ -18,38 +18,33 @@ import shutil
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ============================================================
-# VERCEL FIX: Copy seeded DB to /tmp (writable) on startup
+# VERCEL FIX: Copy seeded DB to /tmp so Django can write to it
 # ============================================================
 IS_VERCEL = os.environ.get('VERCEL', False)
 
 if IS_VERCEL:
     TMP_DB = '/tmp/db.sqlite3'
     SOURCE_DB = str(BASE_DIR / 'db.sqlite3')
-    if not os.path.exists(TMP_DB):
-        try:
+    try:
+        if os.path.exists(SOURCE_DB):
             shutil.copy2(SOURCE_DB, TMP_DB)
-        except Exception:
-            pass  # Will be created fresh if copy fails
+            print(f"Vercel: Copied DB from {SOURCE_DB} to {TMP_DB}")
+        else:
+            print(f"Vercel: Source DB not found at {SOURCE_DB}, using empty /tmp DB")
+    except Exception as e:
+        print(f"Vercel: DB copy failed: {e}")
     DATABASE_PATH = TMP_DB
 else:
     DATABASE_PATH = str(BASE_DIR / 'db.sqlite3')
 
-
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ix-860&u#jt*rzgju_r*syar-^go(q%9m&)i^&60-xz1+c8**2'
+SECRET_KEY = 'django-insecure-ix-860&u#jt*rzgju_r*syar-^go(q%9m&)i^`60-xz1+c8**2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
-
-
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
