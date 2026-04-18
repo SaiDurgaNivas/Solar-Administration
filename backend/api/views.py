@@ -79,34 +79,38 @@ def register_view(request):
     if User.objects.filter(email=email).exists():
         return Response({'error': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create new user
-    user = User.objects.create_user(
-        username=email.split('@')[0],
-        email=email,
-        password=password,
-        first_name=first_name,
-        last_name=last_name,
-        role=role
-    )
-
-    # Create customer profile if role is customer
-    if role == 'customer':
-        CustomerProfile.objects.create(user=user)
-
-        # Send welcome email
-        send_mail(
-            subject="Welcome to Solar Administration",
-            message=f"Hello {first_name} {last_name},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=True,
+    try:
+        # Create new user
+        user = User.objects.create_user(
+            username=email.split('@')[0],
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            role=role
         )
 
-    serializer = UserSerializer(user)
-    return Response({
-        'message': 'Registration successful',
-        'user': serializer.data
-    }, status=status.HTTP_201_CREATED)
+        # Create customer profile if role is customer
+        if role == 'customer':
+            CustomerProfile.objects.create(user=user)
+
+            # Send welcome email
+            send_mail(
+                subject="Welcome to Solar Administration",
+                message=f"Hello {first_name} {last_name},\n\nYour customer account has been successfully registered!\n\nThank you for choosing Solar Administration.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=True,
+            )
+
+        serializer = UserSerializer(user)
+        return Response({
+            'message': 'Registration successful',
+            'user': serializer.data
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        print(f"Registration error trace: {str(e)}")
+        return Response({'error': f'Server Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 def oauth_login_view(request):
