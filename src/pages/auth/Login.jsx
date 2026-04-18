@@ -63,7 +63,17 @@ function Login({ onLogin }) {
       else navigate("/customer-dashboard");
 
     } catch (err) {
-      setError(err.response?.data?.error || "Invalid Credentials or Server Offline.");
+      console.error('Login error:', err);
+      const errorData = err.response?.data;
+      let errorMessage = "Invalid Credentials or Server Offline.";
+      
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData && typeof errorData === 'object') {
+        errorMessage = Object.values(errorData).flat().join(" ") || JSON.stringify(errorData);
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

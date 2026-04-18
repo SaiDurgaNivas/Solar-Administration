@@ -61,7 +61,17 @@ function Register() {
       navigate("/login");
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.error || "Registration failed. Server may be offline.");
+      const errorData = err.response?.data;
+      let errorMessage = "Registration failed. Server may be offline.";
+      
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData && typeof errorData === 'object') {
+        // Handle Django DRF style errors: { email: ["msg"], non_field_errors: ["msg"] }
+        errorMessage = Object.values(errorData).flat().join(" ") || JSON.stringify(errorData);
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
