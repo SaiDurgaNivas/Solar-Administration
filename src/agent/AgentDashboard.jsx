@@ -112,7 +112,11 @@ const AgentDashboard = () => {
   };
 
   const handleDispatchTeam = async (bookingId) => {
-    ...
+    const info = dispatchInfo[bookingId];
+    if (!info || !info.sub_worker_id || !info.location_link) {
+        alert("Please set Location & Assign a Lead Worker.");
+        return;
+    }
     try {
         const user = getUser();
         if (!user) return;
