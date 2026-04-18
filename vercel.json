@@ -3,33 +3,34 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/static-build"
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
     },
     {
       "src": "backend/solar_api/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.12"
-      }
+      "use": "@vercel/python"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/solar_api/wsgi.py"
+      "source": "/api/(.*)",
+      "destination": "backend/solar_api/wsgi.py"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "backend/solar_api/wsgi.py"
+      "source": "/admin/(.*)",
+      "destination": "backend/solar_api/wsgi.py"
     },
     {
-      "src": "/media/(.*)",
-      "dest": "backend/solar_api/wsgi.py"
+      "source": "/media/(.*)",
+      "destination": "backend/solar_api/wsgi.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/static/(.*)",
+      "destination": "backend/solar_api/wsgi.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
