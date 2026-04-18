@@ -65,17 +65,25 @@ function Login({ onLogin }) {
     } catch (err) {
       console.error('Login error:', err);
       const errorData = err.response?.data;
-      let errorMessage = "Invalid Credentials or Server Offline.";
+      let errorMessage = "";
       
-      if (typeof errorData === 'string') {
+      if (!errorData) {
+        errorMessage = "Invalid Credentials or Server Offline.";
+      } else if (typeof errorData === 'string') {
         errorMessage = errorData;
-      } else if (errorData && typeof errorData === 'object') {
+      } else if (typeof errorData === 'object') {
         errorMessage = Object.values(errorData)
-          .map(val => Array.isArray(val) ? val.join(" ") : (typeof val === 'object' ? JSON.stringify(val) : val))
+          .map(v => {
+            if (Array.isArray(v)) return v.join(" ");
+            if (typeof v === 'object' && v !== null) return JSON.stringify(v);
+            return String(v);
+          })
           .join(" ");
+      } else {
+        errorMessage = String(errorData);
       }
       
-      setError(errorMessage || "An unexpected error occurred.");
+      setError(errorMessage || "Login failed. Please check credentials.");
     } finally {
       setLoading(false);
     }
