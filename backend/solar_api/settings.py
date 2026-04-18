@@ -11,9 +11,28 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import shutil
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ============================================================
+# VERCEL FIX: Copy seeded DB to /tmp (writable) on startup
+# ============================================================
+IS_VERCEL = os.environ.get('VERCEL', False)
+
+if IS_VERCEL:
+    TMP_DB = '/tmp/db.sqlite3'
+    SOURCE_DB = str(BASE_DIR / 'db.sqlite3')
+    if not os.path.exists(TMP_DB):
+        try:
+            shutil.copy2(SOURCE_DB, TMP_DB)
+        except Exception:
+            pass  # Will be created fresh if copy fails
+    DATABASE_PATH = TMP_DB
+else:
+    DATABASE_PATH = str(BASE_DIR / 'db.sqlite3')
 
 
 # Quick-start development settings - unsuitable for production
@@ -85,7 +104,7 @@ WSGI_APPLICATION = 'solar_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DATABASE_PATH,
     }
 }
 
