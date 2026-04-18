@@ -47,10 +47,17 @@ class UserSerializer(serializers.ModelSerializer):
             try:
                 agent = User.objects.get(id=agent_id)
                 SubWorkerProfile.objects.create(user=user, agent=agent, job_title=job_title, raw_password=password)
-                print(f"SubWorkerProfile created for {user.username} with raw_password tracking.")
+                print(f"SubWorkerProfile created for {user.username}")
             except User.DoesNotExist:
                 print(f"Failed to create SubWorkerProfile: Agent ID {agent_id} does not exist.")
-                pass
+        
+        elif role == 'customer':
+            CustomerProfile.objects.create(user=user)
+            print(f"CustomerProfile created for {user.username}")
+            
+        elif role == 'agent':
+            AgentProfile.objects.create(user=user)
+            print(f"AgentProfile created for {user.username}")
                 
         return user
 
