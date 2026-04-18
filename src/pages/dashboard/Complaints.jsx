@@ -156,7 +156,6 @@ function Complaints() {
                                 </div>
                             </motion.div>
                         ))}
-}
                     </AnimatePresence>
                 </div>
             )}
