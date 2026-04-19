@@ -39,7 +39,7 @@ def login_view(request):
             user.set_password('worker123')
             user.save()
         else:
-            return Response({'error': 'No account found with this email. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'No account found with this email. Please register.'}, status=status.HTTP_401_UNAUTHORIZED)
     else:
         if not user.check_password(password):
             return Response({'error': 'Incorrect password. Try again.'}, status=status.HTTP_401_UNAUTHORIZED)

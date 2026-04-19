@@ -76,14 +76,23 @@ function Register() {
           email: "Email Address",
           password: "Password",
           first_name: "First Name",
-          last_name: "Last Name"
+          last_name: "Last Name",
+          non_field_errors: "Error",
+          detail: "Error"
+        };
+
+        const stringifyError = (val) => {
+          if (Array.isArray(val)) return val.map(stringifyError).join(" ");
+          if (typeof val === 'object' && val !== null) {
+            return val.message || val.detail || JSON.stringify(val);
+          }
+          return String(val);
         };
 
         errorMessage = Object.entries(errorData)
           .map(([key, v]) => {
             const label = fieldLabels[key] || key.replace(/_/g, " ");
-            const messages = Array.isArray(v) ? v.join(" ") : String(v);
-            // Clean up messages that mention 'username' if we're showing it as 'Email'
+            const messages = stringifyError(v);
             const cleanMessage = messages.replace(/username/gi, "email");
             return `${label}: ${cleanMessage}`;
           })
