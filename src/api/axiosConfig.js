@@ -5,8 +5,8 @@ const isLocal = window.location.hostname === 'localhost' ||
                  window.location.hostname.startsWith('192.168.') || 
                  window.location.hostname.startsWith('10.');
 
-// Vercel lo localhost work avvadu. Replace with your deployed backend URL:
-const PROD_API_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-url.onrender.com/api/';
+// Point directly to the Vercel backend using a relative route
+const PROD_API_URL = import.meta.env.VITE_API_BASE_URL || '/api/';
 
 const API_BASE_URL = isLocal
     ? `http://${window.location.hostname}:8000/api/`
