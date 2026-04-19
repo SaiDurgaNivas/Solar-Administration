@@ -3,6 +3,14 @@ WSGI config for solar_api project.
 """
 
 import os
+import sys
+from pathlib import Path
+
+# Fix for Vercel: append the backend directory to Python path
+base_dir = Path(__file__).resolve().parent.parent
+if str(base_dir) not in sys.path:
+    sys.path.insert(0, str(base_dir))
+
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'solar_api.settings')
