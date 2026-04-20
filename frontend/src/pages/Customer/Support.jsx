@@ -55,52 +55,7 @@ function Support({ modal, setModal }) {
   };
 
   const handleAction = (block) => {
-    let content = null;
-    if (block.title === "Comm Link") {
-        content = (
-            <div className="space-y-6">
-                <div className="flex flex-col items-center py-10 bg-[#020617]/50 rounded-3xl border border-white/5">
-                    <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-6"></div>
-                    <p className="text-blue-400 font-black uppercase tracking-widest text-xs animate-pulse">Initializing Neural Link...</p>
-                    <p className="text-gray-500 text-xs mt-2">Connecting to Secure Signal Channel</p>
-                </div>
-                <div className="bg-white/5 p-4 rounded-xl text-sm text-gray-400 leading-relaxed italic">
-                    "All agents are currently assisting other grid nodes. Typical wait time: 4 minutes."
-                </div>
-            </div>
-        );
-    } else if (block.title === "Engineering Desk") {
-        content = (
-            <div className="space-y-4">
-                <p className="text-gray-400 text-sm leading-relaxed">Fill out the diagnostic brief below to alert our hardware engineers.</p>
-                <div className="space-y-3">
-                    <input type="text" placeholder="Subject" className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-sm" />
-                    <textarea rows="4" placeholder="Detail the anomaly (e.g. Inverter Error Code 402)..." className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-sm resize-none"></textarea>
-                    <button onClick={() => {alert("Ticket Transmitted Successfully!"); setModal({open: false})}} className="w-full bg-orange-500 text-black font-black uppercase tracking-widest py-3 rounded-xl">Transmit Ticket</button>
-                </div>
-            </div>
-        );
-    } else {
-        content = (
-            <div className="grid grid-cols-1 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {[
-                    { name: "Grid Integration Guide v3.1", size: "4.2 MB", date: "Jan 2026" },
-                    { name: "Inverter Maintenance Protcols", size: "2.1 MB", date: "Feb 2026" },
-                    { name: "Panel Cleaning & Efficiency", size: "1.8 MB", date: "Dec 2025" },
-                    { name: "Battery Safety Manual", size: "5.5 MB", date: "Mar 2026" }
-                ].map((doc, idx) => (
-                    <div key={idx} className="bg-[#020617]/50 border border-white/5 p-4 rounded-2xl flex justify-between items-center group hover:border-green-500/30 transition">
-                        <div>
-                            <p className="font-bold text-white text-sm">{doc.name}</p>
-                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">{doc.date} • {doc.size}</p>
-                        </div>
-                        <button className="p-2 bg-white/5 rounded-lg text-gray-400 group-hover:text-green-400 transition italic text-[10px] uppercase font-black">Download</button>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-    setModal({ open: true, title: block.title, content: content, icon: block.icon });
+    navigate(`/customer-dashboard/support/${block.slug}`);
   };
 
   return (
@@ -128,9 +83,9 @@ function Support({ modal, setModal }) {
 
           <div className="grid md:grid-cols-3 gap-6 mb-20">
             {[
-                { icon: MessageSquare, title: "Comm Link", desc: "Open a direct chat array with an agent.", action: "Start Session", color: "text-blue-400", borderHover: "hover:border-blue-500/30", bgHover: "hover:bg-blue-500/5" },
-                { icon: Mail, title: "Engineering Desk", desc: "Submit a detailed email diagnostic request.", action: "Create Ticket", color: "text-orange-400", borderHover: "hover:border-orange-500/30", bgHover: "hover:bg-orange-500/5" },
-                { icon: Briefcase, title: "Hardware Manuals", desc: "Read documentation on grid integration.", action: "Access Library", color: "text-green-400", borderHover: "hover:border-green-500/30", bgHover: "hover:bg-green-500/5" }
+                { icon: MessageSquare, title: "Comm Link", desc: "Open a direct chat array with an agent.", action: "Start Session", color: "text-blue-400", borderHover: "hover:border-blue-500/30", bgHover: "hover:bg-blue-500/5", slug: "comm-link" },
+                { icon: Mail, title: "Engineering Desk", desc: "Submit a detailed email diagnostic request.", action: "Create Ticket", color: "text-orange-400", borderHover: "hover:border-orange-500/30", bgHover: "hover:bg-orange-500/5", slug: "engineering-desk" },
+                { icon: Briefcase, title: "Hardware Manuals", desc: "Read documentation on grid integration.", action: "Access Library", color: "text-green-400", borderHover: "hover:border-green-500/30", bgHover: "hover:bg-green-500/5", slug: "hardware-manuals" }
             ].map((block, i) => (
                  <motion.div 
                     key={i} 
