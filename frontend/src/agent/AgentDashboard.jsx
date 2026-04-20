@@ -620,6 +620,31 @@ const AgentDashboard = () => {
                                   <div className="text-xs text-gray-400">Technician assignment is being processed.</div>
                                 )}
                               </div>
+                              {/* MISSION LOGS (Worker Updates) */}
+                              {req.team_tasks?.some(t => t.updates?.length > 0) && (
+                                <div className="mt-2 space-y-2 border-t border-white/5 pt-3">
+                                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-2">
+                                     <FileText className="w-3 h-3 text-cyan-500" /> Field Mission Logs
+                                  </h4>
+                                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1 custom-scrollbar">
+                                    {req.team_tasks.map(task => 
+                                      task.updates?.map((update, idx) => (
+                                        <div key={idx} className="bg-white/5 p-2.5 rounded-xl border border-white/5 flex gap-3 items-center group/log">
+                                          {update.photo && (
+                                            <a href={update.photo} target="_blank" rel="noreferrer" className="shrink-0">
+                                              <img src={update.photo} className="w-10 h-10 rounded-lg object-cover border border-white/10 hover:border-cyan-500 transition-colors" alt="Log" />
+                                            </a>
+                                          )}
+                                          <div className="overflow-hidden">
+                                            <p className="text-[11px] text-gray-200 font-medium leading-tight">{update.description}</p>
+                                            <p className="text-[9px] text-gray-500 mt-1 uppercase font-bold">{new Date(update.timestamp).toLocaleString()}</p>
+                                          </div>
+                                        </div>
+                                      ))
+                                    )}
+                                  </div>
+                                </div>
+                              )}
                           </div>
                       ) : (req.status === "Loan Approved" || req.status === "Direct Pay Confirmed") ? (
                           <div className="mt-auto space-y-3 border-t border-white/5 pt-4">

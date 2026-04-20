@@ -281,6 +281,32 @@ function AdminBookings() {
                     </div>
                 )}
 
+                {/* MISSION LOGS (Worker Updates) */}
+                {b.team_tasks?.some(t => t.updates?.length > 0) && (
+                    <div className="mb-6">
+                        <h3 className="text-sm text-gray-400 uppercase font-bold tracking-widest mb-3 flex items-center gap-2">
+                            <ShieldAlert className="w-4 h-4 text-blue-400"/> Field Mission Logs
+                        </h3>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {b.team_tasks.map(task => 
+                                task.updates?.map((update, idx) => (
+                                    <div key={idx} className="bg-[#020617] border border-white/5 p-4 rounded-xl flex gap-3 items-center group">
+                                        {update.photo && (
+                                            <a href={update.photo} target="_blank" rel="noreferrer" className="shrink-0">
+                                                <img src={update.photo} className="w-12 h-12 rounded-lg object-cover border border-white/10 group-hover:border-blue-400 transition-colors" alt="Log" />
+                                            </a>
+                                        )}
+                                        <div className="overflow-hidden">
+                                            <p className="text-xs text-white font-medium line-clamp-2">{update.description}</p>
+                                            <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">{new Date(update.timestamp).toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Agent Action Area */}
                 <div className="pt-6 border-t border-white/5 flex flex-wrap gap-4 items-center justify-end">
                     {['Awaiting Admin', 'Forwarded'].includes(b.status) && (

@@ -110,6 +110,14 @@ class BookingSerializer(serializers.ModelSerializer):
                 'sub_worker_name': task.sub_worker.username,
                 'status': task.status,
                 'location_link': task.location_link,
+                'updates': [
+                    {
+                        'description': update.description,
+                        'photo': update.photo.url if update.photo else None,
+                        'timestamp': update.timestamp
+                    }
+                    for update in task.updates.all()
+                ]
             }
             for task in obj.team_tasks.all()
         ]
