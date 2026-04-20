@@ -173,7 +173,7 @@ function Maintenance() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-yellow-500 transition-all group-hover:scale-105"></div>
                 <div className="relative flex items-center justify-center gap-3 bg-transparent py-5 px-8 transition-colors">
-                  <span className="text-black font-black uppercase tracking-[0.3em] text-sm">Raise Diagnostic Ticket</span>
+                  <span className="text-black font-black uppercase tracking-[0.3em] text-sm">Raise Complaint</span>
                   <ArrowRight className="w-5 h-5 text-black group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
