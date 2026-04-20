@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, Notification
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -176,3 +176,8 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
     def get_assigned_worker_name(self, obj):
         return obj.assigned_worker.username if obj.assigned_worker else "Not Assigned"
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'

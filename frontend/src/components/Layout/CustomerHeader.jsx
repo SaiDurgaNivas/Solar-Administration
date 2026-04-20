@@ -36,12 +36,25 @@ function CustomerHeader({ user, onLogout }) {
   const fetchNotifications = async () => {
     if (!user) return;
     try {
-      const [bookRes, billRes] = await Promise.all([
+      const [bookRes, billRes, notifRes] = await Promise.all([
         api.get(`bookings/?client_id=${user.id}`),
-        api.get(`bills/?client_id=${user.id}`)
+        api.get(`bills/?client_id=${user.id}`),
+        api.get(`notifications/?user_id=${user.id}`)
       ]);
       
       let notifs = [];
+
+      // Official DB Notifications
+      notifRes.data.forEach(n => {
+        notifs.push({
+           id: `db-${n.id}`,
+           title: n.title,
+           message: n.message,
+           time: new Date(n.created_at),
+           type: 'official',
+           read: n.is_read
+        });
+      });
       
       // Parse Bookings
       bookRes.data.forEach(b => {
@@ -75,15 +88,6 @@ function CustomerHeader({ user, onLogout }) {
             time: new Date(bill.date || Date.now()),
             type: 'bill',
             read: false
-          });
-        } else {
-          notifs.push({
-            id: `bill-${bill.id}-paid`,
-            title: 'Payment Cleared',
-            message: `Your payment of ₹${bill.amount} was successfully verified.`,
-            time: new Date(bill.paid_at || bill.date || Date.now()),
-            type: 'bill',
-            read: true
           });
         }
       });

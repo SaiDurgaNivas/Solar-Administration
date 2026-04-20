@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask
-from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask, Notification
+from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer, NotificationSerializer
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.mail import send_mail
 from django.conf import settings
@@ -210,7 +210,13 @@ class BillViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         if serializer.validated_data.get('status') == 'Paid' and serializer.instance.status != 'Paid':
-            serializer.save(paid_at=timezone.now())
+            bill = serializer.save(paid_at=timezone.now())
+            # 🔥 AUTOMATIC SUBSIDY NOTIFICATION
+            Notification.objects.create(
+                user=bill.client,
+                title="✨ Subsidy Successfully Disbursed!",
+                message=f"Congratulations! Since your ledger {bill.bill_no} is now fully settled, your Government Subsidy of ₹{bill.subsidy.toLocaleString if hasattr(bill.subsidy, 'toLocaleString') else bill.subsidy} has been automatically credited to your node profile."
+            )
         else:
             serializer.save()
 
@@ -297,3 +303,13 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
             
         return queryset
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all().order_by('-created_at')
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id')
+        if user_id:
+            return Notification.objects.filter(user_id=user_id).order_by('-created_at')
+        return Notification.objects.all().order_by('-created_at')
