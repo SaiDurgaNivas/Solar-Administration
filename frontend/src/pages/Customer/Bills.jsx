@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, FileText, CheckCircle, Clock, Download, CreditCard, Smartphone, Landmark, ScanLine, X, ShieldCheck } from "lucide-react";
+import { Search, FileText, CheckCircle, Clock, Download, CreditCard, Smartphone, Landmark, ScanLine, X, ShieldCheck, Building } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Bills() {
   const [bills, setBills] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Authenticated User Scope
+  const userStr = sessionStorage.getItem("solar_user");
+  const user = userStr ? JSON.parse(userStr) : null;
   
   // Payment Modal State
   const [paymentModal, setPaymentModal] = useState({ open: false, bill: null, step: 1, method: 'upi', successData: null, selectedSlot: 'full' });
@@ -27,9 +31,7 @@ function Bills() {
   }, []);
 
   const fetchData = async (showLoader = true) => {
-    const userStr = sessionStorage.getItem("solar_user");
-    if (!userStr) return;
-    const user = JSON.parse(userStr);
+    if (!user) return;
 
     try {
       if (showLoader) setLoading(true);
