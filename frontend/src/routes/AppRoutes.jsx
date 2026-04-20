@@ -14,6 +14,7 @@ import CustomerBookings from "../pages/Customer/CustomerBookings";
 import Bills from "../pages/Customer/Bills";
 import Usage from "../pages/Customer/Usage";
 import Support from "../pages/Customer/Support";
+import SupportDetail from "../pages/Customer/SupportDetail";
 import Maintenance from "../pages/Customer/Maintenance";
 import HardwareCatalog from "../pages/Customer/HardwareCatalog";
 import About from "../pages/About";
@@ -175,6 +176,14 @@ function AppRoutes({ user, onLogin, onLogout }) {
         element={
           <ProtectedLayout user={user} onLogout={onLogout} role="customer">
             <Support />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/customer-dashboard/support/:type"
+        element={
+          <ProtectedLayout user={user} onLogout={onLogout} role="customer">
+            <SupportDetail />
           </ProtectedLayout>
         }
       />
