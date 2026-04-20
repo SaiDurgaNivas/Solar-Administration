@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Wrench, MapPin, CheckCircle, Clock, Save, ShieldAlert, HardHat, PlusCircle, UserPlus, Zap, FileText } from "lucide-react";
+import { Users, Wrench, MapPin, CheckCircle, Clock, Save, ShieldAlert, HardHat, PlusCircle, UserPlus, Zap, FileText, X } from "lucide-react";
 import api from "../api/axiosConfig";
 import { useTickets } from "../context/TicketContext";
 import { useLiveTime } from "../hooks/useLiveTime";
@@ -8,6 +8,7 @@ import { useLiveTime } from "../hooks/useLiveTime";
 const AgentDashboard = () => {
   const [installations, setInstallations] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [viewingPhoto, setViewingPhoto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmDates, setConfirmDates] = useState({});
   const [confirmTimes, setConfirmTimes] = useState({});
@@ -631,9 +632,12 @@ const AgentDashboard = () => {
                                       task.updates?.map((update, idx) => (
                                         <div key={idx} className="bg-white/5 p-2.5 rounded-xl border border-white/5 flex gap-3 items-center group/log">
                                           {update.photo && (
-                                            <a href={update.photo} target="_blank" rel="noreferrer" className="shrink-0">
+                                            <div 
+                                              onClick={() => setViewingPhoto(update.photo)} 
+                                              className="shrink-0 cursor-pointer"
+                                            >
                                               <img src={update.photo} className="w-10 h-10 rounded-lg object-cover border border-white/10 hover:border-cyan-500 transition-colors" alt="Log" />
-                                            </a>
+                                            </div>
                                           )}
                                           <div className="overflow-hidden">
                                             <p className="text-[11px] text-gray-200 font-medium leading-tight">{update.description}</p>
@@ -916,6 +920,26 @@ const AgentDashboard = () => {
         </motion.div>
 
       </div>
+      {/* Image Viewer Modal */}
+      {viewingPhoto && (
+        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10" onClick={() => setViewingPhoto(null)}>
+            <div className="relative max-w-5xl w-full h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
+                <motion.img 
+                    initial={{ opacity: 0, scale: 0.9 }} 
+                    animate={{ opacity: 1, scale: 1 }}
+                    src={viewingPhoto} 
+                    className="max-w-full max-h-full object-contain rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.3)] border border-white/10" 
+                    alt="Enlarged view" 
+                />
+                <button 
+                  onClick={() => setViewingPhoto(null)}
+                  className="absolute top-0 -right-12 bg-white/10 hover:bg-red-500 p-2 rounded-full text-white transition-all backdrop-blur-md"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
