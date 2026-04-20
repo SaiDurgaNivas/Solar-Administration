@@ -23,25 +23,23 @@ function AdminBookings() {
     }
   };
 
-  const newRequests = bookings.filter((booking) => [
-    'Awaiting Admin',
-    'Forwarded'
-  ].includes(booking.status));
+  const newRequests = bookings
+    .filter((booking) => ['Awaiting Admin', 'Forwarded'].includes(booking.status))
+    .sort((a, b) => b.id - a.id);
 
-  const pendingRequests = bookings.filter((booking) => ![
-    'Completed', 
-    'Awaiting Admin', 
-    'Forwarded', 
-    'Loan Rejected'
-  ].includes(booking.status));
+  const pendingRequests = bookings
+    .filter((booking) => !['Completed', 'Awaiting Admin', 'Forwarded', 'Loan Rejected'].includes(booking.status))
+    .sort((a, b) => b.id - a.id);
 
-  const completedRequests = bookings.filter((booking) => booking.status === 'Completed');
+  const completedRequests = bookings
+    .filter((booking) => booking.status === 'Completed')
+    .sort((a, b) => b.id - a.id);
 
   const displayedBookings = 
     activeTab === 'new' ? newRequests : 
     activeTab === 'pending' ? pendingRequests :
     activeTab === 'completed' ? completedRequests :
-    bookings;
+    [...bookings].sort((a, b) => b.id - a.id);
 
   useEffect(() => {
     fetchBookings();
