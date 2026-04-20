@@ -15,6 +15,7 @@ router.register(r'workerupdates', views.WorkerUpdateViewSet)
 router.register(r'reviews', views.CustomerReviewViewSet)
 router.register(r'agentprofiles', views.AgentProfileViewSet)
 router.register(r'support-tickets', views.SupportTicketViewSet)
+router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
     path('auth/login/', views.login_view, name='login'),

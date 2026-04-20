@@ -585,7 +585,13 @@ function Bills() {
 
                 <div className="flex flex-col items-end border-t-2 border-gray-100 pt-8 gap-4">
                     <div className="flex justify-between w-full md:w-80 text-sm"><span className="text-gray-400 font-bold uppercase tracking-widest">Subtotal</span><span className="font-bold text-gray-800">₹{selectedInvoiceMaterials?.total?.toLocaleString()}</span></div>
-                    <div className="flex justify-between w-full md:w-80 text-sm text-green-600"><span className="font-bold uppercase tracking-widest">Subsidy (Applied)</span><span className="font-bold">- ₹{(selectedInvoice.subsidy || 0).toLocaleString()}</span></div>
+                    <div className="flex justify-between w-full md:w-80 text-sm text-green-600">
+                        <span className="font-bold uppercase tracking-widest flex items-center gap-2">
+                            Subsidy (Applied)
+                            {selectedInvoice.status === "Paid" && <span className="text-[9px] bg-green-500 text-white px-2 py-0.5 rounded-full animate-pulse">AUTOMATICALLY RELEASED</span>}
+                        </span>
+                        <span className="font-bold">- ₹{(selectedInvoice.subsidy || 0).toLocaleString()}</span>
+                    </div>
                     <div className="flex justify-between w-full md:w-80 text-sm text-blue-600"><span className="font-bold uppercase tracking-widest">Loan (Sanctioned)</span><span className="font-bold">- ₹{(selectedInvoice.loan || 0).toLocaleString()}</span></div>
                     <div className="flex justify-between items-center w-full md:w-80 p-5 rounded-2xl bg-[#0f172a] text-white shadow-xl mt-4 border-t-4 border-orange-500">
                         <span className="font-black uppercase tracking-tighter">Amount Paid</span>
