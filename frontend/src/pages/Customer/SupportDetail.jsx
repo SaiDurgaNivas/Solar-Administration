@@ -27,7 +27,7 @@ function SupportDetail() {
                  </p>
                  <div className="grid grid-cols-2 gap-4 text-sm font-mono uppercase tracking-widest text-gray-500">
                     <div className="bg-white/5 p-3 rounded-xl border border-white/5">Encryption: 256-bit</div>
-                    <div className="bg-white/5 p-3 rounded-xl border border-white/5">Latency: < 40ms</div>
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/5">Latency: &lt; 40ms</div>
                  </div>
               </div>
               <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] border border-white/10 p-8 rounded-3xl">
