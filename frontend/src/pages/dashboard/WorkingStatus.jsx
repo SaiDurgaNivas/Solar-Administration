@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Activity, Clock, CheckCircle, Package, ArrowRight, ShieldAlert } from "lucide-react";
+import { Activity, Clock, CheckCircle, Package, ArrowRight, ShieldAlert, MapPin } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function WorkingStatus() {
@@ -100,29 +100,66 @@ function WorkingStatus() {
                          )}
                       </div>
 
-                      <div className="space-y-3 pt-4 border-t border-gray-700/50">
-                          {task.agent && (
-                              <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
-                                      {getUserName(task.agent).charAt(0).toUpperCase()}
-                                  </div>
-                                  <div>
-                                     <p className="text-sm font-bold text-gray-300 capitalize">{getUserName(task.agent)}</p>
-                                     <p className="text-xs text-gray-500 tracking-wider">AGENT IN CHARGE</p>
-                                  </div>
+                      <div className="space-y-4 pt-4 border-t border-gray-700/50">
+                          {/* Target Location */}
+                          <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex gap-3 items-center mb-2">
+                              <MapPin className="w-4 h-4 text-orange-500" />
+                              <div>
+                                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">Target Location</p>
+                                  <p className="text-xs text-gray-300 font-medium">{task.address || "Location Pending"}</p>
                               </div>
-                          )}
+                          </div>
 
-                          {task.sub_worker && (
-                              <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-sm">
-                                      {getUserName(task.sub_worker).charAt(0).toUpperCase()}
-                                  </div>
-                                  <div>
-                                     <p className="text-sm font-bold text-gray-300 capitalize">{getUserName(task.sub_worker)}</p>
-                                     <p className="text-xs text-gray-500 tracking-wider">FIELD WORKER</p>
-                                  </div>
-                              </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            {task.agent && (
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
+                                        {getUserName(task.agent).charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                       <p className="text-sm font-bold text-gray-300 capitalize">{getUserName(task.agent)}</p>
+                                       <p className="text-[10px] text-gray-500 tracking-wider font-bold">AGENT</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {task.sub_worker && (
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold text-sm shrink-0">
+                                        {getUserName(task.sub_worker).charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                       <p className="text-sm font-bold text-gray-300 capitalize">{getUserName(task.sub_worker)}</p>
+                                       <p className="text-[10px] text-gray-500 tracking-wider font-bold">WORKER</p>
+                                    </div>
+                                </div>
+                            )}
+                          </div>
+
+                          {/* MISSION LOGS (Worker Updates) */}
+                          {task.updates?.length > 0 && (
+                            <div className="mt-2 space-y-2 pt-3 border-t border-white/5">
+                                <h4 className="text-[10px] font-extrabold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-2">
+                                     <Activity className="w-3 h-3 text-purple-400" /> Live Updates & Photos
+                                </h4>
+                                <div className="space-y-2">
+                                    {task.updates.map((update, idx) => (
+                                        <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 flex gap-3 items-center group/log">
+                                            {update.photo && (
+                                              <a href={update.photo} target="_blank" rel="noreferrer" className="shrink-0">
+                                                <img src={update.photo} className="w-12 h-12 rounded-lg object-cover border border-white/10 group-hover/log:border-purple-400 transition-colors shadow-lg" alt="Field" />
+                                              </a>
+                                            )}
+                                            <div className="overflow-hidden">
+                                                <p className="text-xs text-gray-200 font-medium leading-tight">{update.description}</p>
+                                                <p className="text-[9px] text-gray-500 mt-1 uppercase font-bold tracking-tighter">
+                                                    {new Date(update.timestamp).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                           )}
                       </div>
 
