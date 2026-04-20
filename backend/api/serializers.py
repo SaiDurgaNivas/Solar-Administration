@@ -83,10 +83,11 @@ class UserSerializer(serializers.ModelSerializer):
 class InstallationSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.username', read_only=True)
     agent_name = serializers.CharField(source='agent.username', read_only=True)
+    sub_worker_name = serializers.CharField(source='sub_worker.username', read_only=True)
 
     class Meta:
         model = Installation
-        fields = ['id', 'system', 'status', 'client', 'client_name', 'agent', 'agent_name', 'date', 'location']
+        fields = ['id', 'system', 'status', 'client', 'client_name', 'agent', 'agent_name', 'sub_worker', 'sub_worker_name', 'date', 'location']
 
 class BookingDocumentSerializer(serializers.ModelSerializer):
     class Meta:
