@@ -6,6 +6,7 @@ import { useTickets } from '../../context/TicketContext';
 function Maintenance() {
   const [formData, setFormData] = useState({
     issueType: 'general',
+    priority: 'Medium',
     description: '',
   });
 
@@ -20,7 +21,7 @@ function Maintenance() {
     if (formData.description.trim() === '') return;
     
     // Global Context submission
-    addTicket('Customer (Local)', formData.issueType, formData.description);
+    addTicket('Customer (Local)', formData.issueType, formData.description, formData.priority);
 
     setSubmitted(true);
     setTimeout(() => {
@@ -133,7 +134,16 @@ function Maintenance() {
                     <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-2">Priority Level</label>
                     <div className="flex gap-2">
                         {['Low', 'Medium', 'Critical'].map(p => (
-                            <button key={p} type="button" className={`flex-1 py-3.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all ${p === 'Critical' ? 'border-red-500/20 text-red-400 bg-red-500/5 hover:bg-red-500/10' : 'border-white/5 text-gray-500 bg-white/[0.02] hover:bg-white/5'}`}>
+                            <button 
+                                key={p} 
+                                type="button" 
+                                onClick={() => setFormData({...formData, priority: p})}
+                                className={`flex-1 py-3.5 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all ${
+                                    formData.priority === p 
+                                    ? 'bg-orange-500 border-orange-500 text-black shadow-[0_0_20px_rgba(249,115,22,0.4)]' 
+                                    : 'border-white/5 text-gray-500 bg-white/[0.02] hover:bg-white/5'
+                                }`}
+                            >
                                 {p}
                             </button>
                         ))}
