@@ -153,8 +153,23 @@ const AgentDashboard = () => {
       if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const res = await api.get('bookings/');
-      const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || b.agent === user.id);
+      const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || b.agent === user.id || b.status === "Loan Approved" || b.status === "Direct Pay Confirmed" || b.status === "Dispatched");
       setAppointments(filtered);
+
+      // Auto-populate dispatch address for approved bookings if not already set
+      setDispatchInfo(prev => {
+        const newInfo = { ...prev };
+        filtered.forEach(b => {
+          if ((b.status === "Loan Approved" || b.status === "Direct Pay Confirmed") && !newInfo[b.id]?.location_link) {
+            newInfo[b.id] = { 
+              ...newInfo[b.id], 
+              location_link: b.address || "" 
+            };
+          }
+        });
+        return newInfo;
+      });
+
     } catch (err) {
       console.error(err);
     }
