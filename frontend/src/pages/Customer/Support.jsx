@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Headphones, Mail, MessageSquare, Briefcase, Star, Send, User } from "lucide-react";
 
-function Support() {
+function Support({ modal, setModal }) {
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [modal, setModal] = useState({ open: false, title: "", content: null, icon: null });
 
   // Get current user
   const userStr = sessionStorage.getItem("solar_user");
