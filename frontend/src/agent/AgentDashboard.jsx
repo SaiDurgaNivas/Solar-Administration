@@ -330,14 +330,93 @@ const AgentDashboard = () => {
                     <h3 className="text-lg font-bold border-b border-white/10 pb-2 mb-4">Hardware Config</h3>
                     <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-4">
-                            <div><label>Panel Type</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.panel_type} onChange={e=>setConfigData({...configData, panel_type: e.target.value})}/></div>
-                            <div><label>Capacity</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.capacity} onChange={e=>setConfigData({...configData, capacity: e.target.value})}/></div>
-                            <div><label>Wire Type</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.wire_type} onChange={e=>setConfigData({...configData, wire_type: e.target.value})}/></div>
-                            <div><label>Battery Type</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.battery_type} onChange={e=>setConfigData({...configData, battery_type: e.target.value})}/></div>
-                            <div><label>Inverter Type</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.inverter_type} onChange={e=>setConfigData({...configData, inverter_type: e.target.value})}/></div>
-                            <div><label>Rod Type</label><input type="text" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.rod_type} onChange={e=>setConfigData({...configData, rod_type: e.target.value})}/></div>
-                            <div><label>Rod Count</label><input type="number" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.rod_count} onChange={e=>setConfigData({...configData, rod_count: e.target.value})}/></div>
-                            <div><label>Panel Count</label><input type="number" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.panel_count} onChange={e=>setConfigData({...configData, panel_count: e.target.value})}/></div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Panel Type</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.panel_type} 
+                                    onChange={e=>setConfigData({...configData, panel_type: e.target.value})}
+                                >
+                                    <option value="">Select Panel Type</option>
+                                    <option value="Monocrystalline">Monocrystalline</option>
+                                    <option value="Polycrystalline">Polycrystalline</option>
+                                    <option value="Bifacial High Efficiency">Bifacial High Efficiency</option>
+                                    <option value="Thin Film Nano">Thin Film Nano</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Capacity</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.capacity} 
+                                    onChange={e=>setConfigData({...configData, capacity: e.target.value})}
+                                >
+                                    <option value="">Select Capacity</option>
+                                    <option value="3KW System">3KW System</option>
+                                    <option value="5KW System">5KW System</option>
+                                    <option value="8KW System">8KW System</option>
+                                    <option value="10KW System">10KW System</option>
+                                    <option value="15KW+ (Commercial)">15KW+ (Commercial)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Wire Type</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.wire_type} 
+                                    onChange={e=>setConfigData({...configData, wire_type: e.target.value})}
+                                >
+                                    <option value="">Select Wire Type</option>
+                                    <option value="4mm DC Solar Wire">4mm DC Solar Wire</option>
+                                    <option value="6mm DC Solar Wire">6mm DC Solar Wire</option>
+                                    <option value="10mm DC High Load">10mm DC High Load</option>
+                                    <option value="Armoured AC Main Cable">Armoured AC Main Cable</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Battery Type</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.battery_type} 
+                                    onChange={e=>setConfigData({...configData, battery_type: e.target.value})}
+                                >
+                                    <option value="">Select Battery</option>
+                                    <option value="Lithium-ion (LiFePO4)">Lithium-ion (LiFePO4)</option>
+                                    <option value="Tubular Lead Acid">Tubular Lead Acid</option>
+                                    <option value="Gel Deep Cycle">Gel Deep Cycle</option>
+                                    <option value="None (On-Grid Setup)">None (On-Grid Setup)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Inverter Type</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.inverter_type} 
+                                    onChange={e=>setConfigData({...configData, inverter_type: e.target.value})}
+                                >
+                                    <option value="">Select Inverter</option>
+                                    <option value="Smart Hybrid Inverter">Smart Hybrid Inverter</option>
+                                    <option value="Pure Sine Wave (Off-Grid)">Pure Sine Wave (Off-Grid)</option>
+                                    <option value="Micro-Inverter System">Micro-Inverter System</option>
+                                    <option value="String Inverter (On-Grid)">String Inverter (On-Grid)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-1">Rod Type</label>
+                                <select 
+                                    className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500 appearance-none cursor-pointer" 
+                                    value={configData.rod_type} 
+                                    onChange={e=>setConfigData({...configData, rod_type: e.target.value})}
+                                >
+                                    <option value="">Select Rod Type</option>
+                                    <option value="Copper Bonded Earth Rod">Copper Bonded Earth Rod</option>
+                                    <option value="Solid Copper (Premium)">Solid Copper (Premium)</option>
+                                    <option value="GI (Galvanized Iron)">GI (Galvanized Iron)</option>
+                                    <option value="Chemical Earthing Kit">Chemical Earthing Kit</option>
+                                </select>
+                            </div>
+                            <div><label className="block text-xs font-bold text-gray-400 mb-1">Rod Count</label><input type="number" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.rod_count} onChange={e=>setConfigData({...configData, rod_count: e.target.value})}/></div>
+                            <div><label className="block text-xs font-bold text-gray-400 mb-1">Panel Count</label><input type="number" className="w-full bg-[#020617] border border-white/10 p-2 rounded outline-none text-white focus:border-orange-500" value={configData.panel_count} onChange={e=>setConfigData({...configData, panel_count: e.target.value})}/></div>
                         </div>
                     </div>
                 </div>
