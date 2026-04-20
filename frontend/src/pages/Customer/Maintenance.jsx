@@ -16,6 +16,31 @@ function Maintenance() {
   // Filter context tickets
   const pastRequests = tickets;
 
+  const handleEmergency = async () => {
+    if (!window.confirm("🚨 ATTENTION: This will trigger a CRITICAL EMERGENCY signal to all SolarNode Admin and Agent nodes. Are you sure you want to proceed?")) return;
+
+    try {
+        const userStr = sessionStorage.getItem("solar_user");
+        const user = userStr ? JSON.parse(userStr) : null;
+        if (!user) return alert("System Auth Error: Node identity not found.");
+
+        const response = await fetch("http://127.0.0.1:8000/api/emergency/trigger/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: user.id })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(`🚨 EMERGENCY SIGNAL DISPATCHED\n\nTicket No: ${data.ticket_no}\nAll engineering nodes have been prioritized. Our team is deploying now.`);
+        } else {
+            alert("Signal Transmission Failed: " + (data.error || "Unknown error"));
+        }
+    } catch (error) {
+        alert("Neural Link Error: Could not connect to engineering gateway.");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.description.trim() === '') return;
@@ -165,16 +190,25 @@ function Maintenance() {
                 </div>
               </div>
 
-              <div className="bg-red-500/5 border border-red-500/10 rounded-[1.5rem] p-6 flex gap-6 items-start">
-                  <div className="p-3 bg-red-500/10 rounded-xl">
-                    <AlertTriangle className="w-6 h-6 text-red-500 shrink-0" />
+              <div className="bg-red-500/5 border border-red-500/10 rounded-[1.5rem] p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+                  <div className="flex gap-6 items-start">
+                    <div className="p-3 bg-red-500/10 rounded-xl">
+                        <AlertTriangle className="w-6 h-6 text-red-500 shrink-0" />
+                    </div>
+                    <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-red-400 mb-1">Emergency Protocol</p>
+                        <p className="text-[11px] text-gray-500 leading-relaxed font-semibold italic max-w-md">
+                            Direct line to Tier-1 infrastructure team. Signal dispatched to all Admin and Agent nodes immediately.
+                        </p>
+                    </div>
                   </div>
-                  <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-red-400 mb-1">Emergency Protocol</p>
-                      <p className="text-[11px] text-gray-500 leading-relaxed font-semibold italic">
-                        In case of electrical arcing, smoke, or fire, immediately activate the DC Isolator and contact your local utility grid control room.
-                      </p>
-                  </div>
+                  <button 
+                    type="button"
+                    onClick={handleEmergency}
+                    className="whitespace-nowrap bg-red-600 hover:bg-red-500 text-white text-[10px] font-black uppercase tracking-widest px-6 py-3 rounded-xl transition shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.4)]"
+                  >
+                    Initiate Urgent Response
+                  </button>
               </div>
 
               <button 

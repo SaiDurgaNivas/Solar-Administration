@@ -22,5 +22,6 @@ urlpatterns = [
     path('auth/register/', views.register_view, name='register'),
     path('auth/oauth/', views.oauth_login_view, name='oauth_login'),
     path('agent/update-profile/', views.update_agent_profile, name='update_agent_profile'),
+    path('emergency/trigger/', views.trigger_emergency, name='trigger_emergency'),
     path('', include(router.urls)),
 ]
