@@ -12,9 +12,10 @@ function Installations() {
   const [editingInstallation, setEditingInstallation] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [subWorkers, setSubWorkers] = useState([]);
   
   const [formData, setFormData] = useState({
-    system: "", location: "", status: "Pending", client: "", agent: "", date: new Date().toISOString().split('T')[0]
+    system: "", location: "", status: "Pending", client: "", agent: "", sub_worker: "", date: new Date().toISOString().split('T')[0]
   });
 
   useEffect(() => {
@@ -26,15 +27,17 @@ function Installations() {
   const fetchData = async (showLoader = true) => {
     try {
       if (showLoader) setLoading(true);
-      const [instRes, custRes, agentRes, billsRes] = await Promise.all([
+      const [instRes, custRes, agentRes, billsRes, workerRes] = await Promise.all([
         api.get('installations/'),
         api.get('users/?role=customer'),
         api.get('users/?role=agent'),
-        api.get('bills/')
+        api.get('bills/'),
+        api.get('users/?role=sub_worker')
       ]);
       setInstallations(instRes.data);
       setCustomers(custRes.data);
       setAgents(agentRes.data);
+      setSubWorkers(workerRes.data || []);
       setBills(billsRes.data || []);
     } catch (err) {
       console.error("Error fetching installations dataset", err);
@@ -50,7 +53,7 @@ function Installations() {
 
   const openAddModal = () => {
     setEditingInstallation(null);
-    setFormData({ system: "", location: "", status: "Pending", client: "", agent: "", date: new Date().toISOString().split('T')[0] });
+    setFormData({ system: "", location: "", status: "Pending", client: "", agent: "", sub_worker: "", date: new Date().toISOString().split('T')[0] });
     setIsModalOpen(true);
   };
 
@@ -62,6 +65,7 @@ function Installations() {
       status: item.status,
       client: item.client,
       agent: item.agent || "",
+      sub_worker: item.sub_worker || "",
       date: item.date || ""
     });
     setIsModalOpen(true);
@@ -75,7 +79,8 @@ function Installations() {
 
     try {
       const payload = { ...formData };
-      if (!payload.agent) payload.agent = null; // backend validation expects null, not empty string
+      if (!payload.agent) payload.agent = null;
+      if (!payload.sub_worker) payload.sub_worker = null;
 
       if (editingInstallation) {
         await api.put(`installations/${editingInstallation.id}/`, payload);
@@ -169,12 +174,21 @@ function Installations() {
                     <input type="text" name="system" placeholder="e.g. 10kW Commercial Setup" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none" value={formData.system} onChange={handleInputChange} />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Assigned Field Agent</label>
-                    <select name="agent" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none" value={formData.agent} onChange={handleInputChange}>
-                      <option value="" className="text-black">Unassigned</option>
-                      {agents.map(a => <option key={a.id} value={a.id} className="text-black">{a.username}</option>)}
-                    </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Assigned Agent</label>
+                      <select name="agent" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none text-sm" value={formData.agent} onChange={handleInputChange}>
+                        <option value="" className="text-black">Unassigned</option>
+                        {agents.map(a => <option key={a.id} value={a.id} className="text-black">{a.username}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Field Worker</label>
+                      <select name="sub_worker" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none text-sm" value={formData.sub_worker} onChange={handleInputChange}>
+                        <option value="" className="text-black">Unassigned</option>
+                        {subWorkers.map(w => <option key={w.id} value={w.id} className="text-black">{w.username}</option>)}
+                      </select>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -255,7 +269,8 @@ function Installations() {
                 <tr className="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5 bg-white/5">
                   <th className="py-5 px-6 font-semibold">Node Client</th>
                   <th className="py-5 px-6 font-semibold">Topology</th>
-                  <th className="py-5 px-6 font-semibold">Handover Agent</th>
+                  <th className="py-5 px-6 font-semibold text-xs">Assigned Agent</th>
+                  <th className="py-5 px-6 font-semibold text-xs">Field Team</th>
                   <th className="py-5 px-6 font-semibold">Date Completed</th>
                   <th className="py-5 px-6 font-semibold text-center">Payment</th>
                   <th className="py-5 px-6 font-semibold text-center">Status</th>
@@ -282,9 +297,18 @@ function Installations() {
                               {item.system}
                           </span>
                       </td>
-                      <td className="py-5 px-6 font-bold text-blue-400 text-xs tracking-wider uppercase">
-                          {item.agent_name || <span className="italic opacity-50 text-gray-500">Unassigned</span>}
-                      </td>
+                      <td className="py-5 px-6">
+                           <div className="flex flex-col">
+                               <span className="font-bold text-blue-400 text-xs tracking-wider uppercase">{item.agent_name || 'UNASSIGNED'}</span>
+                               <span className="text-[10px] text-gray-500 uppercase tracking-tighter">LEAD MANAGER</span>
+                           </div>
+                       </td>
+                       <td className="py-5 px-6">
+                           <div className="flex flex-col">
+                               <span className="font-bold text-orange-400 text-xs tracking-wider uppercase">{item.sub_worker_name || 'PENDING'}</span>
+                               <span className="text-[10px] text-gray-500 uppercase tracking-tighter">FIELD TECHNICIAN</span>
+                           </div>
+                       </td>
                       <td className="py-5 px-6 text-gray-300 font-bold text-xs">
                           {item.status === 'Completed' ? (
                              <span className="text-green-400 bg-green-500/10 px-2 py-1 rounded inline-block">{item.date}</span>

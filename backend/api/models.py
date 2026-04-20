@@ -39,6 +39,7 @@ class Installation(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_installations', limit_choices_to={'role': 'customer'})
     agent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_installations', limit_choices_to={'role': 'agent'})
+    sub_worker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='field_installations', limit_choices_to={'role': 'sub_worker'})
     date = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
 
