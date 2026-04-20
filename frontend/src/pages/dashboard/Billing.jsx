@@ -66,7 +66,29 @@ function Billing() {
 
   const handleInputChange = (e) => {
       const { name, value } = e.target;
-      setBillForm(prev => ({ ...prev, [name]: value }));
+      setBillForm(prev => {
+          const updated = { ...prev, [name]: value };
+          
+          // Auto-calculate if client is changed
+          if (name === "client" && value) {
+              const clientBooking = bookings.find(b => b.client === parseInt(value));
+              if (clientBooking && clientBooking.documents) {
+                  const docs = clientBooking.documents;
+                  const panelCount = parseInt(docs.panel_count || docs.panelCount || 1);
+                  const rodCount = parseInt(docs.rod_count || 0);
+                  
+                  const baseCost = PANEL_UNIT_COST * panelCount + INVERTER_COST + BATTERY_COST + ROD_UNIT_COST * rodCount + WIRE_COST;
+                  const subsidy = 78000;
+                  const loan = 40000;
+                  
+                  updated.amount = baseCost - subsidy - loan;
+                  updated.loan = loan;
+                  updated.subsidy = subsidy;
+                  updated.units = panelCount * 100; // Demo estimate
+              }
+          }
+          return updated;
+      });
   };
 
   const generateInvoice = async () => {
