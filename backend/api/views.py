@@ -288,6 +288,54 @@ class CustomerReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+@api_view(['POST'])
+def trigger_emergency(request):
+    """
+    Triggers a system-wide emergency alert for a customer.
+    Notifies all admins and the assigned agent immediately.
+    """
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return Response({'error': 'User ID required for emergency signal'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    customer = User.objects.filter(id=user_id).first()
+    if not customer:
+        return Response({'error': 'Customer node not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # 1. Notify all Admins
+    admins = User.objects.filter(role='admin')
+    for admin in admins:
+        Notification.objects.create(
+            user=admin,
+            title="🚨 CRITICAL EMERGENCY ALERT",
+            message=f"Customer {customer.username} (ID: {customer.id}) has triggered a CRITICAL EMERGENCY protocol. Immediate intervention required at their site."
+        )
+
+    # 2. Notify Assigned Agent
+    # Attempt to find agent from latest booking
+    latest_booking = Booking.objects.filter(client=customer).order_by('-created_at').first()
+    if latest_booking and latest_booking.agent:
+        Notification.objects.create(
+            user=latest_booking.agent,
+            title="🚨 EMERGENCY: YOUR CLIENT NEEDS HELP",
+            message=f"Your assigned client {customer.username} has activated the emergency protocol. Direct deployment may be necessary."
+        )
+
+    # 3. Create a Critical Support Ticket
+    ticket_no = f"EMG-{timezone.now().strftime('%M%S')}-{customer.id}"
+    SupportTicket.objects.create(
+        client=customer,
+        ticket_no=ticket_no,
+        type="EMERGENCY",
+        description="CRITICAL EMERGENCY SIGNAL TRIGGERED BY USER VIA MAINTENANCE PORTAL.",
+        status="Pending"
+    )
+
+    return Response({
+        'message': 'Emergency signal successfully dispatched to all Admin and Agent nodes.',
+        'ticket_no': ticket_no
+    }, status=status.HTTP_201_CREATED)
+
 class SupportTicketViewSet(viewsets.ModelViewSet):
     queryset = SupportTicket.objects.all()
     serializer_class = SupportTicketSerializer
