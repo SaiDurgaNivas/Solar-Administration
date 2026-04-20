@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays, X } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { useTickets } from '../context/TicketContext';
@@ -9,6 +10,8 @@ import { useLiveTime } from '../hooks/useLiveTime';
 const Target = MapPin;
 
 function WorkerDashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { tickets: contextTickets, resolveTicket, loading: loadingTicks } = useTickets();
   const [tasks, setTasks] = useState([]);
   const [attendance, setAttendance] = useState([]);
@@ -32,6 +35,15 @@ function WorkerDashboard() {
   const assignedCount = tasks.filter((task) => ['Dispatched', 'In Progress'].includes(task.status)).length;
   const today = new Date().toISOString().slice(0, 10);
   const { timeString, dateString, greeting } = useLiveTime();
+
+  // 🔄 Sync Active Tab with URL Hash
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash === 'tasks' || !hash) setActiveTab('tasks');
+    else if (hash === 'attendance' || hash === 'vacation') setActiveTab('attendance');
+    else if (hash === 'notifications') setActiveTab('notifications');
+    else if (hash === 'profile') setActiveTab('profile');
+  }, [location.hash]);
 
   // Mock Notifications
   const notifications = [
@@ -71,6 +83,10 @@ function WorkerDashboard() {
     fetchTasks();
     fetchAttendance();
   }, [user?.id]);
+
+  const handleTabClick = (id) => {
+    navigate(`#${id}`);
+  };
 
   const handleUpdateStatus = async (taskId, newStatus) => {
     const task = tasks.find((t) => t.id === taskId);
@@ -205,7 +221,7 @@ function WorkerDashboard() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab.id)}
               className={`flex-1 min-w-[170px] flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl font-bold transition-all duration-300 ${activeTab === tab.id ? 'bg-orange-500 text-[#020617] shadow-[0_0_25px_rgba(249,115,22,0.35)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
             >
               <tab.icon className="w-5 h-5 flex-shrink-0" /> {tab.label}
