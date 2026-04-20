@@ -45,11 +45,16 @@ export const TicketProvider = ({ children }) => {
     }
   };
 
-  const resolveTicket = async (id) => {
+  const resolveTicket = async (id, photo, materials) => {
     try {
-      const res = await api.patch(`support-tickets/${id}/`, {
-        status: 'Resolved',
-        resolved_at: new Date().toISOString()
+      const formData = new FormData();
+      formData.append('status', 'Resolved');
+      formData.append('resolved_at', new Date().toISOString());
+      if (photo) formData.append('resolution_photo', photo);
+      if (materials) formData.append('materials_used', materials);
+
+      const res = await api.patch(`support-tickets/${id}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       setTickets(prev => prev.map(t => t.id === id ? res.data : t));
     } catch (err) {
