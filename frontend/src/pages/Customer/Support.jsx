@@ -7,6 +7,7 @@ function Support() {
   const [rating, setRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modal, setModal] = useState({ open: false, title: "", content: null, icon: null });
 
   // Get current user
   const userStr = sessionStorage.getItem("solar_user");
@@ -54,6 +55,55 @@ function Support() {
     }, 800);
   };
 
+  const handleAction = (block) => {
+    let content = null;
+    if (block.title === "Comm Link") {
+        content = (
+            <div className="space-y-6">
+                <div className="flex flex-col items-center py-10 bg-[#020617]/50 rounded-3xl border border-white/5">
+                    <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+                    <p className="text-blue-400 font-black uppercase tracking-widest text-xs animate-pulse">Initializing Neural Link...</p>
+                    <p className="text-gray-500 text-xs mt-2">Connecting to Secure Signal Channel</p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl text-sm text-gray-400 leading-relaxed italic">
+                    "All agents are currently assisting other grid nodes. Typical wait time: 4 minutes."
+                </div>
+            </div>
+        );
+    } else if (block.title === "Engineering Desk") {
+        content = (
+            <div className="space-y-4">
+                <p className="text-gray-400 text-sm leading-relaxed">Fill out the diagnostic brief below to alert our hardware engineers.</p>
+                <div className="space-y-3">
+                    <input type="text" placeholder="Subject" className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-sm" />
+                    <textarea rows="4" placeholder="Detail the anomaly (e.g. Inverter Error Code 402)..." className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl outline-none focus:border-orange-500 text-sm resize-none"></textarea>
+                    <button onClick={() => {alert("Ticket Transmitted Successfully!"); setModal({open: false})}} className="w-full bg-orange-500 text-black font-black uppercase tracking-widest py-3 rounded-xl">Transmit Ticket</button>
+                </div>
+            </div>
+        );
+    } else {
+        content = (
+            <div className="grid grid-cols-1 gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {[
+                    { name: "Grid Integration Guide v3.1", size: "4.2 MB", date: "Jan 2026" },
+                    { name: "Inverter Maintenance Protcols", size: "2.1 MB", date: "Feb 2026" },
+                    { name: "Panel Cleaning & Efficiency", size: "1.8 MB", date: "Dec 2025" },
+                    { name: "Battery Safety Manual", size: "5.5 MB", date: "Mar 2026" }
+                ].map((doc, idx) => (
+                    <div key={idx} className="bg-[#020617]/50 border border-white/5 p-4 rounded-2xl flex justify-between items-center group hover:border-green-500/30 transition">
+                        <div>
+                            <p className="font-bold text-white text-sm">{doc.name}</p>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">{doc.date} • {doc.size}</p>
+                        </div>
+                        <button className="p-2 bg-white/5 rounded-lg text-gray-400 group-hover:text-green-400 transition italic text-[10px] uppercase font-black">Download</button>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    setModal({ open: true, title: block.title, content: content, icon: block.icon });
+  };
+
   return (
     <div className="bg-[#020617] min-h-screen text-white font-sans animate-in fade-in duration-700 relative overflow-hidden pb-20">
         
@@ -93,7 +143,10 @@ function Support() {
                       </div>
                       <h3 className="text-xl font-bold text-white mb-3 tracking-wide">{block.title}</h3>
                       <p className="text-gray-400 text-sm mb-8 flex-grow leading-relaxed">{block.desc}</p>
-                      <button className="w-full bg-[#020617] hover:bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl transition duration-300 relative overflow-hidden">
+                      <button 
+                        onClick={() => handleAction(block)}
+                        className="w-full bg-[#020617] hover:bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl transition duration-300 relative overflow-hidden"
+                      >
                           <span className="relative z-10">{block.action}</span>
                       </button>
                  </motion.div>
@@ -194,4 +247,48 @@ function Support() {
   );
 }
 
-export default Support;
+const SupportModal = ({ isOpen, onClose, title, content, Icon }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={onClose}>
+            <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                className="bg-[#0f172a] border border-white/10 p-8 md:p-12 rounded-[2.5rem] w-full max-w-xl shadow-2xl relative"
+                onClick={e => e.stopPropagation()}
+            >
+                <button onClick={onClose} className="absolute top-6 right-6 text-gray-500 hover:text-white bg-white/5 p-2 rounded-full transition">
+                    <Star className="w-5 h-5 rotate-45" /> {/* Using Star as X for style */}
+                </button>
+                <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 bg-[#020617] rounded-2xl border border-white/5">
+                        {Icon && <Icon className="w-6 h-6 text-orange-400" />}
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-black text-white tracking-widest uppercase">{title}</h2>
+                        <div className="h-1 w-12 bg-orange-500 rounded-full mt-1"></div>
+                    </div>
+                </div>
+                <div>{content}</div>
+            </motion.div>
+        </div>
+    );
+};
+
+// Replace export wrapper to include modal
+const SupportPage = () => {
+    const [modal, setModal] = useState({ open: false, title: "", content: null, icon: null });
+    return (
+        <>
+           <Support modal={modal} setModal={setModal} />
+           <SupportModal 
+             isOpen={modal.open} 
+             onClose={() => setModal({...modal, open: false})} 
+             title={modal.title} 
+             content={modal.content} 
+             Icon={modal.icon} 
+           />
+        </>
+    );
+};
+
+export default SupportPage;
