@@ -172,6 +172,8 @@ function WorkingStatus() {
               </div>
             )}
           </div>
+        </motion.div>
+      </div>
 
       {/* Image Viewer Modal */}
       {viewingPhoto && (
