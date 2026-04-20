@@ -561,13 +561,6 @@ function Billing() {
                         </span>
                     </div>
                 </div>
-                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-xl bg-[#0f172a] text-white p-5 rounded-2xl mt-4 shadow-xl">
-                        <span className="font-black uppercase tracking-tighter">Total Paid</span>
-                        <span className="font-black text-orange-400 flex items-center gap-1">
-                             ₹{parseFloat(selectedInvoice.amount).toLocaleString()}
-                        </span>
-                    </div>
-                </div>
 
                 <div className="mt-12 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] relative">
                     <div className="absolute inset-x-0 top-1/2 h-px bg-gray-100 -z-10"></div>
