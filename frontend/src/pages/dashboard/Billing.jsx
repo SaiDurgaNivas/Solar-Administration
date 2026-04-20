@@ -146,12 +146,15 @@ function Billing() {
           const panelCount = parseInt(docs.panel_count || docs.panelCount || 1);
           const rodCount = parseInt(docs.rod_count || 0);
           
+          const materialTotal = PANEL_UNIT_COST * panelCount + INVERTER_COST + BATTERY_COST + ROD_UNIT_COST * rodCount + WIRE_COST;
+          
           setSelectedInvoiceMaterials({
               panels: { type: docs.panel_type || 'Monocrystalline', count: panelCount, cost: PANEL_UNIT_COST * panelCount },
               inverter: { type: docs.inverter_type || 'Standard Hybrid', cost: INVERTER_COST },
               battery: { type: docs.battery_type || 'Lithium-Ion 5kWh', cost: BATTERY_COST },
               rods: { type: docs.rod_type || 'Earth GI', count: rodCount, cost: ROD_UNIT_COST * rodCount },
-              wiring: { type: docs.wire_type || 'Heavy Duty DC', cost: WIRE_COST }
+              wiring: { type: docs.wire_type || 'Heavy Duty DC', cost: WIRE_COST },
+              total: materialTotal
           });
       } else {
           // Default fallbacks if no docs found
@@ -160,7 +163,8 @@ function Billing() {
               inverter: { type: 'Smart Inverter', cost: 45000 },
               battery: { type: 'Energy Storage', cost: 25000 },
               rods: { type: 'Grounding Kit', count: 2, cost: 2000 },
-              wiring: { type: 'Secure Cabling', cost: 1000 }
+              wiring: { type: 'Secure Cabling', cost: 1000 },
+              total: 158000
           });
       }
       setSelectedInvoice(bill);
@@ -519,16 +523,19 @@ function Billing() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50 text-sm">
-                                {selectedInvoiceMaterials && Object.entries(selectedInvoiceMaterials).map(([key, data]) => (
-                                    <tr key={key} className="hover:bg-gray-50/50 transition">
-                                        <td className="p-4">
-                                            <p className="font-bold text-gray-800 capitalize">{key}</p>
-                                            <p className="text-[10px] text-gray-400 font-medium">{data.type}</p>
-                                        </td>
-                                        <td className="p-4 text-center text-gray-500 font-bold">{data.count || '1 Set'}</td>
-                                        <td className="p-4 text-right font-black text-gray-800">₹{data.cost.toLocaleString()}</td>
-                                    </tr>
-                                ))}
+                                {selectedInvoiceMaterials && Object.entries(selectedInvoiceMaterials).map(([key, data]) => {
+                                    if (key === 'total') return null;
+                                    return (
+                                        <tr key={key} className="hover:bg-gray-50/50 transition">
+                                            <td className="p-4">
+                                                <p className="font-bold text-gray-800 capitalize">{key}</p>
+                                                <p className="text-[10px] text-gray-400 font-medium">{data.type}</p>
+                                            </td>
+                                            <td className="p-4 text-center text-gray-500 font-bold">{data.count || '1 Set'}</td>
+                                            <td className="p-4 text-right font-black text-gray-800">₹{data.cost.toLocaleString()}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -536,13 +543,24 @@ function Billing() {
 
                 <div className="flex flex-col items-end border-t-2 border-gray-100 pt-8 gap-3">
                     <div className="flex items-center gap-12 w-full md:w-80 justify-between text-sm">
-                        <span className="text-gray-400 font-bold uppercase tracking-wider">Subtotal (Net)</span>
-                        <span className="font-bold text-gray-800">₹{parseFloat(selectedInvoice.amount).toLocaleString()}</span>
+                        <span className="text-gray-400 font-bold uppercase tracking-wider">Gross Material Cost</span>
+                        <span className="font-bold text-gray-800">₹{selectedInvoiceMaterials?.total?.toLocaleString() || '0'}</span>
                     </div>
                     <div className="flex items-center gap-12 w-full md:w-80 justify-between text-sm">
-                        <span className="text-green-500 font-bold uppercase tracking-wider">Applied Subsidy</span>
+                        <span className="text-green-500 font-bold uppercase tracking-wider">Govt Subsidy (Applied)</span>
                         <span className="font-bold text-green-600">- ₹{(selectedInvoice.subsidy || 0).toLocaleString()}</span>
                     </div>
+                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-sm">
+                        <span className="text-blue-500 font-bold uppercase tracking-wider">Bank Loan (Sanctioned)</span>
+                        <span className="font-bold text-blue-600">- ₹{(selectedInvoice.loan || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-xl bg-[#0f172a] text-white p-5 rounded-2xl mt-4 shadow-xl border-t-4 border-orange-500">
+                        <span className="font-black uppercase tracking-tighter">Net Amount Paid</span>
+                        <span className="font-black text-orange-400 flex items-center gap-1">
+                             ₹{parseFloat(selectedInvoice.amount).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
                     <div className="flex items-center gap-12 w-full md:w-80 justify-between text-xl bg-[#0f172a] text-white p-5 rounded-2xl mt-4 shadow-xl">
                         <span className="font-black uppercase tracking-tighter">Total Paid</span>
                         <span className="font-black text-orange-400 flex items-center gap-1">
