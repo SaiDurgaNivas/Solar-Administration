@@ -352,6 +352,23 @@ class SupportTicketViewSet(viewsets.ModelViewSet):
             
         return queryset
 
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        
+        # 🔔 Notify customer on status change
+        if instance.status == 'Dispatched':
+            Notification.objects.create(
+                user=instance.client,
+                title="🚀 Technician Dispatched!",
+                message=f"Deployment Initiated: A field engineering unit is now en route to resolve ticket {instance.ticket_no}. Estimated arrival: ASAP."
+            )
+        elif instance.status == 'Resolved':
+            Notification.objects.create(
+                user=instance.client,
+                title="✅ Issue Successfully Resolved",
+                message=f"Good news! Your node complaint {instance.ticket_no} has been successfully cleared and verified by our engineering desk."
+            )
+
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all().order_by('-created_at')
     serializer_class = NotificationSerializer
