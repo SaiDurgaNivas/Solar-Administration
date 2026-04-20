@@ -51,9 +51,9 @@ def login_view(request):
     # Create dummy data on first customer creation
     if user.role == 'customer' and not Installation.objects.filter(client=user).exists():
         Installation.objects.create(system="5KW Residential Setup", status="Pending", client=user, location="Demo Site")
-        Bill.objects.create(client=user, bill_no="B001", units=120, amount=1500, loan=500, subsidy=200, downpayment=800, status="Paid")
-        Bill.objects.create(client=user, bill_no="B002", units=95, amount=1100, loan=400, subsidy=150, downpayment=550, status="Unpaid")
-        Bill.objects.create(client=user, bill_no="B003", units=140, amount=1800, loan=700, subsidy=300, downpayment=800, status="Paid")
+        Bill.objects.create(client=user, bill_no=f"B001-{user.id}", units=120, amount=1500, loan=500, subsidy=200, downpayment=800, status="Paid")
+        Bill.objects.create(client=user, bill_no=f"B002-{user.id}", units=95, amount=1100, loan=400, subsidy=150, downpayment=550, status="Unpaid")
+        Bill.objects.create(client=user, bill_no=f"B003-{user.id}", units=140, amount=1800, loan=700, subsidy=300, downpayment=800, status="Paid")
         UsageTelemetry.objects.create(client=user, monthly_avg=140, total_units=450, efficiency=91)
 
     serializer = UserSerializer(user)
