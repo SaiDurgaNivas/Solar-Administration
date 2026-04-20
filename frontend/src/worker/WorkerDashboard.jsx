@@ -24,6 +24,10 @@ function WorkerDashboard() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [vacationNote, setVacationNote] = useState('');
   
+  // Maintenance Ticket Data State
+  const [ticketPhotos, setTicketPhotos] = useState({});
+  const [materialsData, setMaterialsData] = useState({});
+  
   const user = JSON.parse(sessionStorage.getItem('solar_user')) || {};
   const assignedCount = tasks.filter((task) => ['Dispatched', 'In Progress'].includes(task.status)).length;
   const today = new Date().toISOString().slice(0, 10);
@@ -81,8 +85,14 @@ function WorkerDashboard() {
     }
   };
 
-  const markTicketResolved = (ticketId) => {
-    resolveTicket(ticketId);
+  const markTicketResolved = async (ticketId) => {
+    const photo = ticketPhotos[ticketId];
+    const materials = materialsData[ticketId];
+    
+    if (!materials) return alert("Please list materials utilized for this intervention.");
+    if (!photo) return alert("Visual proof (Site Photo) is required to certify node resolution.");
+
+    await resolveTicket(ticketId, photo, materials);
     alert("Maintenance Ticket Resolved Successfully!");
   };
 
@@ -329,16 +339,48 @@ function WorkerDashboard() {
 
                         {/* Action Area */}
                         <div className="mt-4 pt-6 border-t border-red-500/20">
-                          {ticket.status !== 'Resolved' ? (
-                            <button onClick={() => markTicketResolved(ticket.id)} className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-green-500 to-emerald-400 text-[#020617] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-3">
-                              <CheckCircle className="w-6 h-6" /> Mark Problem Fixed
-                            </button>
-                          ) : (
-                            <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
-                               <CheckCircle className="w-6 h-6" /> Ticket Closed At Site
+                           {ticket.status !== 'Resolved' ? (
+                             <div className="space-y-4">
+                                <div className="bg-[#020617] p-5 rounded-3xl border border-red-500/10 shadow-inner">
+                                    <h4 className="text-[10px] font-black text-red-400 uppercase mb-4 text-center tracking-[0.2em]">Resolution Report</h4>
+                                    
+                                    <div className="space-y-4">
+                                        <textarea
+                                            placeholder="List all materials utilized (e.g. 15m DC cable, MC4 Connectors, Isolator Switch)..."
+                                            className="w-full bg-white/5 text-xs p-4 rounded-2xl outline-none border border-white/10 focus:border-red-500 text-white h-24 resize-none transition-all"
+                                            onChange={(e) => setMaterialsData({ ...materialsData, [ticket.id]: e.target.value })}
+                                            value={materialsData[ticket.id] || ""}
+                                        />
+                                        
+                                        <div className="relative">
+                                            <input 
+                                                type="file" 
+                                                accept="image/*" 
+                                                id={`ticket-file-${ticket.id}`} 
+                                                className="hidden" 
+                                                onChange={(e) => setTicketPhotos({ ...ticketPhotos, [ticket.id]: e.target.files[0] })} 
+                                            />
+                                            <label htmlFor={`ticket-file-${ticket.id}`} className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-dashed border-red-500/10 hover:border-red-500/40 hover:bg-red-500/5 rounded-2xl cursor-pointer text-xs font-bold transition-all text-gray-500 hover:text-red-400">
+                                                <Camera className="w-4 h-4 shrink-0" /> 
+                                                <span className="truncate max-w-[180px]">{ticketPhotos[ticket.id] ? ticketPhotos[ticket.id].name : 'Site Completion Photo'}</span>
+                                            </label>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => markTicketResolved(ticket.id)} 
+                                            className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-red-600 to-orange-500 text-white hover:shadow-[0_0_25px_rgba(239,68,68,0.3)] transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                                        >
+                                            <CheckCircle className="w-6 h-6" /> Finalize & Dispatch Report
+                                        </button>
+                                    </div>
+                                </div>
                              </div>
-                          )}
-                        </div>
+                           ) : (
+                             <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
+                                <CheckCircle className="w-6 h-6" /> Node Cleared & Certified
+                              </div>
+                           )}
+                         </div>
                      </div>
                   ))}
                 </div>

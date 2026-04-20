@@ -169,7 +169,7 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SupportTicket
-        fields = ['id', 'client', 'client_name', 'ticket_no', 'type', 'description', 'status', 'created_at', 'resolved_at', 'assigned_worker', 'assigned_worker_name']
+        fields = ['id', 'client', 'client_name', 'ticket_no', 'type', 'description', 'status', 'created_at', 'resolved_at', 'assigned_worker', 'assigned_worker_name', 'resolution_photo', 'materials_used']
 
     def get_client_name(self, obj):
         return obj.client.username if obj.client else "Unknown"

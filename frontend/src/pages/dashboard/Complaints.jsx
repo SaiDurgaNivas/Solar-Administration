@@ -148,14 +148,53 @@ function Complaints() {
                                         "{ticket.description}"
                                     </div>
                                     
-                                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/5">
+                                     <div className="flex flex-col sm:flex-row justify-between items-center mt-4 pt-4 border-t border-white/5 gap-4">
                                         <p className="text-[10px] text-gray-500 font-bold">Logged at: {new Date(ticket.created_at).toLocaleString()}</p>
-                                        {ticket.status === 'Resolved' && (
+                                        {ticket.status === 'Resolved' ? (
                                             <div className="flex items-center gap-2 text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-500/5 px-3 py-1 rounded-full border border-green-500/10">
-                                                <CheckCircle className="w-3 h-3"/> Diagnostics Cleared {new Date(ticket.resolved_at).toLocaleDateString()}
+                                                <CheckCircle className="w-3 h-3"/> Diagnostics Cleared {ticket.resolved_at ? new Date(ticket.resolved_at).toLocaleDateString() : 'N/A'}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1 rounded-full border border-blue-500/10">
+                                                <Zap className="w-3 h-3"/> {ticket.assigned_worker_name ? `Assigned to: ${ticket.assigned_worker_name}` : 'Awaiting Dispatch'}
                                             </div>
                                         )}
                                      </div>
+
+                                     {/* 📊 Admin Resolution Review */}
+                                     {ticket.status === 'Resolved' && (ticket.resolution_photo || ticket.materials_used) && (
+                                         <motion.div 
+                                            initial={{ height: 0, opacity: 0 }} 
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            className="mt-6 bg-[#020617] p-6 rounded-[2rem] border border-white/5 space-y-5"
+                                         >
+                                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                                                 Field Operations Report
+                                            </p>
+                                            
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                {ticket.resolution_photo && (
+                                                    <div className="rounded-2xl overflow-hidden border border-white/5 bg-black/40 relative group">
+                                                        <img 
+                                                           src={`http://127.0.0.1:8000${ticket.resolution_photo}`} 
+                                                           alt="Site Verification" 
+                                                           className="w-full h-40 object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                                        />
+                                                        <div className="absolute bottom-3 left-4 bg-black/60 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md">
+                                                            <span className="text-[8px] text-white font-black uppercase tracking-tighter">Site Completion Asset</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                {ticket.materials_used && (
+                                                    <div className="bg-white/[0.03] p-5 rounded-2xl border border-white/5 h-40 overflow-y-auto custom-scrollbar">
+                                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Material Audit Log</p>
+                                                        <p className="text-xs text-gray-400 leading-relaxed italic">{ticket.materials_used}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                         </motion.div>
+                                     )}
                                 </div>
                             </motion.div>
                         ))}

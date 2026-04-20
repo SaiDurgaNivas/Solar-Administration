@@ -213,6 +213,10 @@ class SupportTicket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
     assigned_worker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets', limit_choices_to={'role': 'sub_worker'})
+    
+    # Resolution Data
+    resolution_photo = models.FileField(upload_to='support_resolutions/', blank=True, null=True)
+    materials_used = models.TextField(blank=True, null=True, help_text="Materials used during intervention")
 
     def __str__(self):
         return f"{self.ticket_no} - {self.client.username}"

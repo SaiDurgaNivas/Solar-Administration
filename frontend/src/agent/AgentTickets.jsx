@@ -196,15 +196,48 @@ function AgentTickets() {
                     </button>
                  </div>
               ) : (
-                 <div className="flex justify-between items-center border-t border-white/5 pt-8 mt-4">
-                    <div className="flex flex-col">
-                        <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Resolution Stamp</p>
-                        <p className="text-xs text-gray-500 font-mono italic">{t.resolved_at ? new Date(t.resolved_at).toLocaleString() : ''}</p>
+                 <div className="flex flex-col border-t border-white/5 pt-8 mt-4 space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div className="flex flex-col">
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Resolution Stamp</p>
+                            <p className="text-xs text-gray-500 font-mono italic">{t.resolved_at ? new Date(t.resolved_at).toLocaleString() : ''}</p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="text-green-400 text-[10px] font-black uppercase tracking-widest">Cleared</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400 text-[10px] font-black uppercase tracking-widest">Cleared</span>
-                    </div>
+
+                    {/* 📋 Operations Report */}
+                    {(t.resolution_photo || t.materials_used) && (
+                        <div className="bg-white/[0.02] border border-white/5 p-6 rounded-3xl space-y-4">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                                <FileText className="w-3 h-3" /> Operations Report
+                            </p>
+                            
+                            {t.resolution_photo && (
+                                <div className="relative group/photo overflow-hidden rounded-2xl border border-white/5 bg-black/40">
+                                    <img 
+                                        src={`http://127.0.0.1:8000${t.resolution_photo}`} 
+                                        alt="Resolution proof" 
+                                        className="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    <div className="absolute bottom-3 left-4 flex items-center gap-2">
+                                        <Camera className="w-3 h-3 text-white/50" />
+                                        <span className="text-[9px] text-white/50 font-bold uppercase">Final Site Verification Image</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {t.materials_used && (
+                                <div className="bg-[#020617] p-4 rounded-xl border border-white/5">
+                                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Materials Logged</p>
+                                    <p className="text-xs text-gray-400 leading-relaxed italic">{t.materials_used}</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                  </div>
               )}
             </div>
