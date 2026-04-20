@@ -11,6 +11,8 @@ function Billing() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showMaterials, setShowMaterials] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedInvoiceMaterials, setSelectedInvoiceMaterials] = useState(null);
 
   // Form State for creating a new Invoice
   const [billForm, setBillForm] = useState({
@@ -114,6 +116,33 @@ function Billing() {
     const rodCount   = parseInt(b.documents?.rod_count || 0);
     return sum + PANEL_UNIT_COST * panelCount + INVERTER_COST + BATTERY_COST + ROD_UNIT_COST * rodCount + WIRE_COST;
   }, 0);
+
+  const openInvoice = (bill) => {
+      const clientBooking = bookings.find(b => (b.client === bill.client || b.client_name === bill.client_name) && b.documents);
+      if (clientBooking) {
+          const docs = clientBooking.documents;
+          const panelCount = parseInt(docs.panel_count || docs.panelCount || 1);
+          const rodCount = parseInt(docs.rod_count || 0);
+          
+          setSelectedInvoiceMaterials({
+              panels: { type: docs.panel_type || 'Monocrystalline', count: panelCount, cost: PANEL_UNIT_COST * panelCount },
+              inverter: { type: docs.inverter_type || 'Standard Hybrid', cost: INVERTER_COST },
+              battery: { type: docs.battery_type || 'Lithium-Ion 5kWh', cost: BATTERY_COST },
+              rods: { type: docs.rod_type || 'Earth GI', count: rodCount, cost: ROD_UNIT_COST * rodCount },
+              wiring: { type: docs.wire_type || 'Heavy Duty DC', cost: WIRE_COST }
+          });
+      } else {
+          // Default fallbacks if no docs found
+          setSelectedInvoiceMaterials({
+              panels: { type: 'Solar Grid Panels', count: 1, cost: 85000 },
+              inverter: { type: 'Smart Inverter', cost: 45000 },
+              battery: { type: 'Energy Storage', cost: 25000 },
+              rods: { type: 'Grounding Kit', count: 2, cost: 2000 },
+              wiring: { type: 'Secure Cabling', cost: 1000 }
+          });
+      }
+      setSelectedInvoice(bill);
+  };
 
   return (
     <div className="bg-[#020617] min-h-screen p-6 font-sans text-white overflow-x-hidden">
@@ -275,6 +304,7 @@ function Billing() {
                   <th className="p-5 font-semibold">KWh Metric</th>
                   <th className="p-5 font-semibold text-right">Net Charge</th>
                   <th className="p-5 font-semibold text-center">Clearance</th>
+                  <th className="p-5 font-semibold text-right">Invoice</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -303,6 +333,18 @@ function Billing() {
                           </span>
                         )}
                       </div>
+                    </td>
+                    <td className="p-5 text-right">
+                       {bill.status === "Paid" ? (
+                         <button 
+                            onClick={(e) => { e.stopPropagation(); openInvoice(bill); }}
+                            className="bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-blue-500/30 ml-auto"
+                         >
+                            <FileText className="w-4 h-4" /> View Invoice
+                         </button>
+                       ) : (
+                         <span className="text-gray-600 text-xs font-bold italic pr-4">Drafting...</span>
+                       )}
                     </td>
                   </tr>
                 ))}
@@ -387,6 +429,114 @@ function Billing() {
           )}
         </AnimatePresence>
       </motion.div>
+      {/* 🧾 INVOICE VIEW MODAL */}
+      <AnimatePresence>
+        {selectedInvoice && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex justify-center items-center z-[100] p-4 overflow-y-auto"
+            onClick={() => setSelectedInvoice(null)}
+          >
+            <motion.div 
+               initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
+               className="bg-white text-[#0f172a] p-8 md:p-12 rounded-3xl shadow-2xl w-full max-w-4xl relative print:p-0 print:shadow-none print:rounded-none"
+               onClick={e => e.stopPropagation()}
+            >
+                <div className="absolute top-6 right-6 flex gap-3 print:hidden">
+                    <button onClick={() => window.print()} className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-full transition shadow-sm border border-gray-200">
+                        <FileText className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => setSelectedInvoice(null)} className="bg-red-50 hover:bg-red-100 text-red-500 p-3 rounded-full transition shadow-sm border border-red-100">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="flex justify-between items-start mb-12 border-b-2 border-gray-100 pb-8">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                             <div className="p-2 bg-orange-500 rounded-lg">
+                                <Building className="w-6 h-6 text-white" />
+                             </div>
+                             <h1 className="text-2xl font-black uppercase tracking-tighter">SOLAR<span className="text-orange-500">NODE</span></h1>
+                        </div>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Energy Infrastructure Group</p>
+                    </div>
+                    <div className="text-right">
+                        <h2 className="text-4xl font-black text-gray-200 uppercase mb-2">INVOICE</h2>
+                        <div className="space-y-1">
+                            <p className="text-sm font-bold"><span className="text-gray-400">Ledger ID:</span> {selectedInvoice.bill_no}</p>
+                            <p className="text-sm font-bold"><span className="text-gray-400">Timestamp:</span> {selectedInvoice.date}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-12 mb-12">
+                    <div>
+                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Billing Information</h3>
+                        <p className="text-xl font-bold text-[#0f172a] capitalize">{selectedInvoice.client_name}</p>
+                        <p className="text-sm text-gray-500 mt-2">Active Solar Node Client</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Financial Status</h3>
+                        <div className="flex justify-between items-center bg-green-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20">
+                            SETTLED <CheckCircle className="w-4 h-4" />
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-3 text-center uppercase tracking-wider font-bold">Electronically Verified Transaction</p>
+                    </div>
+                </div>
+
+                <div className="mb-12">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Hardware & Deployment Inventory</h3>
+                    <div className="overflow-hidden border border-gray-100 rounded-2xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50 text-[10px] uppercase font-black tracking-widest text-gray-500">
+                                    <th className="p-4">Material Specification</th>
+                                    <th className="p-4 text-center">Unit</th>
+                                    <th className="p-4 text-right">Base Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50 text-sm">
+                                {selectedInvoiceMaterials && Object.entries(selectedInvoiceMaterials).map(([key, data]) => (
+                                    <tr key={key} className="hover:bg-gray-50/50 transition">
+                                        <td className="p-4">
+                                            <p className="font-bold text-gray-800 capitalize">{key}</p>
+                                            <p className="text-[10px] text-gray-400 font-medium">{data.type}</p>
+                                        </td>
+                                        <td className="p-4 text-center text-gray-500 font-bold">{data.count || '1 Set'}</td>
+                                        <td className="p-4 text-right font-black text-gray-800">₹{data.cost.toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-end border-t-2 border-gray-100 pt-8 gap-3">
+                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-sm">
+                        <span className="text-gray-400 font-bold uppercase tracking-wider">Subtotal (Net)</span>
+                        <span className="font-bold text-gray-800">₹{parseFloat(selectedInvoice.amount).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-sm">
+                        <span className="text-green-500 font-bold uppercase tracking-wider">Applied Subsidy</span>
+                        <span className="font-bold text-green-600">- ₹{(selectedInvoice.subsidy || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-12 w-full md:w-80 justify-between text-xl bg-[#0f172a] text-white p-5 rounded-2xl mt-4 shadow-xl">
+                        <span className="font-black uppercase tracking-tighter">Total Paid</span>
+                        <span className="font-black text-orange-400 flex items-center gap-1">
+                             ₹{parseFloat(selectedInvoice.amount).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="mt-12 text-center text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em] relative">
+                    <div className="absolute inset-x-0 top-1/2 h-px bg-gray-100 -z-10"></div>
+                    <span className="bg-white px-6">Official SolarNode Document</span>
+                </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
