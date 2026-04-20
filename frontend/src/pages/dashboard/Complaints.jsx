@@ -79,7 +79,10 @@ function Complaints() {
             ) : (
                 <div className="space-y-4">
                     <AnimatePresence mode="popLayout">
-                        {tickets.filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved').map((ticket, i) => (
+                        {tickets
+                            .filter(t => activeTab === 'Active' ? t.status !== 'Resolved' : t.status === 'Resolved')
+                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                            .map((ticket, i) => (
                             <motion.div 
                                 key={ticket.id}
                                 layout

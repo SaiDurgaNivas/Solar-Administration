@@ -116,11 +116,13 @@ function Installations() {
     }
   };
 
-  const filteredList = installations.filter(i => 
-    i.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    i.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    i.system?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredList = installations
+    .filter(i => 
+      i.client_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.system?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => b.id - a.id);
 
   return (
     <div className="p-6 bg-[#020617] min-h-screen text-white font-sans overflow-x-hidden">
