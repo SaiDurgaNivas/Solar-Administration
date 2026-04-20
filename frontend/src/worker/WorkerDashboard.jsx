@@ -32,7 +32,14 @@ function WorkerDashboard() {
   const [materialsData, setMaterialsData] = useState({});
   
   const user = JSON.parse(sessionStorage.getItem('solar_user')) || {};
-  const assignedCount = tasks.filter((task) => ['Dispatched', 'In Progress'].includes(task.status)).length;
+  
+  // Filter context tickets dispatched to this worker
+  const myTickets = (contextTickets || []).filter(t => Number(t.assigned_worker) === Number(user?.id));
+  
+  const activeTasksCount = tasks.filter((task) => ['Dispatched', 'In Progress'].includes(task.status)).length;
+  const activeTicketsCount = myTickets.filter(t => t.status !== 'Resolved').length;
+  const assignedCount = activeTasksCount + activeTicketsCount;
+
   const today = new Date().toISOString().slice(0, 10);
   const { timeString, dateString, greeting } = useLiveTime();
 
@@ -62,9 +69,6 @@ function WorkerDashboard() {
       setLoadingTasks(false);
     }
   };
-
-  // Filter context tickets dispatched to this worker
-  const myTickets = (contextTickets || []).filter(t => Number(t.assigned_worker) === Number(user?.id));
 
 
   const fetchAttendance = async () => {
@@ -244,19 +248,28 @@ function WorkerDashboard() {
 
               {loadingTasks ? (
                  <div className="py-20 flex justify-center"><Activity className="w-12 h-12 animate-spin text-orange-500" /></div>
-              ) : tasks.length === 0 ? (
+              ) : tasks.length === 0 && myTickets.length === 0 ? (
                 <div className="text-center py-24 bg-[#0f172a] rounded-3xl border border-dashed border-white/10">
                   <div className="inline-block p-6 bg-white/5 rounded-full mb-4 ring-8 ring-white/5">
                     <FileText className="w-12 h-12 text-gray-500" />
                   </div>
                   <h3 className="text-2xl font-bold mb-2">No Deployments Found</h3>
-                  <p className="text-gray-400 text-sm">You have no active installation assignments at the moment. Stand by for agent dispatch.</p>
+                  <p className="text-gray-400 text-sm">You have no active installation or maintenance assignments at the moment. Stand by for agent dispatch.</p>
                 </div>
               ) : (
-                <div className="grid xl:grid-cols-2 gap-8">
-                  {tasks.map((task) => (
-                     <div key={task.id} className="bg-gradient-to-b from-[#0f172a] to-[#020617] border border-white/10 rounded-3xl p-7 shadow-2xl flex flex-col justify-between hover:border-white/20 transition-all duration-500">
-                        <div>
+                <div className="space-y-12">
+                  
+                  {/* INSTALLATIONS SECTION */}
+                  {tasks.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <Zap className="w-6 h-6 text-orange-400" />
+                        <h2 className="text-xl font-bold uppercase tracking-widest text-gray-400">Deployment Assignments</h2>
+                      </div>
+                      <div className="grid xl:grid-cols-2 gap-8">
+                        {tasks.map((task) => (
+                           <div key={task.id} className="bg-gradient-to-b from-[#0f172a] to-[#020617] border border-white/10 rounded-3xl p-7 shadow-2xl flex flex-col justify-between hover:border-white/20 transition-all duration-500">
+                              <div>
                           <div className="flex justify-between items-start mb-5 gap-4">
                             <div>
                               <span className="text-xs font-black uppercase text-orange-500 tracking-widest bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">Booking #{task.booking}</span>
@@ -329,76 +342,91 @@ function WorkerDashboard() {
                              <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
                                <CheckCircle className="w-6 h-6" /> Installation Cycle Complete
                              </div>
-                          )}
-                        </div>
-                     </div>
-                  ))}
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
-                  {/* Maintenance Tickets Section */}
-                  {myTickets.map(ticket => (
-                     <div key={ticket.id} className="bg-gradient-to-b from-red-950/40 to-[#020617] border border-red-500/20 rounded-3xl p-7 shadow-2xl flex flex-col justify-between hover:border-red-500/40 transition-all duration-500">
-                        <div>
-                          <div className="flex justify-between items-start mb-5 gap-4">
-                            <div>
-                              <span className="text-xs font-black uppercase text-red-400 tracking-widest bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">Maintenance: {ticket.type}</span>
-                              <h3 className="text-xl font-bold mt-4">{ticket.client_name || 'Customer'}</h3>
-                            </div>
-                            <span className={`px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border shadow-lg ${ticket.status === 'Resolved' ? 'text-green-400 bg-green-500/10 border-green-500/30' : 'text-blue-400 bg-blue-500/10 border-blue-500/30'}`}>
-                              {ticket.status}
-                            </span>
-                          </div>
-
-                          <div className="bg-[#020617] p-5 rounded-2xl flex items-start gap-4 border border-red-500/10 mb-6 shadow-inner text-gray-300 text-sm italic">
-                            "{ticket.description}"
-                          </div>
-                        </div>
-
-                        {/* Action Area */}
-                        <div className="mt-4 pt-6 border-t border-red-500/20">
-                           {ticket.status !== 'Resolved' ? (
-                             <div className="space-y-4">
-                                <div className="bg-[#020617] p-5 rounded-3xl border border-red-500/10 shadow-inner">
-                                    <h4 className="text-[10px] font-black text-red-400 uppercase mb-4 text-center tracking-[0.2em]">Resolution Report</h4>
-                                    
+                  {/* MAINTENANCE & EMERGENCY SECTION */}
+                  {myTickets.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="w-6 h-6 text-red-500" />
+                        <h2 className="text-xl font-bold uppercase tracking-widest text-gray-400">Maintenance & Critical Repairs</h2>
+                      </div>
+                      <div className="grid xl:grid-cols-2 gap-8">
+                        {myTickets.map(ticket => {
+                          const isEmergency = ticket.type === 'Emergency';
+                          return (
+                            <div key={ticket.id} className={`bg-gradient-to-b from-[#0f172a] to-[#020617] border rounded-3xl p-7 shadow-2xl flex flex-col justify-between transition-all duration-500 ${isEmergency ? 'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.2)] animate-[pulse_2s_infinite]' : 'border-white/10 hover:border-white/20'}`}>
+                               <div>
+                                 <div className="flex justify-between items-start mb-5 gap-4">
+                                   <div>
+                                     <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${isEmergency ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
+                                       {ticket.type} Ticket
+                                     </span>
+                                     <h3 className="text-xl font-bold mt-4">{ticket.client_name || 'Customer'}</h3>
+                                   </div>
+                                   <span className={`px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full border shadow-lg ${ticket.status === 'Resolved' ? 'text-green-400 bg-green-500/10 border-green-500/30' : 'text-blue-400 bg-blue-500/10 border-blue-500/30'}`}>
+                                     {ticket.status}
+                                   </span>
+                                 </div>
+ 
+                                 <div className={`bg-[#020617] p-5 rounded-2xl flex items-start gap-4 border mb-6 shadow-inner text-sm italic ${isEmergency ? 'border-red-500/10 text-red-200' : 'border-white/10 text-gray-300'}`}>
+                                   "{ticket.description}"
+                                 </div>
+                               </div>
+ 
+                               {/* Action Area */}
+                               <div className={`mt-4 pt-6 border-t ${isEmergency ? 'border-red-500/20' : 'border-white/10'}`}>
+                                  {ticket.status !== 'Resolved' ? (
                                     <div className="space-y-4">
-                                        <textarea
-                                            placeholder="List all materials utilized (e.g. 15m DC cable, MC4 Connectors, Isolator Switch)..."
-                                            className="w-full bg-white/5 text-xs p-4 rounded-2xl outline-none border border-white/10 focus:border-red-500 text-white h-24 resize-none transition-all"
-                                            onChange={(e) => setMaterialsData({ ...materialsData, [ticket.id]: e.target.value })}
-                                            value={materialsData[ticket.id] || ""}
-                                        />
-                                        
-                                        <div className="relative">
-                                            <input 
-                                                type="file" 
-                                                accept="image/*" 
-                                                id={`ticket-file-${ticket.id}`} 
-                                                className="hidden" 
-                                                onChange={(e) => setTicketPhotos({ ...ticketPhotos, [ticket.id]: e.target.files[0] })} 
-                                            />
-                                            <label htmlFor={`ticket-file-${ticket.id}`} className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-dashed border-red-500/10 hover:border-red-500/40 hover:bg-red-500/5 rounded-2xl cursor-pointer text-xs font-bold transition-all text-gray-500 hover:text-red-400">
-                                                <Camera className="w-4 h-4 shrink-0" /> 
-                                                <span className="truncate max-w-[180px]">{ticketPhotos[ticket.id] ? ticketPhotos[ticket.id].name : 'Site Completion Photo'}</span>
-                                            </label>
-                                        </div>
-
-                                        <button 
-                                            onClick={() => markTicketResolved(ticket.id)} 
-                                            className="w-full py-4 rounded-2xl font-black bg-gradient-to-r from-red-600 to-orange-500 text-white hover:shadow-[0_0_25px_rgba(239,68,68,0.3)] transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
-                                        >
-                                            <CheckCircle className="w-6 h-6" /> Finalize & Dispatch Report
-                                        </button>
+                                       <div className="bg-[#020617] p-5 rounded-3xl border border-white/5 shadow-inner">
+                                           <h4 className={`text-[10px] font-black uppercase mb-4 text-center tracking-[0.2em] ${isEmergency ? 'text-red-400' : 'text-gray-500'}`}>Final Resolution Report</h4>
+                                           
+                                           <div className="space-y-4">
+                                               <textarea
+                                                   placeholder="List all materials utilized for this repair..."
+                                                   className="w-full bg-white/5 text-xs p-4 rounded-2xl outline-none border border-white/10 focus:border-orange-500 text-white h-24 resize-none transition-all"
+                                                   onChange={(e) => setMaterialsData({ ...materialsData, [ticket.id]: e.target.value })}
+                                                   value={materialsData[ticket.id] || ""}
+                                               />
+                                               
+                                               <div className="relative">
+                                                   <input 
+                                                       type="file" 
+                                                       accept="image/*" 
+                                                       id={`ticket-file-${ticket.id}`} 
+                                                       className="hidden" 
+                                                       onChange={(e) => setTicketPhotos({ ...ticketPhotos, [ticket.id]: e.target.files[0] })} 
+                                                   />
+                                                   <label htmlFor={`ticket-file-${ticket.id}`} className="flex items-center justify-center gap-2 w-full py-3.5 border-2 border-dashed border-white/20 hover:border-orange-500 hover:text-orange-400 hover:bg-orange-500/5 rounded-2xl cursor-pointer text-xs font-bold transition-all text-gray-500">
+                                                       <Camera className="w-4 h-4 shrink-0" /> 
+                                                       <span className="truncate max-w-[180px]">{ticketPhotos[ticket.id] ? ticketPhotos[ticket.id].name : 'Final Proof Image'}</span>
+                                                   </label>
+                                               </div>
+ 
+                                               <button 
+                                                   onClick={() => markTicketResolved(ticket.id)} 
+                                                   className={`w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${isEmergency ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-[0_0_25px_rgba(239,68,68,0.4)]' : 'bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow-[0_0_25px_rgba(249,115,22,0.3)]'}`}
+                                               >
+                                                   <CheckCircle className="w-6 h-6" /> Complete Work Order
+                                               </button>
+                                           </div>
+                                       </div>
                                     </div>
-                                </div>
-                             </div>
-                           ) : (
-                             <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
-                                <CheckCircle className="w-6 h-6" /> Node Cleared & Certified
-                              </div>
-                           )}
-                         </div>
-                     </div>
-                  ))}
+                                  ) : (
+                                    <div className="w-full py-4 rounded-2xl border border-green-500/30 bg-green-500/10 text-green-400 font-bold flex items-center justify-center gap-3">
+                                       <CheckCircle className="w-6 h-6" /> Service Protocol Restored
+                                     </div>
+                                  )}
+                               </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>
