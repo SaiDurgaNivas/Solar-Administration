@@ -1,12 +1,61 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { User, Mail, Shield, Phone, MapPin, Calendar, CheckCircle, Fingerprint, Settings, Camera } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { User, Mail, Shield, Phone, MapPin, Calendar, CheckCircle, Fingerprint, Settings, Camera, Save, X } from "lucide-react";
 import UserProfilePhoto from "../../components/UserProfilePhoto";
+import api from "../../api/axiosConfig";
 
 function Profile() {
   const userStr = sessionStorage.getItem("solar_user");
-  const user = userStr ? JSON.parse(userStr) : { username: "Valued Customer", email: "customer@solar.local", role: "customer", first_name: "John", last_name: "Doe" };
+  const initialUser = userStr ? JSON.parse(userStr) : { 
+    username: "Valued Customer", 
+    email: "customer@solar.local", 
+    role: "customer", 
+    first_name: "John", 
+    last_name: "Doe",
+    customer_profile: { phone: "", address: "" }
+  };
+
+  const [user, setUser] = useState(initialUser);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
+    email: user.email || "",
+    phone: user.customer_profile?.phone || "",
+    address: user.customer_profile?.address || ""
+  });
+  const [loading, setLoading] = useState(false);
+
   const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.username || "Customer");
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+        // Prepare payload for partial update
+        const payload = {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            email: formData.email,
+            customer_profile: {
+                phone: formData.phone,
+                address: formData.address
+            }
+        };
+
+        const res = await api.patch(`users/${user.id}/`, payload);
+        const updatedUser = { ...user, ...res.data };
+        
+        sessionStorage.setItem("solar_user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        setIsEditing(false);
+        alert("Profile updated successfully!");
+    } catch (err) {
+        console.error(err);
+        alert("Failed to update profile. Please try again.");
+    } finally {
+        setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen text-white font-sans animate-in fade-in duration-700 relative overflow-hidden">
@@ -51,20 +100,61 @@ function Profile() {
 
                 <div className="flex-1 text-center md:text-left pt-2">
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6">
-                        <div>
-                            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-2 highlight-text">
-                                {fullName}
-                            </h1>
-                            <div className="flex items-center justify-center md:justify-start gap-3 mt-3">
-                                <span className="bg-orange-500/10 text-orange-500 font-black tracking-widest text-[10px] uppercase py-1.5 px-4 rounded-full border border-orange-500/20 flex items-center gap-2">
-                                    <Shield className="w-3 h-3" /> Solar Customer Account
-                                </span>
-                            </div>
+                        <div className="w-full md:w-auto">
+                            {isEditing ? (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <input 
+                                        className="bg-white/5 border border-white/20 rounded-xl p-3 text-white focus:outline-none focus:border-orange-500"
+                                        placeholder="First Name"
+                                        value={formData.first_name}
+                                        onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                                    />
+                                    <input 
+                                        className="bg-white/5 border border-white/20 rounded-xl p-3 text-white focus:outline-none focus:border-orange-500"
+                                        placeholder="Last Name"
+                                        value={formData.last_name}
+                                        onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                                    />
+                                </div>
+                            ) : (
+                                <>
+                                    <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-2 highlight-text">
+                                        {fullName}
+                                    </h1>
+                                    <div className="flex items-center justify-center md:justify-start gap-3 mt-3">
+                                        <span className="bg-orange-500/10 text-orange-500 font-black tracking-widest text-[10px] uppercase py-1.5 px-4 rounded-full border border-orange-500/20 flex items-center gap-2">
+                                            <Shield className="w-3 h-3" /> Solar Customer Account
+                                        </span>
+                                    </div>
+                                </>
+                            )}
                         </div>
-                        <div className="mt-8 md:mt-0">
-                            <button className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all">
-                                Edit Profile details
-                            </button>
+                        <div className="mt-8 md:mt-0 flex gap-3">
+                            {isEditing ? (
+                                <>
+                                    <button 
+                                        onClick={() => setIsEditing(false)}
+                                        className="px-6 py-3.5 bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+                                    >
+                                        <X className="w-4 h-4 inline mr-2" /> Cancel
+                                    </button>
+                                    <button 
+                                        onClick={handleSave}
+                                        disabled={loading}
+                                        className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                                    >
+                                        {loading ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div> : <Save className="w-4 h-4" />}
+                                        Save Changes
+                                    </button>
+                                </>
+                            ) : (
+                                <button 
+                                    onClick={() => setIsEditing(true)}
+                                    className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    Edit Profile details
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -108,9 +198,17 @@ function Profile() {
                         <div className="p-4 bg-white/5 rounded-2xl">
                             <Mail className="w-6 h-6 text-gray-400" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Email Address</p>
-                            <p className="text-lg font-bold text-gray-200">{user.email || "Add your email"}</p>
+                            {isEditing ? (
+                                <input 
+                                    className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                />
+                            ) : (
+                                <p className="text-lg font-bold text-gray-200">{user.email || "Add your email"}</p>
+                            )}
                         </div>
                     </div>
 
@@ -118,9 +216,18 @@ function Profile() {
                         <div className="p-4 bg-white/5 rounded-2xl">
                             <Phone className="w-6 h-6 text-gray-400" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Mobile Number</p>
-                            <p className="text-lg font-bold text-gray-200">{user.customer_profile?.phone || "Personal contact needed"}</p>
+                            {isEditing ? (
+                                <input 
+                                    className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1"
+                                    placeholder="+91 00000 00000"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                />
+                            ) : (
+                                <p className="text-lg font-bold text-gray-200">{user.customer_profile?.phone || "Personal contact needed"}</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -145,12 +252,21 @@ function Profile() {
                         <div className="p-4 bg-white/5 rounded-2xl mt-1">
                             <MapPin className="w-6 h-6 text-gray-400" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Service Address</p>
-                            <p className="text-lg font-bold text-gray-200 leading-snug">
-                                {user.customer_profile?.address || "Assigned Residential Grid"}<br/>
-                                <span className="text-xs text-orange-500/70 font-bold uppercase tracking-wider">Primary Installation Point</span>
-                            </p>
+                            {isEditing ? (
+                                <textarea 
+                                    className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1 resize-none"
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                    rows="2"
+                                />
+                            ) : (
+                                <p className="text-lg font-bold text-gray-200 leading-snug">
+                                    {user.customer_profile?.address || "Assigned Residential Grid"}<br/>
+                                    <span className="text-xs text-orange-500/70 font-bold uppercase tracking-wider">Primary Installation Point</span>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
