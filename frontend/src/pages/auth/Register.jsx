@@ -48,49 +48,46 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex font-sans">
-      
-      {/* LEFT SIDE - BRANDING */}
-      <div 
-        className="hidden lg:flex lg:w-1/2 bg-[#0f172a] text-white flex-col justify-center items-center p-12 relative overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: 'url("/images/register_side_bg.png")' }}
+    <div 
+      className="min-h-screen flex items-center justify-center p-6 bg-cover bg-center relative"
+      style={{ backgroundImage: 'url("/images/register_side_bg.png")' }}
+    >
+      {/* Overall Soft Navy Overlay */}
+      <div className="absolute inset-0 bg-[#0f172a]/70 pointer-events-none"></div>
+
+      {/* Floating Home Button */}
+      <Link 
+        to="/" 
+        className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all shadow-lg z-[70]"
       >
-        {/* Navy Overlay for readability */}
-        <div className="absolute inset-0 bg-[#0f172a]/80 pointer-events-none"></div>
+        <Home className="w-5 h-5 text-white" />
+      </Link>
+
+      <div className="w-full max-w-5xl flex items-center justify-center relative z-10">
         
-        {/* Floating Home Button (Matches Screenshot Position) */}
-        <Link 
-          to="/" 
-          className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all shadow-lg z-[20]"
-        >
-          <Home className="w-5 h-5" />
-        </Link>
-        
-        <div className="relative z-10 text-center max-w-lg">
-          <div className="mb-10 flex justify-center">
-             <div className="p-1 rounded-full bg-orange-100/10 shadow-[0_0_50px_rgba(249,115,22,0.2)]">
-                <Sun className="w-24 h-24 text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.5)] fill-orange-500" />
+        {/* Branding (Hidden or Adjusted for overall background) */}
+        <div className="hidden lg:flex lg:w-1/2 text-white flex-col justify-center p-12">
+          <div className="mb-6">
+             <div className="inline-flex p-1 rounded-full bg-orange-100/10 mb-4">
+                <Sun className="w-20 h-20 text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.5)] fill-orange-500" />
              </div>
           </div>
-          <h1 className="text-5xl font-black mb-6 tracking-tight">Join Solar Administration</h1>
+          <h1 className="text-5xl font-black mb-6 tracking-tight leading-tight">Join Solar <br /> Administration</h1>
           <p className="text-gray-200 text-lg leading-relaxed font-semibold">
-            Create your account to start managing your solar installations and monitoring energy production efficiently.
+            Manage installations and monitor production with precision and ease.
           </p>
         </div>
-      </div>
 
-      {/* RIGHT SIDE - FORM */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#f8fafc] p-6">
-        <div className="w-full max-w-md">
-          
+        {/* FORM CARD */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="bg-white p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100"
+            initial={{ opacity: 0, scale: 0.95 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            className="w-full max-w-md bg-white p-10 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.3)] border border-white/20"
           >
             <div className="mb-8">
               <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Create Account</h2>
-              <p className="text-gray-500 font-medium italic">Please fill in your details</p>
+              <p className="text-gray-500 font-medium italic">Enter your credentials to proceed</p>
             </div>
 
             {error && (
@@ -99,27 +96,27 @@ function Register() {
               </div>
             )}
 
-            <form onSubmit={handleRegister} className="space-y-6">
+            <form onSubmit={handleRegister} className="space-y-5">
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">First Name</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">First Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text" name="firstName" placeholder="John"
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                       value={formData.firstName} onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Last Name</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Last Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text" name="lastName" placeholder="Doe"
-                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                       value={formData.lastName} onChange={handleChange}
                     />
                   </div>
@@ -127,41 +124,41 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Connection</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="email" name="email" placeholder="john@example.com"
-                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                     value={formData.email} onChange={handleChange}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Password</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Access Passphrase</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password" placeholder="Min. 6 characters"
-                    className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
+                    className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                     value={formData.password} onChange={handleChange}
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-xs uppercase tracking-tighter">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 font-bold text-xs uppercase transition-colors">
                     {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Confirm Password</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Confirm Security</label>
                 <div className="relative">
                   <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="confirmPassword" placeholder="Confirm your password"
-                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                     value={formData.confirmPassword} onChange={handleChange}
                   />
                 </div>
@@ -169,14 +166,14 @@ function Register() {
 
               <button 
                 type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4.5 rounded-[1.5rem] font-black transition-all shadow-[0_10px_30px_rgba(249,115,22,0.2)] hover:shadow-[0_15px_40px_rgba(249,115,22,0.4)] hover:-translate-y-0.5 flex items-center justify-center gap-2 text-lg active:scale-95"
+                className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-[1.5rem] font-black transition-all shadow-[0_10px_30px_rgba(249,115,22,0.3)] hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)] hover:-translate-y-0.5 flex items-center justify-center gap-2 text-lg active:scale-95"
               >
                 {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Create Account"}
               </button>
             </form>
 
-            <p className="text-center mt-10 text-sm text-gray-500 font-bold">
-              Already have an account? <Link to="/login" className="text-orange-500 hover:underline hover:text-orange-600 ml-1">Login</Link>
+            <p className="text-center mt-10 text-sm text-gray-500 font-bold uppercase tracking-widest">
+              Ready to beam? <Link to="/login" className="text-orange-500 hover:underline hover:text-orange-600 ml-1">Login Here</Link>
             </p>
           </motion.div>
         </div>
