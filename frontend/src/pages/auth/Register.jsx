@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Home, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  Home, Loader2, User, Mail, Lock, 
+  ShieldCheck, Eye, EyeOff, ArrowRight, Sun, CheckCircle 
+} from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Register() {
@@ -14,185 +18,130 @@ function Register() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError(""); // Clear error on change
+    setError(""); 
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    // Prevent double submission
     if (loading) return;
     
     const { firstName, lastName, email, password, confirmPassword } = formData;
 
     if (!firstName || !lastName || !email || !password) {
-      setError("All fields are required.");
+      setError("Strategic protocol requires all fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Security passphrase mismatch detected.");
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError("Passphrase integrity must be at least 6 characters.");
       return;
     }
 
     setLoading(true);
-    setError(""); // Clear any previous errors
+    setError("");
     
     try {
-      const response = await api.post('auth/register/', { 
+      await api.post('auth/register/', { 
         username: email, 
         email, 
         password,
         first_name: firstName,
         last_name: lastName,
-        role: 'customer'  // Default to customer role for registration
+        role: 'customer'
       });
       
-      alert("Registration Successful! Please login.");
-      // Reset form
-      setFormData({
-        firstName: "", lastName: "", email: "", password: "", confirmPassword: ""
-      });
-      // Redirect to correct login page
-      navigate("/login");
+      // Success logic
+      navigate("/login", { state: { registered: true } });
     } catch (err) {
       console.error('Registration error:', err);
       const errorData = err.response?.data;
-      let errorMessage = "";
+      let errorMessage = "System rejection. Core offline or data invalid.";
       
-      if (!errorData) {
-        errorMessage = "Server error or offline. Please try again.";
-      } else if (typeof errorData === 'string') {
-        errorMessage = errorData;
-      } else if (typeof errorData === 'object' && errorData !== null) {
-        // Map backend field names to user-friendly labels
-        const fieldLabels = {
-          username: "Email",
-          email: "Email Address",
-          password: "Password",
-          first_name: "First Name",
-          last_name: "Last Name",
-          non_field_errors: "Error",
-          detail: "Error"
-        };
-
-        const stringifyError = (val) => {
-          if (Array.isArray(val)) return val.map(stringifyError).join(" ");
-          if (typeof val === 'object' && val !== null) {
-            return val.message || val.detail || JSON.stringify(val);
-          }
-          return String(val);
-        };
-
-        errorMessage = Object.entries(errorData)
-          .map(([key, v]) => {
-            const label = fieldLabels[key] || key.replace(/_/g, " ");
-            const messages = stringifyError(v);
-            const cleanMessage = messages.replace(/username/gi, "email");
-            return `${label}: ${cleanMessage}`;
-          })
-          .join(" | ");
-      } else {
-        errorMessage = String(errorData);
+      if (typeof errorData === 'object' && errorData !== null) {
+        errorMessage = Object.values(errorData).flat().join(" | ").replace(/username/gi, "email");
       }
-      
-      setError(errorMessage || "Registration failed. Check your data.");
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex font-sans relative">
+    <div 
+      className="min-h-screen flex text-white bg-[#020617] overflow-hidden relative selection:bg-orange-500/30 bg-cover bg-center bg-no-repeat w-full"
+      style={{ backgroundImage: 'url("/images/login_bg.png")' }}
+    >
+      {/* Transparency Overlay */}
+      <div className="absolute inset-0 bg-[#020617]/85 pointer-events-none z-[5]"></div>
       
-      {/* 🏠 PREMIUM FLOATING HOME BUTTON */}
+      {/* 🏠 FLOATING HOME BUTTON */}
       <Link 
         to="/" 
-        className="fixed top-6 left-6 z-50 bg-gray-900/40 backdrop-blur-3xl border border-white/20 text-white shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:border-orange-500/50 hover:bg-gray-900/60 p-4 rounded-2xl transition-all duration-300 flex items-center justify-center group overflow-hidden"
+        className="fixed top-6 left-6 z-[70] bg-white/5 backdrop-blur-3xl border border-white/20 text-white shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:border-orange-500/50 hover:bg-white/10 p-4 rounded-2xl transition-all duration-300 flex items-center justify-center group overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <Home className="w-6 h-6 relative z-10 group-hover:scale-110 group-hover:text-orange-400 transition-all duration-300 drop-shadow-md" />
       </Link>
 
-      {/* Left Side - Branding (Hidden on small screens) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex-col justify-center items-center p-12 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-yellow-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="w-full flex min-h-screen relative z-10">
         
-        <div className="relative z-10 text-center">
-          <span className="text-8xl mb-6 block">☀️</span>
-          <h1 className="text-4xl font-extrabold mb-4">Join Solar Hub</h1>
-          <p className="text-gray-400 text-lg max-w-md">
-            Create your account to start managing your solar installations and monitoring energy production efficiently.
-          </p>
-        </div>
-      </div>
-
-      {/* Right Side - Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6">
-        <div className="w-full max-w-md">
+        {/* LEFT: FORM CONTAINER */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 relative">
           
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <span className="text-5xl">☀️</span>
-            <h1 className="text-2xl font-bold text-gray-800 mt-2">Solar Hub</h1>
-          </div>
-
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Account</h2>
-            <p className="text-gray-500 mb-6">Please fill in your details</p>
-
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg flex items-center text-sm">
-                <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{error}</span>
+          <div className="absolute top-1/4 right-1/2 w-96 h-96 bg-orange-500/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+          
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            className="w-full max-w-xl bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-10 rounded-[2.5rem] shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+          >
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-orange-500/10 rounded-2xl border border-orange-500/20">
+                <Sun className="w-8 h-8 text-orange-500" />
               </div>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight text-white">Join Solar Hub</h1>
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Initialize Residential Network Account</p>
+              </div>
+            </div>
+
+            {error && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-2xl text-sm font-bold flex items-center gap-3">
+                <Lock className="w-5 h-5 shrink-0" /> {error}
+              </motion.div>
             )}
 
-            <form onSubmit={handleRegister} className="space-y-5">
+            <form onSubmit={handleRegister} className="space-y-6">
               
-              {/* Name Inputs */}
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Identity (First)</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <input
                       type="text"
                       name="firstName"
-                      placeholder="John"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                      placeholder="First Name"
+                      className="w-full pl-11 pr-4 py-4 rounded-2xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner text-sm"
                       value={formData.firstName}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
-
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Identity (Last)</label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                     <input
                       type="text"
                       name="lastName"
-                      placeholder="Doe"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                      placeholder="Last Name"
+                      className="w-full pl-11 pr-4 py-4 rounded-2xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner text-sm"
                       value={formData.lastName}
                       onChange={handleChange}
                     />
@@ -200,95 +149,116 @@ function Register() {
                 </div>
               </div>
 
-              {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Core Contact (Email)</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input
                     type="email"
                     name="email"
-                    placeholder="john@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+                    placeholder="name@nexus.com"
+                    className="w-full pl-11 pr-4 py-4 rounded-2xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner text-sm"
                     value={formData.email}
                     onChange={handleChange}
                   />
                 </div>
               </div>
 
-              {/* Password Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Passphrase</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="••••••••"
+                      className="w-full pl-11 pr-12 py-4 rounded-2xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner text-sm"
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white pb-1">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Min. 6 characters"
-                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Verification</label>
+                  <div className="relative">
+                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="••••••••"
+                      className="w-full pl-11 pr-4 py-4 rounded-2xl bg-[#020617] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-all shadow-inner text-sm"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Confirm Password Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Confirm your password"
-                    className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-lg text-white font-semibold transition-all duration-300 shadow-md bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
+                className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-black py-5 rounded-[1.5rem] font-black transition-all shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:shadow-[0_0_50px_rgba(249,115,22,0.5)] flex items-center justify-center gap-3 group mt-4 overflow-hidden relative"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Initialize Account <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" /></>}
               </button>
             </form>
 
-            <p className="text-center mt-6 text-sm text-gray-600">
-              Already have an account? <Link to="/login" className="text-orange-500 font-bold hover:underline">Login</Link>
-            </p>
-          </div>
+            <div className="mt-10 pt-8 border-t border-white/5 text-center">
+              <p className="text-gray-500 font-bold text-sm">
+                Already have a station? <Link to="/login" className="text-orange-500 hover:text-orange-400 transition-colors ml-2 underline underline-offset-4">Sign In to Hub</Link>
+              </p>
+            </div>
+          </motion.div>
         </div>
+
+        {/* RIGHT: BRANDING / BENEFITS */}
+        <div className="hidden lg:flex w-1/2 bg-[#020617] relative items-center justify-center p-16 border-l border-white/5 overflow-hidden">
+           {/* Visual Assets */}
+           <img src="/images/solar_hero.png" alt="Solar" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-screen grayscale contrast-125 sepia-[.3]" />
+           <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent"></div>
+           <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/50 to-transparent"></div>
+           
+           <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="relative z-10 max-w-lg">
+             <h2 className="text-5xl font-black mb-8 leading-[1.1] tracking-tighter">
+                Accelerate Your <br />
+                <span className="text-orange-500">Solar Transition.</span>
+             </h2>
+             <ul className="space-y-8">
+                {[
+                  "Military-grade encryption for all financial and energy data.",
+                  "Real-time monitoring of monocrystalline panel performance.",
+                  "Automated support ticket dispatch for hardware anomalies."
+                ].map((text, i) => (
+                  <motion.li 
+                    key={i} 
+                    initial={{ opacity: 0, y: 10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: 0.4 + (i * 0.1) }}
+                    className="flex gap-5 items-start"
+                  >
+                    <div className="mt-1 bg-orange-500/20 p-1.5 rounded-lg border border-orange-500/30">
+                        <CheckCircle className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <p className="text-gray-400 text-lg leading-relaxed font-semibold italic">{text}</p>
+                  </motion.li>
+                ))}
+             </ul>
+
+             <div className="mt-16 p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2rem] relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 blur-2xl group-hover:bg-orange-500/20 transition-colors"></div>
+                <p className="text-gray-300 font-bold italic leading-relaxed text-sm">
+                  "RC Solar Solutions has completely transformed how I manage my power bills. The interface is stunning and the data is accurate."
+                </p>
+                <p className="text-xs text-orange-500 font-black uppercase tracking-widest mt-4">— Verified Customer Hub User</p>
+             </div>
+           </motion.div>
+        </div>
+
       </div>
     </div>
   );
