@@ -31,7 +31,6 @@ function Profile() {
   const handleSave = async () => {
     setLoading(true);
     try {
-        // Prepare payload for partial update
         const payload = {
             first_name: formData.first_name,
             last_name: formData.last_name,
@@ -50,8 +49,32 @@ function Profile() {
         setIsEditing(false);
         alert("Profile updated successfully!");
     } catch (err) {
-        console.error(err);
-        alert("Failed to update profile. Please try again.");
+        alert("Update failed. Error: " + (err.response?.data?.detail || "Connection issue"));
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const [passwordForm, setPasswordForm] = useState({ new: "", confirm: "" });
+  const [changingPass, setChangingPass] = useState(false);
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (passwordForm.new !== passwordForm.confirm) {
+        alert("Passwords do not match!"); return;
+    }
+    if (passwordForm.new.length < 6) {
+        alert("Password must be at least 6 characters."); return;
+    }
+
+    setLoading(true);
+    try {
+        await api.patch(`users/${user.id}/`, { password: passwordForm.new });
+        alert("Password updated successfully! Please login again if required.");
+        setPasswordForm({ new: "", confirm: "" });
+        setChangingPass(false);
+    } catch (err) {
+        alert("Failed to update password.");
     } finally {
         setLoading(false);
     }
@@ -177,7 +200,7 @@ function Profile() {
         </motion.div>
 
         {/* Information Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mt-12 px-4 md:px-10">
+        <div className="grid md:grid-cols-2 gap-10 mt-12 px-4 md:px-10">
             
             {/* Contact Information */}
             <motion.div 
@@ -199,7 +222,7 @@ function Profile() {
                             <Mail className="w-6 h-6 text-gray-400" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Email Address</p>
+                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Email Connection</p>
                             {isEditing ? (
                                 <input 
                                     className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1"
@@ -217,7 +240,7 @@ function Profile() {
                             <Phone className="w-6 h-6 text-gray-400" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Mobile Number</p>
+                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Assigned Handheld</p>
                             {isEditing ? (
                                 <input 
                                     className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1"
@@ -231,6 +254,40 @@ function Profile() {
                         </div>
                     </div>
                 </div>
+
+                {/* Change Password Block */}
+                <div className="mt-12 pt-8 border-t border-white/10">
+                    <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Security & Access</h3>
+                    {changingPass ? (
+                        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                             <input 
+                                type="password"
+                                className="w-full bg-black/20 border border-white/10 rounded-2xl p-4 text-white focus:border-orange-500 transition-all font-bold"
+                                placeholder="New Password"
+                                value={passwordForm.new}
+                                onChange={(e) => setPasswordForm({...passwordForm, new: e.target.value})}
+                            />
+                             <input 
+                                type="password"
+                                className="w-full bg-black/20 border border-white/10 rounded-2xl p-4 text-white focus:border-orange-500 transition-all font-bold"
+                                placeholder="Confirm New Password"
+                                value={passwordForm.confirm}
+                                onChange={(e) => setPasswordForm({...passwordForm, confirm: e.target.value})}
+                            />
+                            <div className="flex gap-2">
+                                <button onClick={() => setChangingPass(false)} className="flex-1 bg-white/5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Cancel</button>
+                                <button onClick={handlePasswordUpdate} className="flex-1 bg-orange-500 text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-400 transition-all shadow-lg">Update Password</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button 
+                            onClick={() => setChangingPass(true)}
+                            className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all flex items-center justify-center gap-3"
+                        >
+                            <Shield className="w-4 h-4" /> Change Access Passphrase
+                        </button>
+                    )}
+                </div>
             </motion.div>
 
             {/* Installation Details */}
@@ -238,16 +295,16 @@ function Profile() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/5 border border-white/10 rounded-[3rem] p-10 shadow-2xl group"
+                className="bg-white/5 border border-white/10 rounded-[3rem] p-10 shadow-2xl group flex flex-col"
             >
                 <div className="flex items-center gap-4 mb-10">
                     <div className="p-3 bg-orange-500/10 rounded-[1.25rem]">
                         <MapPin className="w-6 h-6 text-orange-500" />
                     </div>
-                    <h2 className="text-2xl font-black text-white">Installation Details</h2>
+                    <h2 className="text-2xl font-black text-white">System Location</h2>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-6 flex-grow">
                     <div className="bg-black/20 border border-white/5 p-6 rounded-[2rem] flex items-start gap-6 hover:border-orange-500/40 transition-all">
                         <div className="p-4 bg-white/5 rounded-2xl mt-1">
                             <MapPin className="w-6 h-6 text-gray-400" />
@@ -259,7 +316,7 @@ function Profile() {
                                     className="w-full bg-transparent border-b border-white/10 focus:border-orange-500 outline-none text-lg font-bold text-gray-200 py-1 resize-none"
                                     value={formData.address}
                                     onChange={(e) => setFormData({...formData, address: e.target.value})}
-                                    rows="2"
+                                    rows="3"
                                 />
                             ) : (
                                 <p className="text-lg font-bold text-gray-200 leading-snug">
@@ -274,10 +331,10 @@ function Profile() {
                 <div className="mt-10 p-8 bg-gradient-to-br from-orange-500/10 to-transparent border-l-4 border-orange-500 rounded-3xl">
                     <div className="flex items-center gap-3 mb-3">
                         <Shield className="w-4 h-4 text-orange-500" />
-                        <h3 className="text-xs font-black text-orange-500 uppercase tracking-widest">Ownership Status</h3>
+                        <h3 className="text-xs font-black text-orange-500 uppercase tracking-widest">Ownership & Clearance</h3>
                     </div>
                     <p className="text-sm text-gray-400 leading-relaxed font-medium">
-                        Your account is fully verified. You have full administrative access to your solar performance metrics, billing records, and direct support channels.
+                        Modifying these details will automatically synchronize across the administrative registry. Your field agent will be notified of any primary address or contact changes.
                     </p>
                 </div>
 
