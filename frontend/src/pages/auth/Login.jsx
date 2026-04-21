@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sun, CheckCircle, ArrowRight, Loader2, Eye, EyeOff, Mail, Home, Shield, Lock, Briefcase, HardHat, Users, ChevronLeft } from "lucide-react";
+import { Sun, CheckCircle, ArrowRight, Loader2, Eye, EyeOff, Home, Shield, Lock, Briefcase, HardHat, Users, ChevronLeft } from "lucide-react";
 import api from "../../api/axiosConfig"; // Axios for Django
 
 function Login({ onLogin }) {
@@ -106,55 +106,7 @@ function Login({ onLogin }) {
       }
   };
 
-  const handleGoogleLogin = async () => {
-    // Simulated fetch from present Google SSO state
-    const googleEmail = window.prompt("Google SSO Authorization: Choose a Google account to continue.", "personal@gmail.com");
-    if (!googleEmail) return;
 
-    setLoading(true);
-    try {
-      const response = await api.post('auth/oauth/', { email: googleEmail, role: selectedPortal });
-      
-      const { user, token } = response.data;
-      sessionStorage.setItem('access_token', token);
-      onLogin(user);
-
-      if (user.role === 'admin') navigate("/dashboard");
-      else if (user.role === 'agent') navigate("/agent-dashboard");
-      else if (user.role === 'sub_worker') navigate("/worker-dashboard");
-      else navigate("/customer-dashboard");
-    } catch (err) {
-      setError("Google SSO Fetch Failed. Check Backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleWebEmailLogin = async () => {
-    // Simulated fetch from present web browser SSO state
-    const webEmail = window.prompt("Local SSO Authorization: Requesting permission to fetch current web email.", "user@gmail.com");
-    if (!webEmail) return;
-
-    setLoading(true);
-    try {
-      // Connect to backend securely
-      const response = await api.post('auth/oauth/', { email: webEmail, role: selectedPortal });
-      
-      const { user, token } = response.data;
-      sessionStorage.setItem('access_token', token);
-      onLogin(user);
-
-      // Auto-route based on account standing
-      if (user.role === 'admin') navigate("/dashboard");
-      else if (user.role === 'agent') navigate("/agent-dashboard");
-      else if (user.role === 'sub_worker') navigate("/worker-dashboard");
-      else navigate("/customer-dashboard");
-    } catch (err) {
-      setError("Web Email SSO Fetch Failed. Check Backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div 
@@ -295,35 +247,7 @@ function Login({ onLogin }) {
                       </button>
                     </form>
 
-                    <div className="flex items-center my-8 gap-4 opacity-50">
-                      <div className="flex-1 h-px bg-white/20"></div>
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                        {selectedPortal === 'admin' || selectedPortal === 'sub_worker' ? 'Enterprise Federation' : 'Or Link Device'}
-                      </span>
-                      <div className="flex-1 h-px bg-white/20"></div>
-                    </div>
 
-                    <div className="flex gap-4">
-                      {selectedPortal === 'admin' || selectedPortal === 'sub_worker' ? (
-                        <>
-                          <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftoutlook/microsoftoutlook-original.svg" alt="microsoft" className="w-4 h-4 grayscale group-hover:grayscale-0" /> Microsoft
-                          </button>
-                          <button onClick={handleWebEmailLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
-                             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="github" className="w-4 h-4 invert" /> GitHub SSO
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" /> Google
-                          </button>
-                          <button onClick={handleWebEmailLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
-                            <Mail className={`w-4 h-4 ${selectedPortal === 'customer' ? 'text-blue-400' : 'text-orange-400'}`} /> SSO Login
-                          </button>
-                        </>
-                      )}
-                    </div>
 
                     {selectedPortal === 'customer' && (
                       <p className="text-center mt-8 text-sm text-gray-500 font-medium">
