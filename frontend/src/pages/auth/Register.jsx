@@ -51,12 +51,17 @@ function Register() {
     <div className="min-h-screen flex font-sans">
       
       {/* LEFT SIDE - BRANDING */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#0f172a] text-white flex-col justify-center items-center p-12 relative overflow-hidden">
+      <div 
+        className="hidden lg:flex lg:w-1/2 bg-[#0f172a] text-white flex-col justify-center items-center p-12 relative overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: 'url("/images/register_side_bg.png")' }}
+      >
+        {/* Navy Overlay for readability */}
+        <div className="absolute inset-0 bg-[#0f172a]/80 pointer-events-none"></div>
         
         {/* Floating Home Button (Matches Screenshot Position) */}
         <Link 
           to="/" 
-          className="absolute top-8 left-8 p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all shadow-lg"
+          className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all shadow-lg z-[20]"
         >
           <Home className="w-5 h-5" />
         </Link>
@@ -68,7 +73,7 @@ function Register() {
              </div>
           </div>
           <h1 className="text-5xl font-black mb-6 tracking-tight">Join Solar Administration</h1>
-          <p className="text-gray-400 text-lg leading-relaxed font-semibold">
+          <p className="text-gray-200 text-lg leading-relaxed font-semibold">
             Create your account to start managing your solar installations and monitoring energy production efficiently.
           </p>
         </div>
