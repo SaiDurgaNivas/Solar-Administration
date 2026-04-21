@@ -297,17 +297,32 @@ function Login({ onLogin }) {
 
                     <div className="flex items-center my-8 gap-4 opacity-50">
                       <div className="flex-1 h-px bg-white/20"></div>
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Or Link Device</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        {selectedPortal === 'admin' || selectedPortal === 'sub_worker' ? 'Enterprise Federation' : 'Or Link Device'}
+                      </span>
                       <div className="flex-1 h-px bg-white/20"></div>
                     </div>
 
                     <div className="flex gap-4">
-                      <button onClick={handleGoogleLogin} disabled={loading} type="button" className={`flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider`}>
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" /> Google
-                      </button>
-                      <button onClick={handleWebEmailLogin} disabled={loading} type="button" className={`flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider`}>
-                        <Mail className={`w-4 h-4 ${selectedPortal === 'customer' ? 'text-blue-400' : 'text-orange-400'}`} /> SSO Login
-                      </button>
+                      {selectedPortal === 'admin' || selectedPortal === 'sub_worker' ? (
+                        <>
+                          <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftoutlook/microsoftoutlook-original.svg" alt="microsoft" className="w-4 h-4 grayscale group-hover:grayscale-0" /> Microsoft
+                          </button>
+                          <button onClick={handleWebEmailLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
+                             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="github" className="w-4 h-4 invert" /> GitHub SSO
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="google" className="w-4 h-4" /> Google
+                          </button>
+                          <button onClick={handleWebEmailLogin} disabled={loading} type="button" className="flex-1 bg-[#020617] hover:bg-white/5 border border-white/10 py-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-xs font-bold uppercase tracking-wider">
+                            <Mail className={`w-4 h-4 ${selectedPortal === 'customer' ? 'text-blue-400' : 'text-orange-400'}`} /> SSO Login
+                          </button>
+                        </>
+                      )}
                     </div>
 
                     {selectedPortal === 'customer' && (
