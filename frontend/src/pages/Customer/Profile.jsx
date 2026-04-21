@@ -96,8 +96,11 @@ function Profile() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
             
             <div className="absolute top-8 right-8 z-20 flex gap-3">
-                <button className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 hover:bg-white/20 transition-all shadow-lg">
-                    <Settings className="w-5 h-5 text-white" />
+                <button 
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 hover:bg-white/20 transition-all shadow-lg active:scale-95 group"
+                >
+                    <Settings className={`w-5 h-5 text-white transition-transform duration-500 ${isEditing ? 'rotate-90' : 'group-hover:rotate-45'}`} />
                 </button>
             </div>
         </motion.div>
