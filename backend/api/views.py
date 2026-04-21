@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask, Notification
-from .serializers import UserSerializer, AgentProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer, NotificationSerializer
+from .models import User, CustomerProfile, AgentProfile, SubWorkerProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask, Notification
+from .serializers import UserSerializer, AgentProfileSerializer, SubWorkerProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer, NotificationSerializer
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.mail import send_mail
 from django.conf import settings
@@ -139,6 +139,11 @@ class AgentProfileViewSet(viewsets.ModelViewSet):
     queryset = AgentProfile.objects.all()
     serializer_class = AgentProfileSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+class SubWorkerProfileViewSet(viewsets.ModelViewSet):
+    queryset = SubWorkerProfile.objects.all()
+    serializer_class = SubWorkerProfileSerializer
+    lookup_field = 'user_id'
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

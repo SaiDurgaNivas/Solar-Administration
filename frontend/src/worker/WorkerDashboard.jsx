@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays, X } from 'lucide-react';
+import { HardHat, MapPin, CheckCircle, Activity, Power, CalendarCheck, Flag, FileText, User as UserIcon, Bell, Camera, Image as ImageIcon, Send, Clock, CalendarDays, X, Zap, AlertCircle } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { useTickets } from '../context/TicketContext';
 import { useLiveTime } from '../hooks/useLiveTime';
@@ -163,6 +163,19 @@ function WorkerDashboard() {
       alert('Failed to post update.');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleEditProfile = async (e) => {
+    e.preventDefault();
+    try {
+      await api.patch(`subworkerprofile/${user.id}/`, editData);
+      alert('Profile updated successfully!');
+      setShowEditModal(false);
+      // Refresh local user data if possible, though here we just alert
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update profile.');
     }
   };
 
@@ -342,10 +355,13 @@ function WorkerDashboard() {
                              <div className="w-full py-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center gap-3">
                                <CheckCircle className="w-6 h-6" /> Installation Cycle Complete
                              </div>
-                        ))}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                </div>
+              )}
                   
                   {/* MAINTENANCE & EMERGENCY SECTION */}
                   {myTickets.length > 0 && (
