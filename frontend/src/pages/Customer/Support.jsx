@@ -123,7 +123,13 @@ function Support({ modal, setModal }) {
                         <c.icon className="w-6 h-6" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{c.label}</p>
-                    <h4 className="text-xl font-black text-white mb-2">{c.contact}</h4>
+                    <a 
+                      href={`tel:${c.contact.replace(/\s+/g, '')}`} 
+                      className="text-xl font-black text-white mb-2 hover:text-orange-500 transition-colors flex items-center gap-2 group/link"
+                    >
+                        {c.contact}
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse opacity-0 group-hover/link:opacity-100 transition-opacity"></div>
+                    </a>
                     <p className="text-xs text-gray-500 font-medium leading-relaxed">{c.desc}</p>
                 </div>
             ))}
