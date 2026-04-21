@@ -81,7 +81,7 @@ function Support({ modal, setModal }) {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-20">
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
                 { icon: MessageSquare, title: "Comm Link", desc: "Open a direct chat array with an agent.", action: "Start Session", color: "text-blue-400", borderHover: "hover:border-blue-500/30", bgHover: "hover:bg-blue-500/5", slug: "comm-link" },
                 { icon: Mail, title: "Engineering Desk", desc: "Submit a detailed email diagnostic request.", action: "Create Ticket", color: "text-orange-400", borderHover: "hover:border-orange-500/30", bgHover: "hover:bg-orange-500/5", slug: "engineering-desk" },
@@ -106,6 +106,28 @@ function Support({ modal, setModal }) {
                  </motion.div>
             ))}
           </div>
+
+          {/* ================= DIRECT CONTACT CHANNELS ================= */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-20 grid md:grid-cols-3 gap-4"
+          >
+            {[
+                { label: "Administrator Hub", contact: "+91 99887 76655", desc: "Direct baseline for urgent system overrides and escalation.", icon: Headphones, color: "text-orange-500" },
+                { label: "Assigned Field Agent", contact: "+91 88776 65544", desc: "Your primary point of contact for service and billing.", icon: User, color: "text-blue-400" },
+                { label: "Installation Foreman", contact: "+91 77665 54433", desc: "Lead engineer for your specific monogram installation.", icon: Briefcase, color: "text-green-500" }
+            ].map((c, i) => (
+                <div key={i} className="bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-6 rounded-[2rem] flex flex-col items-center text-center group hover:bg-white/10 transition-all duration-500">
+                    <div className={`p-3 bg-white/5 rounded-xl mb-4 group-hover:scale-110 transition-transform ${c.color}`}>
+                        <c.icon className="w-6 h-6" />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{c.label}</p>
+                    <h4 className="text-xl font-black text-white mb-2">{c.contact}</h4>
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed">{c.desc}</p>
+                </div>
+            ))}
+          </motion.div>
 
           {/* ================= REVIEWS & FEEDBACK SECTION ================= */}
           <motion.div
