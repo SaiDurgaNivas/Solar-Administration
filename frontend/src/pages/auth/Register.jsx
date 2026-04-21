@@ -126,7 +126,7 @@ function Register() {
         
         <div className="relative z-10 text-center">
           <span className="text-8xl mb-6 block">☀️</span>
-          <h1 className="text-4xl font-extrabold mb-4">Join Solar Administration</h1>
+          <h1 className="text-4xl font-extrabold mb-4">Join Solar Hub</h1>
           <p className="text-gray-400 text-lg max-w-md">
             Create your account to start managing your solar installations and monitoring energy production efficiently.
           </p>
@@ -140,7 +140,7 @@ function Register() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <span className="text-5xl">☀️</span>
-            <h1 className="text-2xl font-bold text-gray-800 mt-2">Solar Admin</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mt-2">Solar Hub</h1>
           </div>
 
           <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">

@@ -28,21 +28,6 @@ function Login({ onLogin }) {
 
     setLoading(true);
 
-    // 🚀 DEMO OVERRIDE: Local Bypass for Admin
-    if (selectedPortal === 'admin' && email === 'admin@solar.com') {
-        if (password !== 'admin123') {
-           setError("Invalid Admin Credentials.");
-           setLoading(false);
-           return;
-        }
-        
-        // Move to 2FA Secret Code Step
-        setTimeout(() => {
-            setStep('2fa');
-            setLoading(false);
-        }, 600);
-        return;
-    }
 
     try {
       // Send authentication request to Django API with role awareness
@@ -130,12 +115,7 @@ function Login({ onLogin }) {
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-500/10 blur-[150px] rounded-full pointer-events-none z-[8]"></div>
           
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 relative z-10 flex flex-col items-center">
-            <button 
-              onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} 
-              className="relative group hover:scale-110 transition-transform duration-300 outline-none focus:outline-none block"
-            >
-              <Sun className="w-16 h-16 text-orange-500 mb-6 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)] cursor-pointer" />
-            </button>
+            <Sun className="w-16 h-16 text-orange-500 mb-6 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]" />
             <h1 className="text-5xl font-black tracking-tight mb-4">Secure Authentication Gateway</h1>
             <p className="text-gray-400 text-lg uppercase tracking-widest font-semibold">Select Your Designated Operations Portal</p>
           </motion.div>
@@ -184,9 +164,16 @@ function Login({ onLogin }) {
             )}
           </div>
 
-          <button onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-600 hover:text-white transition-colors">
-            <Lock className="w-4 h-4" /> <span className="text-[10px] uppercase tracking-widest font-bold">Admin Clearance</span>
-          </button>
+          {/* 🔥 HIDDEN ADMIN DOOR (ONLY ACCESSIBLE VIA STAFF VIEW) */}
+          {showStaff && (
+            <button 
+              onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} 
+              className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-700/50 hover:text-white transition-all group scale-90 hover:scale-100"
+            >
+              <Lock className="w-4 h-4 group-hover:text-orange-500" /> 
+              <span className="text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-opacity">Admin Clearance</span>
+            </button>
+          )}
         </div>
       ) : (
         // ================= SPECIFIC PORTAL LOGIN =================
@@ -204,7 +191,7 @@ function Login({ onLogin }) {
               {step === 'login' ? (
                  <>
                     <h2 className={`text-4xl font-extrabold mb-2 tracking-tight ${selectedPortal === 'customer' ? 'text-blue-400' : selectedPortal === 'sub_worker' ? 'text-cyan-400' : 'text-orange-400'}`}>
-                      {selectedPortal === 'admin' ? "Admin Access" : selectedPortal === 'customer' ? 'Customer Hub' : selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 'Agent Terminal'}
+                      {selectedPortal === 'customer' ? 'Customer Hub' : selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 'Agent Terminal'}
                     </h2>
                     <p className="text-gray-400 mb-8 text-sm font-semibold uppercase tracking-widest border-b border-white/10 pb-6">Secure Gateway Active</p>
 
@@ -257,26 +244,12 @@ function Login({ onLogin }) {
                  </>
               ) : (
                  <>
-                    {/* 2FA COMPONENT FOR ADMIN */}
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                       <div className="flex justify-center items-center mb-6">
-                          <div className="p-4 bg-orange-500/20 rounded-full border border-orange-500/30">
-                             <Lock className="w-10 h-10 text-orange-500" />
-                          </div>
-                       </div>
-                       <h2 className="text-3xl font-extrabold mb-2 text-center text-white tracking-tight">Level 5 Clearance</h2>
-                       <p className="text-gray-400 text-center mb-8 text-sm leading-relaxed font-semibold">
-                           A Signal Code has been dispatched.<br/><span className="text-orange-400 font-bold block mt-2">Notification Sent to secure device.</span>
-                       </p>
-                       {error && <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-500 rounded-xl text-sm font-bold text-center">{error}</div>}
-                       <form onSubmit={handleVerifyCode} className="flex flex-col gap-5 relative z-10 w-full" autoComplete="off">
-                          <input type="text" value={secretCode} onChange={(e) => setSecretCode(e.target.value)} className="w-full bg-[#020617] text-white border border-white/10 rounded-xl p-6 focus:outline-none focus:border-orange-500/50 transition-all font-mono tracking-[1em] text-center text-3xl shadow-inner" placeholder="0000" maxLength={4} autoFocus />
-                          <button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black uppercase tracking-widest py-5 rounded-xl shadow-[0_0_20px_rgba(249,115,22,0.4)] disabled:opacity-50 transition-all flex justify-center mt-2">
-                            {loading ? <Loader2 className="animate-spin w-5 h-5 mx-auto" /> : "Verify Identity"}
-                          </button>
-                          <button type="button" onClick={() => { setStep('login'); setError(""); setSecretCode(""); }} className="text-xs text-gray-500 hover:text-white transition-colors uppercase font-bold tracking-widest border-b border-gray-600 pb-1 mt-6 text-center w-fit mx-auto">Cancel Override</button>
-                       </form>
-                    </motion.div>
+                  <div className="flex flex-col items-center justify-center p-10 bg-red-500/10 border border-red-500/20 rounded-3xl">
+                    <Lock className="w-12 h-12 text-red-500 mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">Unauthorized Access</h3>
+                    <p className="text-gray-400 text-center text-sm">This portal is restricted. Please contact system administrator.</p>
+                    <button onClick={() => setSelectedPortal(null)} className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-all">Go Back</button>
+                  </div>
                  </>
               )}
             </motion.div>
