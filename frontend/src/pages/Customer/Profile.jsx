@@ -5,149 +5,174 @@ import UserProfilePhoto from "../../components/UserProfilePhoto";
 
 function Profile() {
   const userStr = sessionStorage.getItem("solar_user");
-  const user = userStr ? JSON.parse(userStr) : { username: "Valued Customer", email: "customer@solar.local", role: "customer" };
+  const user = userStr ? JSON.parse(userStr) : { username: "Valued Customer", email: "customer@solar.local", role: "customer", first_name: "John", last_name: "Doe" };
+  const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : (user.username || "Customer");
 
   return (
-    <div className="bg-[#020617] min-h-screen text-white font-sans animate-in fade-in duration-700 relative overflow-hidden">
+    <div className="min-h-screen text-white font-sans animate-in fade-in duration-700 relative overflow-hidden">
       
-      {/* Premium Background Ambience */}
-      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
-      <div className="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none z-0"></div>
-
       <div className="max-w-6xl mx-auto px-6 py-12 relative z-10 w-full">
         
-        {/* Massive Hero Banner */}
+        {/* Profile Hero Header */}
         <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full h-48 md:h-64 rounded-3xl overflow-hidden relative shadow-2xl mb-24 border border-white/5"
+            className="w-full h-48 md:h-64 rounded-[3rem] overflow-hidden relative shadow-2xl mb-24 border border-white/10"
         >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 via-orange-500 to-yellow-500 opacity-20 z-0"></div>
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1548611716-e41fb00c4316?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-30"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#020617] to-transparent z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500/40 to-yellow-500/10 z-0"></div>
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1548611716-e41fb00c4316?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-40"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
             
-            <div className="absolute top-4 right-4 z-20 flex gap-2">
-                <button className="p-3 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
-                    <Settings className="w-5 h-5 text-gray-300" />
+            <div className="absolute top-8 right-8 z-20 flex gap-3">
+                <button className="p-3.5 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 hover:bg-white/20 transition-all shadow-lg">
+                    <Settings className="w-5 h-5 text-white" />
                 </button>
             </div>
         </motion.div>
 
-        {/* Profile Head Card */}
+        {/* Primary Profile Identity Card */}
         <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="bg-[#0f172a]/60 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl p-8 md:p-12 -mt-48 relative z-20 mx-4 md:mx-12"
+            className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)] p-8 md:p-14 -mt-56 relative z-20 mx-4 md:mx-10"
         >
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                {/* Overlapping Avatar */}
-                <div className="relative shrink-0 -mt-24 md:-mt-24 z-30 group">
-                    <div className="w-32 h-32 md:w-40 md:h-40 bg-[#020617] rounded-full p-2 shadow-[0_0_40px_rgba(249,115,22,0.3)] inline-block">
-                        <UserProfilePhoto user={user} size="2xl" clickable={true} />
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
+                {/* Profile Photo Wrapper */}
+                <div className="relative shrink-0 -mt-28 md:-mt-28 z-30">
+                    <div className="w-36 h-36 md:w-44 md:h-44 bg-[#0a0a0a] rounded-[2.5rem] p-2.5 shadow-[0_15px_50px_rgba(249,115,22,0.4)] border border-white/10">
+                        <div className="w-full h-full rounded-[2rem] overflow-hidden">
+                            <UserProfilePhoto user={user} size="2xl" clickable={true} />
+                        </div>
                     </div>
-                    {/* Online Indicator */}
-                    <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-6 h-6 bg-green-500 rounded-full border-4 border-[#020617] z-40 pointer-events-none"></div>
+                    {/* Status Orb */}
+                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-[6px] border-[#0a0a0a] z-40 shadow-lg"></div>
                 </div>
 
-                <div className="flex-1 text-center md:text-left">
-                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-4">
+                <div className="flex-1 text-center md:text-left pt-2">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-center mb-6">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2 capitalize">
-                                {user.username || user.name || "Customer"}
+                            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-2 highlight-text">
+                                {fullName}
                             </h1>
-                            <p className="text-orange-400 font-bold tracking-widest text-sm uppercase flex items-center justify-center md:justify-start gap-2">
-                                <Fingerprint className="w-4 h-4" /> Validated Protocol
-                            </p>
+                            <div className="flex items-center justify-center md:justify-start gap-3 mt-3">
+                                <span className="bg-orange-500/10 text-orange-500 font-black tracking-widest text-[10px] uppercase py-1.5 px-4 rounded-full border border-orange-500/20 flex items-center gap-2">
+                                    <Shield className="w-3 h-3" /> Solar Customer Account
+                                </span>
+                            </div>
                         </div>
-                        <span className="mt-4 md:mt-0 px-5 py-2 bg-gradient-to-r from-orange-500/20 to-orange-500/10 text-orange-400 border border-orange-500/30 rounded-xl text-xs font-black tracking-widest uppercase flex items-center gap-2 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-                            <Shield className="w-4 h-4" /> Clearance: {user.role}
-                        </span>
+                        <div className="mt-8 md:mt-0">
+                            <button className="px-8 py-3.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-black font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all">
+                                Edit Profile details
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="h-px w-full bg-white/5 my-6"></div>
+                    <div className="h-px w-full bg-gradient-to-r from-white/10 via-white/5 to-transparent my-8"></div>
 
-                    <div className="flex flex-wrap justify-center md:justify-start gap-6 text-sm">
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <Calendar className="w-4 h-4 text-gray-500" />
-                            <span>Member Since {new Date().getFullYear()}</span>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-8 text-sm">
+                        <div className="flex items-center gap-3 text-gray-400">
+                            <div className="p-2 bg-white/5 rounded-lg">
+                                <Calendar className="w-4 h-4 text-orange-400/60" />
+                            </div>
+                            <span className="font-semibold">Joined {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-green-400 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                        <div className="flex items-center gap-2 text-green-400 font-black uppercase text-[10px] tracking-widest px-5 py-2.5 rounded-2xl bg-green-500/10 border border-green-500/20">
                             <CheckCircle className="w-4 h-4" />
-                            <span className="font-bold">Active Account</span>
+                            Account Verified
                         </div>
                     </div>
                 </div>
             </div>
         </motion.div>
 
-        {/* Detailed Metrics / Credentials */}
-        <div className="grid md:grid-cols-2 gap-8 mt-12 px-4 md:px-12">
+        {/* Information Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mt-12 px-4 md:px-10">
             
+            {/* Contact Information */}
             <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-[#0f172a]/40 border border-white/5 rounded-[2rem] p-8 shadow-xl"
+                className="bg-white/5 border border-white/10 rounded-[3rem] p-10 shadow-2xl group"
             >
-                <h2 className="text-xl font-bold text-white mb-6 border-b border-white/5 pb-4">Communication Links</h2>
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="p-3 bg-blue-500/10 rounded-[1.25rem]">
+                        <Mail className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Contact Info</h2>
+                </div>
                 
-                <div className="space-y-4">
-                    <div className="bg-[#020617]/50 border border-white/5 p-5 rounded-2xl flex items-center gap-5 hover:border-orange-500/30 hover:bg-white/5 transition-all group">
-                        <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                            <Mail className="w-6 h-6 text-blue-400" />
+                <div className="space-y-6">
+                    <div className="bg-black/20 border border-white/5 p-6 rounded-[2rem] flex items-center gap-6 hover:border-orange-500/40 transition-all">
+                        <div className="p-4 bg-white/5 rounded-2xl">
+                            <Mail className="w-6 h-6 text-gray-400" />
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">Primary Email</p>
-                            <p className="text-lg font-medium text-gray-200">{user.email || "Pending Assignment"}</p>
+                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Email Address</p>
+                            <p className="text-lg font-bold text-gray-200">{user.email || "Add your email"}</p>
                         </div>
                     </div>
 
-                    <div className="bg-[#020617]/50 border border-white/5 p-5 rounded-2xl flex items-center gap-5 hover:border-orange-500/30 hover:bg-white/5 transition-all group">
-                        <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
-                            <Phone className="w-6 h-6 text-purple-400" />
+                    <div className="bg-black/20 border border-white/5 p-6 rounded-[2rem] flex items-center gap-6 hover:border-orange-500/40 transition-all">
+                        <div className="p-4 bg-white/5 rounded-2xl">
+                            <Phone className="w-6 h-6 text-gray-400" />
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">Encrypted Handheld</p>
-                            <p className="text-lg font-medium text-gray-500 italic">Unassigned (Require Admin Override)</p>
+                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Mobile Number</p>
+                            <p className="text-lg font-bold text-gray-200">{user.customer_profile?.phone || "Personal contact needed"}</p>
                         </div>
                     </div>
                 </div>
             </motion.div>
 
+            {/* Installation Details */}
             <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-[#0f172a]/40 border border-white/5 rounded-[2rem] p-8 shadow-xl"
+                className="bg-white/5 border border-white/10 rounded-[3rem] p-10 shadow-2xl group"
             >
-                <h2 className="text-xl font-bold text-white mb-6 border-b border-white/5 pb-4">Physical Infrastructure</h2>
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="p-3 bg-orange-500/10 rounded-[1.25rem]">
+                        <MapPin className="w-6 h-6 text-orange-500" />
+                    </div>
+                    <h2 className="text-2xl font-black text-white">Installation Details</h2>
+                </div>
                 
-                <div className="space-y-4">
-                    <div className="bg-[#020617]/50 border border-white/5 p-5 rounded-2xl flex items-start gap-5 hover:border-orange-500/30 hover:bg-white/5 transition-all group">
-                        <div className="p-3 bg-orange-500/10 rounded-xl group-hover:bg-orange-500/20 transition-colors mt-1">
-                            <MapPin className="w-6 h-6 text-orange-400" />
+                <div className="space-y-6">
+                    <div className="bg-black/20 border border-white/5 p-6 rounded-[2rem] flex items-start gap-6 hover:border-orange-500/40 transition-all">
+                        <div className="p-4 bg-white/5 rounded-2xl mt-1">
+                            <MapPin className="w-6 h-6 text-gray-400" />
                         </div>
                         <div>
-                            <p className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-1">Registered Coordinates</p>
-                            <p className="text-lg font-medium text-gray-200 leading-snug">
-                                Secure Grid Location<br/>
-                                <span className="text-sm text-gray-400">Sector Authorization Required</span>
+                            <p className="text-gray-500 text-[10px] font-black tracking-widest uppercase mb-1">Service Address</p>
+                            <p className="text-lg font-bold text-gray-200 leading-snug">
+                                {user.customer_profile?.address || "Assigned Residential Grid"}<br/>
+                                <span className="text-xs text-orange-500/70 font-bold uppercase tracking-wider">Primary Installation Point</span>
                             </p>
                         </div>
                     </div>
                 </div>
                 
-                <div className="mt-8 p-6 bg-gradient-to-r from-orange-500/10 to-transparent border-l-4 border-orange-500 rounded-r-2xl">
-                    <h3 className="text-sm font-black text-orange-400 uppercase tracking-widest mb-2">Account Status</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed">
-                        Your account holds active customer clearance. You have full access to billing, live telemetry, and direct support lines.
+                <div className="mt-10 p-8 bg-gradient-to-br from-orange-500/10 to-transparent border-l-4 border-orange-500 rounded-3xl">
+                    <div className="flex items-center gap-3 mb-3">
+                        <Shield className="w-4 h-4 text-orange-500" />
+                        <h3 className="text-xs font-black text-orange-500 uppercase tracking-widest">Ownership Status</h3>
+                    </div>
+                    <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                        Your account is fully verified. You have full administrative access to your solar performance metrics, billing records, and direct support channels.
                     </p>
                 </div>
 
             </motion.div>
 
         </div>
+
+      </div>
+    </div>
+  );
+}
 
       </div>
     </div>
