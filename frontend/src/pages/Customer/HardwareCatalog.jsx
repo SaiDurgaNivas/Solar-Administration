@@ -4,7 +4,20 @@ import { Sun, CheckCircle, Zap, Shield, IndianRupee, Layers, FileText } from 'lu
 
 const panels = [
   {
+    name: "RC Premium Monocrystalline",
+    image: "file:///C:/Users/K.%20Sai%20Durga%20Nivas/.gemini/antigravity/brain/b964639b-9118-4778-ad58-c217be38a362/monocrystalline_solar_panel_1776788107079.png",
+    wattage: "550W",
+    type: "Solar Panel",
+    efficiency: "22.5%",
+    price: "₹26,500",
+    color: "orange",
+    description: "Our flagship high-efficiency panel using advanced monocrystalline cells for maximum yield in minimal space.",
+    pros: ["RC 25-Year Performance Guarantee", "Superior Low-Light Performance", "Advanced Heat Dissipation"],
+    popular: true
+  },
+  {
     name: "TATA Power Solar Monocrystalline",
+    image: "/images/tata_solar.png",
     wattage: "540W",
     type: "Solar Panel",
     efficiency: "21.5%",
@@ -15,6 +28,7 @@ const panels = [
   },
   {
     name: "Waaree Bifacial N-Type",
+    image: "/images/waaree_bifacial.png",
     wattage: "600W",
     type: "Solar Panel",
     efficiency: "22.8%",
@@ -22,10 +36,10 @@ const panels = [
     color: "orange",
     description: "Premium Waaree bifacial technology generating power from both front and rear light reflection.",
     pros: ["Highest space efficiency", "Picks up reflective light", "Slowest degradation rate"],
-    popular: true
   },
   {
     name: "Adani Elan Polycrystalline",
+    image: "/images/adani_poly.png",
     wattage: "330W",
     type: "Solar Panel",
     efficiency: "17%",
@@ -36,6 +50,7 @@ const panels = [
   },
   {
     name: "Luminous Solar Inverter",
+    image: "/images/luminous_inv.png",
     wattage: "5kVA",
     type: "Solar Inverter",
     efficiency: "98.5%",
@@ -46,6 +61,7 @@ const panels = [
   },
   {
     name: "V-Guard Hybrid Inverter",
+    image: "/images/vguard_inv.png",
     wattage: "3kVA",
     type: "Solar Inverter",
     efficiency: "97%",
@@ -111,41 +127,56 @@ function HardwareCatalog() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className={`relative bg-[#020617] border shadow-2xl rounded-3xl p-8 flex flex-col group transition-all hover:-translate-y-2 ${panel.popular ? 'border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-white/10 hover:border-white/20'}`}
+              className={`relative bg-[#020617] border shadow-2xl rounded-3xl p-0 flex flex-col group transition-all hover:-translate-y-2 overflow-hidden ${panel.popular ? 'border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-white/10 hover:border-white/20'}`}
             >
               {panel.popular && (
-                <div className="absolute top-0 right-8 transform -translate-y-1/2 bg-gradient-to-r from-orange-500 to-yellow-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                <div className="absolute top-4 right-4 z-20 bg-gradient-to-r from-orange-500 to-yellow-500 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
                   Most Popular
                 </div>
               )}
 
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1 pr-4">{panel.name}</h3>
-                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-${panel.color}-500/10 text-${panel.color}-400 border border-${panel.color}-500/20`}>
-                    Output: {panel.wattage}
-                  </div>
-                </div>
+              {/* Hardware Image */}
+              <div className="w-full h-48 relative overflow-hidden bg-white/5">
+                <img 
+                  src={panel.image} 
+                  alt={panel.name} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  onError={(e) => {
+                    e.target.src = "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=600&auto=format&fit=crop";
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] to-transparent"></div>
               </div>
 
-              <div className="mb-6">
-                <p className="text-4xl font-black text-white flex items-center mb-1">
-                  {panel.price} <span className="text-sm text-gray-500 font-medium ml-2">/ per unit</span>
-                </p>
-                <p className="text-sm text-green-400 font-bold tracking-wide">Efficiency: {panel.efficiency}</p>
-              </div>
-
-              <p className="text-gray-400 text-sm leading-relaxed mb-6 italic border-l-2 border-white/10 pl-4 py-1">
-                "{panel.description}"
-              </p>
-
-              <div className="space-y-3 mt-auto border-t border-white/5 pt-6">
-                {panel.pros.map((pro, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-gray-500 shrink-0 group-hover:text-orange-500 transition-colors" />
-                    <span className="text-sm font-medium text-gray-300">{pro}</span>
+              <div className="p-8 pt-4 flex flex-col flex-1">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1 pr-4">{panel.name}</h3>
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-${panel.color}-500/10 text-${panel.color}-400 border border-${panel.color}-500/20`}>
+                        Output: {panel.wattage}
+                      </div>
+                    </div>
                   </div>
-                ))}
+
+                  <div className="mb-6">
+                    <p className="text-3xl font-black text-white flex items-center mb-1">
+                      {panel.price} <span className="text-xs text-gray-500 font-medium ml-2">/ per unit</span>
+                    </p>
+                    <p className="text-xs text-green-400 font-bold tracking-wide uppercase">Efficiency: {panel.efficiency}</p>
+                  </div>
+
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6 italic border-l-2 border-white/10 pl-4 py-1">
+                    "{panel.description}"
+                  </p>
+
+                  <div className="space-y-3 mt-auto border-t border-white/5 pt-6">
+                    {panel.pros.map((pro, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-gray-500 shrink-0 group-hover:text-orange-500 transition-colors" />
+                        <span className="text-sm font-medium text-gray-300">{pro}</span>
+                      </div>
+                    ))}
+                  </div>
               </div>
             </motion.div>
           ))}

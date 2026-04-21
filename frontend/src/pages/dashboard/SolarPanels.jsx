@@ -122,6 +122,7 @@ function SolarPanels() {
                     <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 pl-1">Hardware Model</label>
                         <select name="model" className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-orange-500 outline-none transition appearance-none" value={formData.model || ''} onChange={handleInputChange}>
+                            <option>RC Premium 550W</option>
                             <option>Trina Vertex 550W</option>
                             <option>Jinko Tiger Pro 540W</option>
                             <option>Canadian Solar 600W</option>
@@ -296,13 +297,22 @@ function SolarPanels() {
                     {filteredPanels.map((panel) => (
                       <tr key={panel.id} className="hover:bg-white/5 transition group">
                         <td className="py-5 px-6 font-bold text-gray-100 capitalize flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xs">
-                                <Cpu className="w-5 h-5 text-orange-400" />
+                            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                                <img 
+                                  src={panel.model === "RC Premium 550W" ? "file:///C:/Users/K.%20Sai%20Durga%20Nivas/.gemini/antigravity/brain/b964639b-9118-4778-ad58-c217be38a362/monocrystalline_solar_panel_1776788107079.png" : "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=100&h=100&fit=crop"} 
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=100&h=100&fit=crop"; }}
+                                />
                             </div>
                             {panel.customer}
                         </td>
                         <td className="py-5 px-6 text-gray-400 font-medium">{panel.location}</td>
-                        <td className="py-5 px-6 text-gray-400 text-sm">{panel.model}</td>
+                        <td className="py-5 px-6 text-gray-400 text-sm">
+                          <div className="flex flex-col">
+                            <span className="text-white font-bold">{panel.model}</span>
+                            <span className="text-[10px] text-orange-400 uppercase tracking-tighter">Certified Hardware</span>
+                          </div>
+                        </td>
                         <td className="py-5 px-6">
                             <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs font-bold text-gray-300 shadow-inner">
                                 {panel.panelCount} UNITS
