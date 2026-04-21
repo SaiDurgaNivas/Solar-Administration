@@ -168,12 +168,7 @@ function CustomerDashboard() {
   };
 
   return (
-    <div 
-      className="min-h-screen p-6 space-y-8 text-white font-sans overflow-x-hidden bg-cover bg-center relative"
-      style={{ backgroundImage: 'url("/images/dashboard_bg.jpg")' }}
-    >
-      {/* Dark Readability Overlay */}
-      <div className="absolute inset-0 bg-[#020617]/80 backdrop-blur-[2px] pointer-events-none"></div>
+    <div className="space-y-8 animate-in fade-in duration-500">
 
       {reviewModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">

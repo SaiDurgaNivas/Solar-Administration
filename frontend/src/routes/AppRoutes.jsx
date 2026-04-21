@@ -82,14 +82,21 @@ const ProtectedLayout = ({ children, user, onLogout, role }) => {
   }
 
   return (
-    <div className="flex bg-[#020617] text-white">
+    <div 
+      className={`flex text-white transition-all duration-500 overflow-hidden ${role === "customer" ? "relative bg-cover bg-center bg-no-repeat" : "bg-[#020617]"}`}
+      style={role === "customer" ? { backgroundImage: 'url("/images/dashboard_bg.jpg")' } : {}}
+    >
+      {/* 🌌 Persistent Customer Overlay */}
+      {role === "customer" && (
+        <div className="absolute inset-0 bg-[#020617]/85 backdrop-blur-[2px] pointer-events-none z-[5]"></div>
+      )}
 
       {role === "admin" && <Sidebar user={user} onLogout={onLogout} />}
       {role === "customer" && <CustomerSidebar user={user} onLogout={onLogout} />}
       {role === "agent" && <AgentSidebar user={user} onLogout={onLogout} />}
       {role === "sub_worker" && <WorkerSidebar user={user} onLogout={onLogout} />}
 
-      <div className={`${(role === "admin" || role === "customer" || role === "agent" || role === "sub_worker") ? "ml-64" : ""} w-full min-h-screen flex flex-col`}>
+      <div className={`${(role === "admin" || role === "customer" || role === "agent" || role === "sub_worker") ? "ml-64" : ""} w-full min-h-screen flex flex-col relative z-10`}>
 
         {role === "admin" && <Header user={user} onLogout={onLogout} />}
         {role === "customer" && <CustomerHeader user={user} onLogout={onLogout} />}
