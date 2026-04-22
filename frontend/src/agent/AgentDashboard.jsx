@@ -12,6 +12,12 @@ const AgentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [confirmDates, setConfirmDates] = useState({});
   const [confirmTimes, setConfirmTimes] = useState({});
+  const timeSlots = [
+    "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
+    "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
+    "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
+    "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM"
+  ];
   const [team, setTeam] = useState([]);
   const [newWorkerFields, setNewWorkerFields] = useState({ username: '', email: '', password: '', job_title: 'worker' });
   const [dispatchInfo, setDispatchInfo] = useState({}); // { booking_id: { sub_worker_id, location_link } }
@@ -192,11 +198,20 @@ const AgentDashboard = () => {
     if (!d || !t) { alert("Please select both date and time before accepting."); return; }
     
     const user = JSON.parse(sessionStorage.getItem("solar_user"));
+    const convertTime = (timeStr) => {
+        if (!timeStr || !timeStr.includes(" ")) return timeStr;
+        const [time, modifier] = timeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (modifier === 'PM' && hours !== '12') hours = String(parseInt(hours, 10) + 12);
+        if (modifier === 'AM' && hours === '12') hours = '00';
+        return `${hours.padStart(2, '0')}:${minutes}:00`;
+    };
+
     try {
       await api.patch(`bookings/${id}/`, {
          status: "Accepted",
          confirmed_date: d,
-         confirmed_time: t,
+         confirmed_time: convertTime(t),
          agent: user.id
       });
       alert("Appointment Accepted and Confirmation Sent to Client!");
@@ -566,19 +581,19 @@ const AgentDashboard = () => {
                                      onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
                                   />
                               </div>
-                              <div>
+                              <div className="relative">
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Time</label>
-                                  <input
-                                     type="time"
-                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg transition-all"
+                                  <select
+                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg appearance-none cursor-pointer transition-all"
                                      value={confirmTimes[req.id] || ''}
                                      onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
-                                  />
-                                  {confirmTimes[req.id] && (
-                                     <div className="flex items-center gap-1.5 mt-2 ml-1 text-cyan-400 font-bold text-[10px] uppercase tracking-wider">
-                                        <Clock className="w-3 h-3" /> Selected: {formatDisplayTime(confirmTimes[req.id])}
-                                     </div>
-                                  )}
+                                  >
+                                      <option value="">- Select AM/PM -</option>
+                                      {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                                  </select>
+                                  <div className="absolute right-4 top-[50px] pointer-events-none">
+                                      <Clock className="w-4 h-4 text-cyan-500" />
+                                  </div>
                               </div>
                               <button onClick={() => handleAcceptAppointment(req.id)} className="w-full flex-1 bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white border border-green-500/30 font-bold text-xs py-3 rounded-lg transition-all text-center">
                                  Accept Request
