@@ -41,7 +41,7 @@
       "destination": "frontend/vite.svg"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets|images|vite.svg|api|admin|static|media).*)",
       "destination": "frontend/index.html"
     }
   ]
