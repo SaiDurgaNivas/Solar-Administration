@@ -167,11 +167,17 @@ function Login({ onLogin }) {
           {/* 🔥 HIDDEN ADMIN DOOR (ONLY ACCESSIBLE VIA STAFF VIEW) */}
           {showStaff && (
             <button 
-              onClick={() => { setSelectedPortal('admin'); setEmail(''); setPassword(''); }} 
-              className="absolute bottom-8 right-8 flex items-center gap-2 text-gray-700/50 hover:text-white transition-all group scale-90 hover:scale-100"
+              onClick={() => { 
+                setSelectedPortal('admin'); 
+                setEmail(''); 
+                setPassword(''); 
+                setStep('2fa');
+                setError('');
+              }} 
+              className="absolute bottom-8 right-8 flex items-center gap-3 text-white/40 hover:text-orange-500 transition-all group scale-90 hover:scale-100 bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:border-orange-500/50 backdrop-blur-md shadow-2xl"
             >
-              <Lock className="w-4 h-4 group-hover:text-orange-500" /> 
-              <span className="text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-opacity">Admin Clearance</span>
+              <Lock className="w-4 h-4 group-hover:animate-pulse" /> 
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black opacity-100 transition-opacity">Admin Clearance</span>
             </button>
           )}
         </div>
@@ -191,7 +197,9 @@ function Login({ onLogin }) {
               {step === 'login' ? (
                  <>
                     <h2 className={`text-4xl font-extrabold mb-2 tracking-tight ${selectedPortal === 'customer' ? 'text-blue-400' : selectedPortal === 'sub_worker' ? 'text-cyan-400' : 'text-orange-400'}`}>
-                      {selectedPortal === 'customer' ? 'Customer Hub' : selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 'Agent Terminal'}
+                      {selectedPortal === 'customer' ? 'Customer Hub' : 
+                       selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 
+                       selectedPortal === 'admin' ? 'Admin Portal' : 'Agent Terminal'}
                     </h2>
                     <p className="text-gray-400 mb-8 text-sm font-semibold uppercase tracking-widest border-b border-white/10 pb-6">Secure Gateway Active</p>
 
@@ -241,6 +249,43 @@ function Login({ onLogin }) {
                         Need an account? <Link to="/register" className="text-blue-400 font-bold hover:underline">Apply Here</Link>
                       </p>
                     )}
+                 </>
+              ) : step === '2fa' ? (
+                 <>
+                    <div className="flex flex-col items-center mb-8">
+                      <div className="w-20 h-20 bg-orange-500/20 rounded-3xl flex items-center justify-center mb-6 border border-orange-500/30">
+                        <Shield className="w-10 h-10 text-orange-500" />
+                      </div>
+                      <h2 className="text-3xl font-black text-center mb-2">Admin Clearance</h2>
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-bold">Verification Level: Omega</p>
+                    </div>
+
+                    {error && (
+                      <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-xl text-sm font-bold flex items-start gap-3">
+                        <Shield className="w-5 h-5 shrink-0" /> {error}
+                      </div>
+                    )}
+
+                    <form onSubmit={handleVerifyCode} className="space-y-6">
+                      <div>
+                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 text-center">Enter 4-Digit Security Authorization Code</label>
+                        <input
+                          type="password"
+                          maxLength="4"
+                          placeholder="••••"
+                          className="w-full px-5 py-6 rounded-2xl bg-[#020617] border border-orange-500/30 text-white placeholder-gray-700 text-center text-4xl tracking-[1em] focus:outline-none focus:border-orange-500 transition-all shadow-2xl font-black"
+                          value={secretCode}
+                          onChange={(e) => setSecretCode(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
+
+                      <button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-400 text-[#020617] py-4 rounded-xl font-black transition-all shadow-lg flex items-center justify-center gap-2 group mt-4">
+                        {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <>Authorize Clearance <ArrowRight className="w-5 h-5 group-hover:translate-x-1" /></>}
+                      </button>
+
+                      <p className="text-center text-[10px] text-gray-600 uppercase tracking-tighter font-bold">Encrypted terminal connection active. All attempts are logged.</p>
+                    </form>
                  </>
               ) : (
                  <>
