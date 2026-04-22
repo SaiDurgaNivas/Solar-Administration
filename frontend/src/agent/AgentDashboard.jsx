@@ -561,7 +561,7 @@ const AgentDashboard = () => {
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Date</label>
                                   <input 
                                      type="date"
-                                     className="w-full bg-white/10 border border-white/20 p-3 rounded-xl text-sm text-white outline-none focus:border-cyan-500 focus:bg-white/15 transition-all shadow-inner"
+                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg transition-all"
                                      value={confirmDates[req.id] || ''}
                                      onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
                                   />
@@ -570,7 +570,7 @@ const AgentDashboard = () => {
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Time</label>
                                   <input
                                      type="time"
-                                     className="w-full bg-white/10 border border-white/20 p-3 rounded-xl text-sm text-white outline-none focus:border-cyan-500 focus:bg-white/15 transition-all shadow-inner"
+                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg transition-all"
                                      value={confirmTimes[req.id] || ''}
                                      onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
                                   />

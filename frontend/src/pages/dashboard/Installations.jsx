@@ -194,7 +194,7 @@ function Installations() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Target Date</label>
-                      <input type="date" name="date" className="w-full p-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none focus:bg-white/20 transition-all shadow-inner" value={formData.date} onChange={handleInputChange} />
+                      <input type="date" name="date" className="w-full p-3 bg-white border-2 border-orange-500/50 rounded-xl focus:ring-4 focus:ring-orange-500/20 text-black font-bold outline-none shadow-lg transition-all" value={formData.date} onChange={handleInputChange} />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Status</label>
