@@ -235,6 +235,15 @@ function Login({ onLogin }) {
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                           </button>
                         </div>
+                        <div className="flex justify-end mt-2">
+                          <button 
+                            type="button" 
+                            onClick={() => alert("Security Protocol: Please contact the system administrator or your regional manager to reset your secure passphrase.")} 
+                            className="text-[9px] font-black text-gray-500 hover:text-orange-400 uppercase tracking-[0.2em] transition-all"
+                          >
+                            Forgot passphrase?
+                          </button>
+                        </div>
                       </div>
 
                       <button type="submit" disabled={loading} className={`w-full text-[#020617] py-4 rounded-xl font-black transition-all shadow-lg flex items-center justify-center gap-2 group mt-4 ${selectedPortal === 'customer' ? 'bg-blue-400 hover:bg-blue-500 hover:shadow-blue-500/50' : selectedPortal === 'sub_worker' ? 'bg-cyan-400 hover:bg-cyan-500 hover:shadow-cyan-500/50' : 'bg-orange-500 hover:bg-orange-400 hover:shadow-orange-500/50'}`}>
