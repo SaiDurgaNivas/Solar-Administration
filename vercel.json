@@ -21,12 +21,24 @@
       "destination": "backend/solar_api/wsgi.py"
     },
     {
+      "source": "/static/(.*)",
+      "destination": "backend/solar_api/wsgi.py"
+    },
+    {
       "source": "/media/(.*)",
       "destination": "backend/solar_api/wsgi.py"
     },
     {
-      "source": "/static/(.*)",
-      "destination": "backend/solar_api/wsgi.py"
+      "source": "/assets/(.*)",
+      "destination": "frontend/assets/$1"
+    },
+    {
+      "source": "/images/(.*)",
+      "destination": "frontend/images/$1"
+    },
+    {
+      "source": "/vite.svg",
+      "destination": "frontend/vite.svg"
     },
     {
       "source": "/(.*)",
