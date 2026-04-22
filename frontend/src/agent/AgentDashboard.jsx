@@ -177,7 +177,7 @@ const AgentDashboard = () => {
       if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const res = await api.get('bookings/');
-      const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || b.agent === user.id || b.status === "Loan Approved" || b.status === "Direct Pay Confirmed" || b.status === "Dispatched");
+      const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || Number(b.agent) === Number(user.id) || b.status === "Loan Approved" || b.status === "Direct Pay Confirmed" || b.status === "Dispatched");
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set
@@ -214,7 +214,12 @@ const AgentDashboard = () => {
     const t = confirmTimes[id];
     if (!d || !t) { alert("Please select both date and time before accepting."); return; }
     
-    const user = JSON.parse(sessionStorage.getItem("solar_user"));
+    const user = getUser();
+    if (!user || !user.id) {
+      alert("Session expired. Please log in again.");
+      return;
+    }
+
     const convertTime = (timeStr) => {
         if (!timeStr || !timeStr.includes(" ")) return timeStr;
         const [time, modifier] = timeStr.split(' ');
@@ -234,7 +239,9 @@ const AgentDashboard = () => {
       alert("Appointment Accepted and Confirmation Sent to Client!");
       fetchAppointments();
     } catch(err) {
-      alert("Failed to accept appointment.");
+      console.error("Accept appointment error:", err);
+      const msg = err.response?.data?.error || err.response?.data?.detail || "Failed to accept appointment.";
+      alert(typeof msg === 'object' ? JSON.stringify(msg) : msg);
     }
   };
 
