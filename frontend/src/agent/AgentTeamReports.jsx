@@ -13,17 +13,27 @@ const AgentTeamReports = () => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const getUser = () => {
     try {
-      const user = JSON.parse(sessionStorage.getItem("solar_user"));
+      const u = sessionStorage.getItem("solar_user");
+      return u ? JSON.parse(u) : null;
+    } catch { return null; }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const user = getUser();
+      if (!user) return;
+
       const [teamRes, attRes, tasksRes] = await Promise.all([
         api.get(`users/?agent_id=${user.id}`),
         api.get("attendance/"),
         api.get("teamtasks/")
       ]);
+      
       setTeam(teamRes.data || []);
       setAllAttendance(attRes.data || []);
-      // Filter tasks managed by this agent
       setTasks((tasksRes.data || []).filter(t => Number(t.agent) === Number(user.id)));
     } catch (err) {
       console.error("Failed to load reports:", err);
@@ -32,7 +42,8 @@ const AgentTeamReports = () => {
     }
   };
 
-  const user = JSON.parse(sessionStorage.getItem("solar_user"));
+  const user = getUser();
+  if (!user) return <div className="p-20 text-center text-gray-500 font-bold uppercase tracking-widest">Access Denied: Terminal Offline</div>;
   
   // ✅ 1. Agent's Own Monthly Attendance
   const myAttendance = allAttendance.filter(a => Number(a.worker) === Number(user.id));
@@ -57,10 +68,21 @@ const AgentTeamReports = () => {
       <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] bg-orange-500/10 blur-[150px] rounded-full pointer-events-none"></div>
 
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-10 max-w-6xl mx-auto relative z-10">
-        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent flex items-center gap-3">
-          <BarChart2 className="w-10 h-10 text-orange-400" /> Duty Logs & Reports
-        </h1>
-        <p className="text-gray-400 text-sm mt-2 font-medium uppercase tracking-widest">Tracking Your Performance & Field Squad</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-gray-100 to-gray-400 bg-clip-text text-transparent flex items-center gap-3">
+              <BarChart2 className="w-10 h-10 text-orange-400" /> Duty Logs & Reports
+            </h1>
+            <p className="text-gray-400 text-sm mt-2 font-medium uppercase tracking-widest">Tracking Your Performance & Field Squad</p>
+          </div>
+          <button 
+            onClick={fetchData} 
+            disabled={loading}
+            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+          >
+            <Clock className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'Syncing...' : 'Sync Latest Data'}
+          </button>
+        </div>
       </motion.div>
 
       <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8 relative z-10">

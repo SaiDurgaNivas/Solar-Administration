@@ -63,8 +63,9 @@ const AgentDashboard = () => {
     try {
         const user = getUser();
         if (!user) return;
+        const res = await api.get('attendance/');
         const todayStr = new Date().toISOString().split('T')[0];
-        const record = res.data.find(a => a.worker === user.id && a.date === todayStr);
+        const record = res.data.find(a => Number(a.worker) === Number(user.id) && a.date === todayStr);
         setSelfAttendance(record);
     } catch(err) { console.error(err); }
   };
@@ -73,6 +74,10 @@ const AgentDashboard = () => {
     try {
         const user = getUser();
         if (!user) return;
+        await api.post('attendance/', {
+            worker: user.id,
+            status: status
+        });
         alert(`Attendance marked as ${status} for today!`);
         fetchSelfAttendance();
     } catch(err) {
@@ -99,7 +104,9 @@ const AgentDashboard = () => {
 
   const fetchTeam = async () => {
     try {
-        const res = await api.get(`users/?role=sub_worker`);
+        const user = getUser();
+        if (!user) return;
+        const res = await api.get(`users/?agent_id=${user.id}`);
         setTeam(res.data);
     } catch(err) {
         console.error(err);
@@ -110,11 +117,21 @@ const AgentDashboard = () => {
     try {
         const user = getUser();
         if (!user) return;
+        if (!newWorkerFields.username || !newWorkerFields.email || !newWorkerFields.password) {
+            alert("Please fill all worker details.");
+            return;
+        }
+        await api.post('users/', {
+            ...newWorkerFields,
+            role: 'sub_worker',
+            agent_id: user.id
+        });
         setNewWorkerFields({ username: '', email: '', password: '', job_title: 'worker' });
         fetchTeam();
-        alert("Worker added to your team!");
+        alert("Worker added to your team successfully!");
     } catch(err) {
-        alert("Failed to add worker. Username/email might exist.");
+        console.error(err);
+        alert("Failed to add worker. Username/email might already exist.");
     }
   };
 
