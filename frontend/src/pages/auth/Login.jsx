@@ -171,7 +171,7 @@ function Login({ onLogin }) {
                 setSelectedPortal('admin'); 
                 setEmail(''); 
                 setPassword(''); 
-                setStep('2fa');
+                setStep('login');
                 setError('');
               }} 
               className="absolute bottom-8 right-8 flex items-center gap-3 text-white/40 hover:text-orange-500 transition-all group scale-90 hover:scale-100 bg-white/5 px-4 py-2 rounded-full border border-white/10 hover:border-orange-500/50 backdrop-blur-md shadow-2xl"
@@ -199,7 +199,7 @@ function Login({ onLogin }) {
                     <h2 className={`text-4xl font-extrabold mb-2 tracking-tight ${selectedPortal === 'customer' ? 'text-blue-400' : selectedPortal === 'sub_worker' ? 'text-cyan-400' : 'text-orange-400'}`}>
                       {selectedPortal === 'customer' ? 'Customer Hub' : 
                        selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 
-                       selectedPortal === 'admin' ? 'Admin Portal' : 'Agent Terminal'}
+                       selectedPortal === 'admin' ? 'Admin Login' : 'Agent Terminal'}
                     </h2>
                     <p className="text-gray-400 mb-8 text-sm font-semibold uppercase tracking-widest border-b border-white/10 pb-6">Secure Gateway Active</p>
 
@@ -242,7 +242,16 @@ function Login({ onLogin }) {
                       </button>
                     </form>
 
-
+                    {selectedPortal === 'admin' && (
+                      <div className="mt-6 pt-6 border-t border-white/5">
+                        <button 
+                          onClick={() => setStep('2fa')}
+                          className="w-full py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all border border-orange-500/20 flex items-center justify-center gap-2"
+                        >
+                          <Shield className="w-4 h-4" /> Use Security Authorization Code
+                        </button>
+                      </div>
+                    )}
 
                     {selectedPortal === 'customer' && (
                       <p className="text-center mt-8 text-sm text-gray-500 font-medium">
