@@ -236,13 +236,12 @@ function Login({ onLogin }) {
                           </button>
                         </div>
                         <div className="flex justify-end mt-2">
-                          <button 
-                            type="button" 
-                            onClick={() => alert("Security Protocol: Please contact the system administrator or your regional manager to reset your secure passphrase.")} 
+                          <Link 
+                            to="/forgot-password" 
                             className="text-[9px] font-black text-gray-500 hover:text-orange-400 uppercase tracking-[0.2em] transition-all"
                           >
                             Forgot passphrase?
-                          </button>
+                          </Link>
                         </div>
                       </div>
 

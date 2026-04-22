@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 // 🌐 Public Pages
 import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 import Register from "../pages/auth/Register";
 import AdvantageDetails from "../pages/AdvantageDetails";
 
@@ -119,6 +120,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login onLogin={onLogin} />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/about" element={<About />} /> 
       <Route path="/features" element={<Features />} />
       <Route path="/advantage/:slug" element={<AdvantageDetails />} />
