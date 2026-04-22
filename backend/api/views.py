@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, CustomerProfile, AgentProfile, SubWorkerProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask, Notification
-from .serializers import UserSerializer, AgentProfileSerializer, SubWorkerProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer, NotificationSerializer
+from .models import User, CustomerProfile, AgentProfile, SubWorkerProfile, Installation, Booking, Bill, UsageTelemetry, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, WorkerAttendance, TeamTask, Notification, HardwareMaterial
+from .serializers import UserSerializer, AgentProfileSerializer, SubWorkerProfileSerializer, InstallationSerializer, BookingSerializer, BillSerializer, UsageTelemetrySerializer, BookingDocumentSerializer, WorkerUpdateSerializer, TeamTaskSerializer, CustomerReviewSerializer, SupportTicketSerializer, WorkerAttendanceSerializer, NotificationSerializer, HardwareMaterialSerializer
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.mail import send_mail
 from django.conf import settings
@@ -383,3 +383,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
         if user_id:
             return Notification.objects.filter(user_id=user_id).order_by('-created_at')
         return Notification.objects.all().order_by('-created_at')
+
+class HardwareMaterialViewSet(viewsets.ModelViewSet):
+    queryset = HardwareMaterial.objects.all()
+    serializer_class = HardwareMaterialSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)

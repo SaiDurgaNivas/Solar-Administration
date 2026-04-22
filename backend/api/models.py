@@ -230,3 +230,24 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}: {self.title}"
+
+class HardwareMaterial(models.Model):
+    CATEGORY_CHOICES = (
+        ('panel', 'Solar Panel'),
+        ('wire', 'Wire'),
+        ('battery', 'Battery'),
+        ('rod', 'Mounting Rod'),
+        ('inverter', 'Inverter'),
+        ('other', 'Other Materials'),
+    )
+    name = models.CharField(max_length=255)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    specification = models.TextField(blank=True, null=True, help_text="e.g. 550W, 4sq mm, 150Ah")
+    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    stock_quantity = models.IntegerField(default=0)
+    brand = models.CharField(max_length=100, blank=True, null=True)
+    image = models.ImageField(upload_to='hardware_inventory/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"

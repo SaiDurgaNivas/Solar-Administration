@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, Notification
+from .models import User, CustomerProfile, AgentProfile, Installation, Booking, Bill, UsageTelemetry, WorkerAttendance, SubWorkerProfile, TeamTask, BookingDocument, WorkerUpdate, CustomerReview, SupportTicket, Notification, HardwareMaterial
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -180,4 +180,10 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
+        fields = '__all__'
+
+class HardwareMaterialSerializer(serializers.ModelSerializer):
+    category_display = serializers.CharField(source='get_category_display', read_only=True)
+    class Meta:
+        model = HardwareMaterial
         fields = '__all__'
