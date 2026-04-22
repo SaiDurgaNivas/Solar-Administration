@@ -217,7 +217,7 @@ function Login({ onLogin }) {
                           placeholder="Enter email"
                           className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-all shadow-inner"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={(e) => { setEmail(e.target.value); setError(""); }}
                         />
                       </div>
 
@@ -229,7 +229,7 @@ function Login({ onLogin }) {
                             placeholder="Enter password"
                             className="w-full px-5 py-4 rounded-xl bg-[#020617] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-all pr-12 shadow-inner"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => { setPassword(e.target.value); setError(""); }}
                           />
                           <button type="button" tabIndex="-1" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
