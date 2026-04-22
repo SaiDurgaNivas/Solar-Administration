@@ -276,7 +276,11 @@ function Agents() {
                                     {agent.username.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-200 text-lg capitalize">{agent.username.replace(/_/g, ' ')}</p>
+                                    <p className="font-bold text-gray-200 text-lg capitalize">
+                                        {agent.first_name || agent.last_name 
+                                          ? `${agent.first_name} ${agent.last_name}`.trim() 
+                                          : agent.username.replace(/_/g, ' ')}
+                                    </p>
                                     <p className="text-sm text-gray-500">{agent.email}</p>
                                 </div>
                              </div>

@@ -13,6 +13,8 @@ function Customers() {
   const [selectedAgent, setSelectedAgent] = useState("");
   const [formData, setFormData] = useState({
     username: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     role: "customer"
@@ -57,7 +59,7 @@ function Customers() {
     try {
       await api.post('users/', formData);
       setIsModalOpen(false);
-      setFormData({ username: "", email: "", password: "", role: "customer" });
+      setFormData({ username: "", first_name: "", last_name: "", email: "", password: "", role: "customer" });
       fetchCustomers();
     } catch (err) {
       console.error(err);
@@ -101,7 +103,9 @@ function Customers() {
 
   const filteredList = customers.filter(c =>
     c.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchQuery.toLowerCase())
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.first_name && c.first_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (c.last_name && c.last_name.toLowerCase().includes(searchQuery.toLowerCase()))
   ).sort((a, b) => {
     if (a.date_joined && b.date_joined) {
       return new Date(b.date_joined) - new Date(a.date_joined);
@@ -139,6 +143,16 @@ function Customers() {
               </div>
 
               <div className="space-y-4 mb-8">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">First Name</label>
+                      <input type="text" name="first_name" placeholder="John" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none" value={formData.first_name} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Last Name</label>
+                      <input type="text" name="last_name" placeholder="Doe" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none" value={formData.last_name} onChange={handleInputChange} />
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1 ml-1">Username/ID *</label>
                     <input type="text" name="username" placeholder="solar_client_01" className="w-full p-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-orange-500 text-white outline-none" value={formData.username} onChange={handleInputChange} />
@@ -288,7 +302,11 @@ function Customers() {
                     key={item.id}
                     className="hover:bg-white/5 transition"
                   >
-                    <td className="py-5 px-6 font-bold text-gray-200 capitalize">{item.username}</td>
+                    <td className="py-5 px-6 font-bold text-gray-200 capitalize">
+                      {item.first_name || item.last_name 
+                        ? `${item.first_name} ${item.last_name}`.trim() 
+                        : item.username.split('@')[0].replace(/[._]/g, ' ')}
+                    </td>
                     <td className="py-5 px-6 text-gray-400">
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-600" /> {item.email}
