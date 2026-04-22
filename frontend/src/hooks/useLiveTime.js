@@ -18,7 +18,7 @@ export const useLiveTime = () => {
   };
 
   return {
-    timeString: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    timeString: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
     dateString: time.toLocaleDateString([], { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }),
     greeting: getGreeting()
   };

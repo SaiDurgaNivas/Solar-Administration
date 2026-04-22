@@ -259,7 +259,7 @@ function CustomerDashboard() {
                 <span className="absolute left-4 top-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Date</span>
                 <input
                     type="date"
-                    className="w-full bg-white/20 border border-blue-500/40 p-5 pl-16 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-white text-base placeholder-gray-400 cursor-pointer"
+                    className="w-full bg-white/25 border-2 border-blue-400/50 p-5 pl-16 rounded-2xl focus:ring-4 focus:ring-blue-500/20 outline-none text-white text-base font-bold placeholder-gray-400 cursor-pointer shadow-[0_0_20px_rgba(59,130,246,0.1)] transition-all"
                     value={form.requested_date}
                     onChange={(e) => setForm({...form, requested_date: e.target.value})}
                 />

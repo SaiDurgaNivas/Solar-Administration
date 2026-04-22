@@ -306,7 +306,7 @@ function Maintenance() {
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center mt-4">
-                                        <p className="text-[10px] text-gray-600 font-bold italic">{new Date(req.created_at).toLocaleDateString()} at {new Date(req.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                                        <p className="text-[10px] text-gray-600 font-bold italic">{new Date(req.created_at).toLocaleDateString()} at {new Date(req.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true})}</p>
                                         <button className="p-2 bg-[#020617] rounded-lg text-gray-500 hover:text-white transition">
                                             <ArrowRight className="w-3 h-3" />
                                         </button>

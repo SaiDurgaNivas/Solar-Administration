@@ -561,7 +561,7 @@ const AgentDashboard = () => {
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Date</label>
                                   <input 
                                      type="date"
-                                     className="w-full bg-white/5 border border-white/10 p-2 rounded-lg text-sm text-gray-300 outline-none focus:border-cyan-500"
+                                     className="w-full bg-white/10 border border-white/20 p-3 rounded-xl text-sm text-white outline-none focus:border-cyan-500 focus:bg-white/15 transition-all shadow-inner"
                                      value={confirmDates[req.id] || ''}
                                      onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
                                   />
@@ -570,10 +570,15 @@ const AgentDashboard = () => {
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Time</label>
                                   <input
                                      type="time"
-                                     className="w-full bg-white/5 border border-white/10 p-2 rounded-lg text-sm text-gray-300 outline-none focus:border-cyan-500"
+                                     className="w-full bg-white/10 border border-white/20 p-3 rounded-xl text-sm text-white outline-none focus:border-cyan-500 focus:bg-white/15 transition-all shadow-inner"
                                      value={confirmTimes[req.id] || ''}
                                      onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
                                   />
+                                  {confirmTimes[req.id] && (
+                                     <div className="flex items-center gap-1.5 mt-2 ml-1 text-cyan-400 font-bold text-[10px] uppercase tracking-wider">
+                                        <Clock className="w-3 h-3" /> Selected: {formatDisplayTime(confirmTimes[req.id])}
+                                     </div>
+                                  )}
                               </div>
                               <button onClick={() => handleAcceptAppointment(req.id)} className="w-full flex-1 bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white border border-green-500/30 font-bold text-xs py-3 rounded-lg transition-all text-center">
                                  Accept Request
