@@ -66,7 +66,10 @@ function AgentIncomingAppointments() {
 
         try {
             setActionLoading(bookingId);
-            const user = JSON.parse(sessionStorage.getItem("solar_user"));
+            const userStr = sessionStorage.getItem("solar_user");
+            if (!userStr) { alert("Session expired. Please log in again."); return; }
+            const user = JSON.parse(userStr);
+            if (!user.id) { alert("User ID not found in session. Please re-login."); return; }
 
             const convertTime = (timeStr) => {
                 if (!timeStr || !timeStr.includes(" ")) return timeStr;
@@ -86,7 +89,9 @@ function AgentIncomingAppointments() {
             alert("Appointment Accepted and Confirmation Sent to Client!");
             fetchIncoming();
         } catch (err) {
-            alert("Failed to accept appointment.");
+            console.error("Accept error:", err);
+            const errorMsg = err.response?.data?.error || err.response?.data?.detail || "Failed to accept appointment.";
+            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
         } finally {
             setActionLoading(null);
         }
