@@ -95,6 +95,19 @@ const materials = [
   }
 ];
 
+const systemPrices = [
+  { size: "1kW", cost: "₹7000/-" },
+  { size: "2kW", cost: "₹14,000/-" },
+  { size: "3kW", cost: "₹21,000/-" },
+  { size: "4kW", cost: "₹28,000/-" },
+  { size: "5kW", cost: "₹35,000/-" },
+  { size: "6kW", cost: "₹42,000/-" },
+  { size: "7kW", cost: "₹49,000/-" },
+  { size: "8kW", cost: "₹56,000/-" },
+  { size: "9kW", cost: "₹63,000/-" },
+  { size: "10kW", cost: "₹70,000/-" },
+];
+
 function HardwareCatalog() {
   return (
     <div className="space-y-12 pb-12 animate-in fade-in duration-700">
@@ -110,6 +123,34 @@ function HardwareCatalog() {
           <p className="text-gray-400 text-lg font-medium max-w-2xl">
             Understand exactly what powers your roof. Transparent pricing, structural materials, and technical specifications tailored for you.
           </p>
+        </div>
+      </div>
+
+      {/* Standard System Pricing Table */}
+      <div className="bg-[#0f172a]/50 border border-white/5 rounded-[2rem] p-8 md:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
+        <div className="flex items-center gap-3 mb-8">
+          <IndianRupee className="text-green-400 w-6 h-6" />
+          <h2 className="text-2xl font-bold text-white">Standard System Installation Pricing</h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="py-4 px-6 text-sm font-bold uppercase tracking-wider text-gray-400">System Size</th>
+                <th className="py-4 px-6 text-sm font-bold uppercase tracking-wider text-gray-400 text-right">Cost Per Watt (In ₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {systemPrices.map((item, idx) => (
+                <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                  <td className="py-4 px-6 font-bold text-white">{item.size}</td>
+                  <td className="py-4 px-6 text-orange-400 font-mono font-bold group-hover:text-orange-300 transition-colors text-right">{item.cost}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 

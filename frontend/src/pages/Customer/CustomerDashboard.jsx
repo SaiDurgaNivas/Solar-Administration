@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../../api/axiosConfig";
-import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert, Star } from "lucide-react";
+import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert, Star, IndianRupee } from "lucide-react";
 import { useLiveTime } from "../../hooks/useLiveTime";
 
 const timeSlots = [
@@ -10,6 +10,19 @@ const timeSlots = [
   "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
   "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
   "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM"
+];
+
+const systemPrices = [
+  { size: "1kW", cost: "₹7,000" },
+  { size: "2kW", cost: "₹14,000" },
+  { size: "3kW", cost: "₹21,000" },
+  { size: "4kW", cost: "₹28,000" },
+  { size: "5kW", cost: "₹35,000" },
+  { size: "6kW", cost: "₹42,000" },
+  { size: "7kW", cost: "₹49,000" },
+  { size: "8kW", cost: "₹56,000" },
+  { size: "9kW", cost: "₹63,000" },
+  { size: "10kW", cost: "₹70,000" },
 ];
 
 function CustomerDashboard() {
@@ -432,6 +445,45 @@ function CustomerDashboard() {
         </motion.div>
 
       </div>
+
+      {/* Quick Pricing Reference */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="max-w-7xl mx-auto"
+      >
+        <div className="bg-gradient-to-br from-[#0f172a] to-[#020617] border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            <div className="absolute top-[-10%] right-[-5%] w-64 h-64 bg-green-500/5 blur-[80px] rounded-full pointer-events-none"></div>
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                    <div className="p-3 bg-green-500/10 rounded-xl">
+                        <IndianRupee className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-white tracking-wide">Standard System Pricing</h2>
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-widest mt-1">Installation Estimates</p>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => navigate("/customer/hardware")}
+                    className="text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 group"
+                >
+                    View Catalog <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                {systemPrices.map((item, idx) => (
+                    <div key={idx} className="bg-white/5 border border-white/5 p-4 rounded-2xl hover:border-green-500/30 hover:bg-white/10 transition-all group">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-tighter mb-1">{item.size} System</p>
+                        <p className="text-xl font-black text-white group-hover:text-green-400 transition-colors">{item.cost}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+      </motion.div>
+
     </div>
   );
 }
