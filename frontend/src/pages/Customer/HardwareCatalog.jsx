@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sun, CheckCircle, Zap, Shield, IndianRupee, Layers, FileText } from 'lucide-react';
+import { Sun, CheckCircle, Zap, Shield, IndianRupee, Layers, FileText, X, Globe, Info } from 'lucide-react';
 
 const panels = [
   {
@@ -108,10 +108,134 @@ const systemPrices = [
   { size: "10kW", cost: "₹70,000/-" },
 ];
 
+const waareePricing = [
+  { model: "Waaree 330w Solar Panel", price: "Rs.8,250", perWatt: "Rs.25" },
+  { model: "Waaree 325w Solar Panel", price: "Rs.8,125", perWatt: "Rs.25" },
+  { model: "Waaree 320w Solar Panel", price: "Rs.8,000", perWatt: "Rs.25" },
+  { model: "Waaree 270w Solar Panel", price: "Rs.6,750", perWatt: "Rs.25" },
+  { model: "Waaree 200w Solar Panel", price: "Rs.5,000", perWatt: "Rs.25" },
+  { model: "Waaree 160w Solar Panel", price: "Rs.5,600", perWatt: "Rs.35" },
+  { model: "Waaree 100w Solar Panel", price: "Rs.3,500", perWatt: "Rs.35" },
+  { model: "Waaree 75w Solar Panel", price: "Rs.2,625", perWatt: "Rs.35" },
+  { model: "Waaree 50w Solar Panel", price: "Rs.1,750", perWatt: "Rs.35" },
+];
+
 function HardwareCatalog() {
+  const [selectedPanel, setSelectedPanel] = React.useState(null);
+
   return (
     <div className="space-y-12 pb-12 animate-in fade-in duration-700">
       
+      {/* Detail Modal */}
+      {selectedPanel && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md overflow-y-auto">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#0f172a] border border-white/10 w-full max-w-4xl rounded-[2.5rem] shadow-2xl relative overflow-hidden my-auto"
+          >
+            {/* Modal Header */}
+            <div className="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-orange-500/10 to-transparent">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-orange-500/20 rounded-2xl">
+                  <Globe className="text-orange-400 w-6 h-6" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white">{selectedPanel.name} - Deep Dive</h2>
+              </div>
+              <button 
+                onClick={() => setSelectedPanel(null)}
+                className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-400 hover:text-white"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+
+            <div className="p-8 md:p-12 space-y-10">
+              {/* About Section (Image 2) */}
+              {selectedPanel.name.includes("Waaree") && (
+                <>
+                  <section className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Info className="text-blue-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">About Waaree Solar</h3>
+                    </div>
+                    <div className="text-gray-400 leading-relaxed space-y-4 text-sm md:text-base">
+                        <p>
+                            Waaree solar is a 28 years old company, founded in 1989. It started its business journey with the formation of Waaree Solar Instruments Ltd. Then Waaree group has diversified into solar business apart from Instrumentation in 2007 and began it in <span className="text-blue-400">renewable energy</span> as Waaree Energies Pvt Ltd. Company has automatic production line for <span className="text-blue-400">solar module</span> at the Surat, north of Mumbai.
+                        </p>
+                        <p>
+                            The Waaree Energies offer a full range of solar panel at best price in all over India from 10Wp to 335Wp with dealer, distributors and stockiest. Company manufacturing its panel for <span className="text-blue-400">on grid solar system, off grid solar system, hybrid solar power plant</span> applications and also exported to a number of countries globally. It is one of the fastest growing company as Waaree is youthful, vibrant with balanced combination of maturity, innovation & creativity.
+                        </p>
+                    </div>
+                  </section>
+
+                  {/* Types Section (Image 3) */}
+                  <section className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Layers className="text-blue-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">Types of Waaree Solar Panel</h3>
+                    </div>
+                    <p className="text-gray-400 text-sm md:text-base">
+                        Waaree Solar has changed the panel technology completely and it continues to improve in terms of efficiency, quality, and versatility. Three types of Waaree solar panels are now available in the market. Let's know about the types of these solar panels.
+                    </p>
+                    <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {['Polycrystalline Solar Panel', 'Monocrystalline Solar Panel', 'Bifacial Solar Panel'].map((type) => (
+                            <li key={type} className="bg-white/5 border-l-2 border-red-500 p-4 rounded-r-xl font-bold text-blue-400 text-sm">{type}</li>
+                        ))}
+                    </ul>
+                  </section>
+
+                  {/* Pricing Table (Image 4) */}
+                  <section className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <IndianRupee className="text-blue-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white pb-1 inline-block">Waaree Models & Pricing</h3>
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-red-500 text-white font-black uppercase text-xs tracking-widest">
+                                    <th className="py-4 px-6">Model / Watt</th>
+                                    <th className="py-4 px-6">Selling Price</th>
+                                    <th className="py-4 px-6">Price per Watt</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white/5">
+                                {waareePricing.map((item, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                        <td className="py-3 px-6 text-blue-400 font-bold text-sm">{item.model}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.perWatt}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
+              {/* Default detailed view for other panels */}
+              {!selectedPanel.name.includes("Waaree") && (
+                  <div className="text-center py-12">
+                      <Sun className="w-20 h-20 text-orange-500 mx-auto mb-6 animate-pulse" />
+                      <h3 className="text-2xl font-bold text-white mb-4">Detailed Specs for {selectedPanel.name}</h3>
+                      <p className="text-gray-400 max-w-md mx-auto">Full technical data sheets and structural diagrams are currently being updated for this model. Please contact support for immediate inquiries.</p>
+                  </div>
+              )}
+            </div>
+            
+            <div className="p-8 bg-black/40 border-t border-white/5 flex justify-end">
+                <button 
+                  onClick={() => setSelectedPanel(null)}
+                  className="bg-orange-500 hover:bg-orange-400 text-black font-black px-10 py-3 rounded-2xl transition shadow-lg"
+                >
+                  Close Detail View
+                </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex justify-between items-center bg-[#0f172a]/50 p-8 shadow-xl rounded-[2rem] border border-white/5 backdrop-blur-xl relative overflow-hidden">
         <div className="absolute right-[-5%] top-[-50%] w-64 h-64 bg-orange-500/10 blur-[80px] rounded-full pointer-events-none"></div>
@@ -165,10 +289,11 @@ function HardwareCatalog() {
           {panels.map((panel, idx) => (
             <motion.div 
               key={idx}
+              onClick={() => setSelectedPanel(panel)}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className={`relative bg-[#020617] border shadow-2xl rounded-3xl p-0 flex flex-col group transition-all hover:-translate-y-2 overflow-hidden ${panel.popular ? 'border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-white/10 hover:border-white/20'}`}
+              className={`relative bg-[#020617] border shadow-2xl rounded-3xl p-0 flex flex-col group transition-all hover:-translate-y-2 cursor-pointer overflow-hidden ${panel.popular ? 'border-orange-500/50 shadow-[0_0_30px_rgba(249,115,22,0.15)]' : 'border-white/10 hover:border-white/20'}`}
             >
               {panel.popular && (
                 <div className="absolute top-4 right-4 z-20 bg-gradient-to-r from-orange-500 to-yellow-500 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
