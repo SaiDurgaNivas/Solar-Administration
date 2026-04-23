@@ -47,6 +47,7 @@ import AgentCustomers from "../agent/AgentCustomers";
 import AgentInstallations from "../agent/AgentInstallations";
 import AgentTickets from "../agent/AgentTickets";
 import AgentTeamReports from "../agent/AgentTeamReports";
+import AgentIncomingAppointments from "../agent/AgentIncomingAppointments";
 
 // 👷 Worker Pages
 import WorkerDashboard from "../worker/WorkerDashboard";
