@@ -6,6 +6,7 @@ import api from '../api/axiosConfig';
 function AgentIncomingAppointments() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(null);
     const [confirmDates, setConfirmDates] = useState({});
     const [confirmTimes, setConfirmTimes] = useState({});
 
