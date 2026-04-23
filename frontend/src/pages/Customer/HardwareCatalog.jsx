@@ -165,8 +165,8 @@ function HardwareCatalog() {
             </div>
 
             <div className="p-8 md:p-12 space-y-10">
-              {/* About Section (Image 2) */}
-              {selectedPanel.name.includes("Waaree") && (
+              {/* WAAREE CONTENT */}
+              {selectedPanel.name.toUpperCase().includes("WAAREE") && (
                 <>
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -183,7 +183,6 @@ function HardwareCatalog() {
                     </div>
                   </section>
 
-                  {/* Types Section (Image 3) */}
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
                         <Layers className="text-blue-400 w-5 h-5" />
@@ -199,7 +198,6 @@ function HardwareCatalog() {
                     </ul>
                   </section>
 
-                  {/* Pricing Table (Image 4) */}
                   <section className="space-y-4">
                     <div className="flex items-center gap-3">
                         <IndianRupee className="text-blue-400 w-5 h-5" />
@@ -229,8 +227,8 @@ function HardwareCatalog() {
                 </>
               )}
 
-              {/* TATA Section (Image 2 & 3) */}
-              {selectedPanel.name.includes("TATA") && (
+              {/* TATA CONTENT */}
+              {selectedPanel.name.toUpperCase().includes("TATA") && (
                 <>
                   <section className="space-y-6">
                     <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -251,7 +249,7 @@ function HardwareCatalog() {
                                 </p>
                             </div>
                         </div>
-                        <div className="w-full md:w-64 shrink-0 bg-white p-4 rounded-2xl">
+                        <div className="w-full md:w-64 shrink-0 bg-white p-4 rounded-2xl shadow-xl">
                             <img 
                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Y6I7O5U7L8K9U1Y2B0G5V8R7J6Q4S9T5W6A&s" 
                                 alt="Tata Solar Logo" 
@@ -290,8 +288,40 @@ function HardwareCatalog() {
                 </>
               )}
 
+              {/* RC PREMIUM CONTENT (First Panel) */}
+              {selectedPanel.name.toUpperCase().includes("RC PREMIUM") && (
+                  <section className="space-y-6">
+                      <div className="flex items-center gap-3">
+                          <Shield className="text-orange-500 w-6 h-6" />
+                          <h3 className="text-2xl font-black text-white uppercase tracking-tight">RC Solar Elite Engineering</h3>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-8">
+                          <div className="space-y-4">
+                              <p className="text-gray-400 leading-relaxed">
+                                  Our signature <strong className="text-white">RC Premium Monocrystalline</strong> series represents the pinnacle of residential solar technology. Each cell is carved from a single crystal of pure silicon, allowing electrons more room to move, which results in a massive <span className="text-green-400 font-bold">22.5% efficiency rating</span>.
+                              </p>
+                              <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+                                  <p className="text-sm text-orange-400 font-medium italic">
+                                      "Designed for homeowners who want the maximum power possible from every square inch of their roof space."
+                                  </p>
+                              </div>
+                          </div>
+                          <div className="space-y-3">
+                              {['Anti-PID Technology', 'Half-Cut Cell Design', '9-Busbar Configuration', 'Excellent Low Irradiance Performance'].map((feat) => (
+                                  <div key={feat} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5">
+                                      <CheckCircle className="w-5 h-5 text-orange-500" />
+                                      <span className="text-sm font-bold text-gray-300">{feat}</span>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                  </section>
+              )}
+
               {/* Default detailed view for other panels */}
-              {!selectedPanel.name.includes("Waaree") && !selectedPanel.name.includes("TATA") && (
+              {!selectedPanel.name.toUpperCase().includes("WAAREE") && 
+               !selectedPanel.name.toUpperCase().includes("TATA") && 
+               !selectedPanel.name.toUpperCase().includes("RC PREMIUM") && (
                   <div className="text-center py-12">
                       <Sun className="w-20 h-20 text-orange-500 mx-auto mb-6 animate-pulse" />
                       <h3 className="text-2xl font-bold text-white mb-4">Detailed Specs for {selectedPanel.name}</h3>
