@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import api from "../../api/axiosConfig";
-import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert, Star, IndianRupee } from "lucide-react";
+import { Calendar, Phone, MapPin, Clock, User as UserIcon, CheckCircle, ArrowRight, Navigation, ShieldAlert, Shield, Star, IndianRupee } from "lucide-react";
 import { useLiveTime } from "../../hooks/useLiveTime";
 
 const timeSlots = [
