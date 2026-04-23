@@ -251,9 +251,9 @@ function HardwareCatalog() {
                         </div>
                         <div className="w-full md:w-64 shrink-0 bg-white p-4 rounded-2xl shadow-xl">
                             <img 
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Y6I7O5U7L8K9U1Y2B0G5V8R7J6Q4S9T5W6A&s" 
+                                src="file:///C:/Users/K.%20Sai%20Durga%20Nivas/.gemini/antigravity/brain/b592bb96-349a-413d-a26f-df52fb2d94a5/tata_solar_panel_detail_1776906848398.png" 
                                 alt="Tata Solar Logo" 
-                                className="w-full h-auto object-contain"
+                                className="w-full h-auto object-contain rounded-xl"
                             />
                         </div>
                     </div>
