@@ -120,6 +120,15 @@ const waareePricing = [
   { model: "Waaree 50w Solar Panel", price: "Rs.1,750", perWatt: "Rs.35" },
 ];
 
+const rcPremiumPricing = [
+  { model: "RC 330W Mono", price: "Rs.14,500", perWatt: "Rs.44" },
+  { model: "RC 375W Mono", price: "Rs.16,800", perWatt: "Rs.45" },
+  { model: "RC 400W Mono", price: "Rs.18,500", perWatt: "Rs.46" },
+  { model: "RC 450W Mono", price: "Rs.21,200", perWatt: "Rs.47" },
+  { model: "RC 540W Mono", price: "Rs.24,800", perWatt: "Rs.46" },
+  { model: "RC 550W Mono", price: "Rs.26,500", perWatt: "Rs.48" },
+];
+
 const tataPricing = [
   { model: "50W Solar Panel", price: "Rs.2,200", perWatt: "Rs.44" },
   { model: "100W Solar Panel", price: "Rs.4,400", perWatt: "Rs.44" },
@@ -337,6 +346,33 @@ function HardwareCatalog() {
                                       <span className="text-sm font-bold text-gray-300">{feat}</span>
                                   </div>
                               ))}
+                          </div>
+                      </div>
+                      
+                      <div className="mt-8 space-y-4">
+                          <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                              <IndianRupee className="w-5 h-5 text-orange-500" />
+                              RC Premium Series Pricing
+                          </h4>
+                          <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                              <table className="w-full text-left border-collapse">
+                                  <thead>
+                                      <tr className="bg-orange-500 text-black font-black uppercase text-xs tracking-widest">
+                                          <th className="py-4 px-6">Model / Capacity</th>
+                                          <th className="py-4 px-6">Price</th>
+                                          <th className="py-4 px-6">Rate / Watt</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody className="bg-white/5">
+                                      {rcPremiumPricing.map((item, i) => (
+                                          <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                              <td className="py-3 px-6 text-orange-400 font-bold text-sm">{item.model}</td>
+                                              <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                              <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.perWatt}</td>
+                                          </tr>
+                                      ))}
+                                  </tbody>
+                              </table>
                           </div>
                       </div>
                   </section>

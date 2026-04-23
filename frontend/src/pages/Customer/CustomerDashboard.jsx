@@ -25,6 +25,13 @@ const systemPrices = [
   { size: "10kW", cost: "₹70,000" },
 ];
 
+const brandPrices = [
+  { brand: "Waaree", starting: "₹1,750", best: "330W @ ₹8,250" },
+  { brand: "TATA Power", starting: "₹2,200", best: "330W @ ₹9,240" },
+  { brand: "Adani Solar", starting: "₹10,500", best: "330W @ ₹10,500" },
+  { brand: "Luminous", starting: "₹6,500", best: "5kVA @ ₹45,000" },
+];
+
 function CustomerDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -480,6 +487,25 @@ function CustomerDashboard() {
                         <p className="text-xl font-black text-white group-hover:text-green-400 transition-colors">{item.cost}</p>
                     </div>
                 ))}
+            </div>
+
+            <div className="mt-10 pt-10 border-t border-white/5">
+                <h3 className="text-lg font-bold text-gray-400 mb-6 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-orange-500" />
+                    Top Brands Live Estimates
+                </h3>
+                <div className="grid md:grid-cols-4 gap-6">
+                    {brandPrices.map((item, idx) => (
+                        <div key={idx} className="bg-[#020617]/50 p-5 rounded-2xl border border-white/5 hover:border-orange-500/20 transition-all">
+                            <p className="text-orange-500 font-black text-sm mb-1">{item.brand}</p>
+                            <p className="text-white font-bold text-xl mb-3">Starts {item.starting}</p>
+                            <div className="bg-white/5 px-3 py-1.5 rounded-lg">
+                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Recommended</p>
+                                <p className="text-xs text-gray-300 font-medium">{item.best}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
       </motion.div>
