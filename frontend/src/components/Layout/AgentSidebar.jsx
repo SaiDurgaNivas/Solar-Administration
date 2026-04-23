@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Wrench, Users, ShieldAlert, LogOut, Zap, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, Calendar, Wrench, Users, ShieldAlert, LogOut, Zap, BarChart2 } from 'lucide-react';
 import UserProfilePhoto from '../UserProfilePhoto';
 
 function AgentSidebar({ user, onLogout }) {
