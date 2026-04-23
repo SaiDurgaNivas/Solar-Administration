@@ -134,6 +134,30 @@ const tataPricing = [
   { model: "330W Solar Panel", price: "Rs.9,240", perWatt: "Rs.28" },
 ];
 
+const adaniPricing = [
+  { model: "Adani 330W Poly", price: "Rs.10,500", perWatt: "Rs.32" },
+  { model: "Adani 335W Poly", price: "Rs.10,800", perWatt: "Rs.32" },
+  { model: "Adani 340W Poly", price: "Rs.11,200", perWatt: "Rs.33" },
+  { model: "Adani 400W Mono", price: "Rs.15,500", perWatt: "Rs.38" },
+  { model: "Adani 450W Mono", price: "Rs.18,000", perWatt: "Rs.40" },
+];
+
+const luminousPricing = [
+  { model: "Luminous 850VA NXG", price: "Rs.6,500", type: "Home UPS" },
+  { model: "Luminous 1100VA NXG", price: "Rs.7,800", type: "Home UPS" },
+  { model: "Luminous 1500VA Solar", price: "Rs.12,500", type: "Inverter" },
+  { model: "Luminous 2kVA PCU", price: "Rs.18,000", type: "PCU" },
+  { model: "Luminous 5kVA Solarverter", price: "Rs.45,000", type: "Heavy Duty" },
+];
+
+const vguardPricing = [
+  { model: "V-Guard 1kVA Hybrid", price: "Rs.7,500", warranty: "2 Years" },
+  { model: "V-Guard 2kVA Hybrid", price: "Rs.14,000", warranty: "2 Years" },
+  { model: "V-Guard 3kVA Smart", price: "Rs.22,000", warranty: "3 Years" },
+  { model: "V-Guard 5kVA Heavy", price: "Rs.38,000", warranty: "3 Years" },
+  { model: "V-Guard 10kVA Industrial", price: "Rs.85,000", warranty: "5 Years" },
+];
+
 function HardwareCatalog() {
   const [selectedPanel, setSelectedPanel] = React.useState(null);
 
@@ -318,10 +342,127 @@ function HardwareCatalog() {
                   </section>
               )}
 
+              {/* ADANI CONTENT */}
+              {selectedPanel.name.toUpperCase().includes("ADANI") && (
+                <>
+                  <section className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <Info className="text-blue-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">About Adani Solar</h3>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed">
+                        Adani Solar is the solar PV manufacturing arm of the Adani Group, a diversified organization in India with a combined market cap of $200 Bn. Mundra Solar PV Ltd (Adani Solar) is one of the 15 largest utility-scale solar PV developers in the world. They provide high-performance polycrystalline panels that are <strong className="text-white">perfect for large installations</strong> due to their extreme cost-effectiveness and durability.
+                    </p>
+                  </section>
+                  <section className="space-y-4">
+                    <h3 className="text-lg font-bold text-white">Adani Models & Pricing</h3>
+                    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-red-500 text-white font-black uppercase text-xs tracking-widest">
+                                    <th className="py-4 px-6">Model</th>
+                                    <th className="py-4 px-6">Selling Price</th>
+                                    <th className="py-4 px-6">Price per Watt</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white/5">
+                                {adaniPricing.map((item, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                        <td className="py-3 px-6 text-blue-400 font-bold text-sm">{item.model}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.perWatt}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
+              {/* LUMINOUS CONTENT */}
+              {selectedPanel.name.toUpperCase().includes("LUMINOUS") && (
+                <>
+                  <section className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <Zap className="text-green-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">About Luminous Solar</h3>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed">
+                        Luminous Power Technologies is the leading home electrical specialist in India having a vast portfolio comprising of Power backup solutions such as Home UPS, Inverter, and Solar Applications. Their <strong className="text-white">Pure Sine Wave</strong> technology ensures that your delicate electronics are protected from power surges and voltage fluctuations.
+                    </p>
+                  </section>
+                  <section className="space-y-4">
+                    <h3 className="text-lg font-bold text-white">Luminous Product Pricing</h3>
+                    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-red-500 text-white font-black uppercase text-xs tracking-widest">
+                                    <th className="py-4 px-6">Product Model</th>
+                                    <th className="py-4 px-6">Selling Price</th>
+                                    <th className="py-4 px-6">Type</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white/5">
+                                {luminousPricing.map((item, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                        <td className="py-3 px-6 text-blue-400 font-bold text-sm">{item.model}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                        <td className="py-3 px-6 text-gray-400 text-xs">{item.type}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
+              {/* V-GUARD CONTENT */}
+              {selectedPanel.name.toUpperCase().includes("V-GUARD") && (
+                <>
+                  <section className="space-y-6">
+                    <div className="flex items-center gap-3">
+                        <Shield className="text-red-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">About V-Guard Hybrid Systems</h3>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed">
+                        V-Guard is a trusted name in the Indian market, known for its focus on energy efficiency and product reliability. Their hybrid solar inverters are designed to work seamlessly with both <strong className="text-white">grid power and battery storage</strong>, ensuring that you never run out of electricity even during prolonged power cuts.
+                    </p>
+                  </section>
+                  <section className="space-y-4">
+                    <h3 className="text-lg font-bold text-white">V-Guard Models & Warranty</h3>
+                    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-red-500 text-white font-black uppercase text-xs tracking-widest">
+                                    <th className="py-4 px-6">Hybrid Model</th>
+                                    <th className="py-4 px-6">Selling Price</th>
+                                    <th className="py-4 px-6">Warranty</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white/5">
+                                {vguardPricing.map((item, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                        <td className="py-3 px-6 text-blue-400 font-bold text-sm">{item.model}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                        <td className="py-3 px-6 text-green-400 text-xs font-bold">{item.warranty}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
               {/* Default detailed view for other panels */}
               {!selectedPanel.name.toUpperCase().includes("WAAREE") && 
                !selectedPanel.name.toUpperCase().includes("TATA") && 
-               !selectedPanel.name.toUpperCase().includes("RC PREMIUM") && (
+               !selectedPanel.name.toUpperCase().includes("RC PREMIUM") && 
+               !selectedPanel.name.toUpperCase().includes("ADANI") && 
+               !selectedPanel.name.toUpperCase().includes("LUMINOUS") && 
+               !selectedPanel.name.toUpperCase().includes("V-GUARD") && (
                   <div className="text-center py-12">
                       <Sun className="w-20 h-20 text-orange-500 mx-auto mb-6 animate-pulse" />
                       <h3 className="text-2xl font-bold text-white mb-4">Detailed Specs for {selectedPanel.name}</h3>
