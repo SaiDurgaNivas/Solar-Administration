@@ -120,6 +120,20 @@ const waareePricing = [
   { model: "Waaree 50w Solar Panel", price: "Rs.1,750", perWatt: "Rs.35" },
 ];
 
+const tataPricing = [
+  { model: "50W Solar Panel", price: "Rs.2,200", perWatt: "Rs.44" },
+  { model: "100W Solar Panel", price: "Rs.4,400", perWatt: "Rs.44" },
+  { model: "150W Solar Panel", price: "Rs.6,600", perWatt: "Rs.44" },
+  { model: "160W Solar Panel", price: "Rs.6,720", perWatt: "Rs.42" },
+  { model: "200W Solar Panel", price: "Rs.7,800", perWatt: "Rs.39" },
+  { model: "250W Solar Panel", price: "Rs.7,250", perWatt: "Rs.29" },
+  { model: "265W Solar Panel", price: "Rs.7,685", perWatt: "Rs.29" },
+  { model: "288W Solar Panel", price: "Rs.8,352", perWatt: "Rs.29" },
+  { model: "300W Solar Panel", price: "Rs.8,700", perWatt: "Rs.29" },
+  { model: "315W Solar Panel", price: "Rs.9,135", perWatt: "Rs.29" },
+  { model: "330W Solar Panel", price: "Rs.9,240", perWatt: "Rs.28" },
+];
+
 function HardwareCatalog() {
   const [selectedPanel, setSelectedPanel] = React.useState(null);
 
@@ -215,8 +229,69 @@ function HardwareCatalog() {
                 </>
               )}
 
+              {/* TATA Section (Image 2 & 3) */}
+              {selectedPanel.name.includes("TATA") && (
+                <>
+                  <section className="space-y-6">
+                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                        <div className="flex-1 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <Info className="text-blue-400 w-5 h-5" />
+                                <h3 className="text-xl font-bold text-white border-b-2 border-red-500 pb-1 inline-block">Tata Solar Panel Overview</h3>
+                            </div>
+                            <div className="text-gray-400 leading-relaxed space-y-4 text-sm md:text-base">
+                                <p>
+                                    Tata solar panels are best in class solar modules, manufactured in India on leading edge module production line and world class processes. The panels are equipped with <strong className="text-white">strong, light-weight anodized aluminium frame</strong> and unique back sheet for high resistance to moisture ingress.
+                                </p>
+                                <p>
+                                    The solar panels from Tata are torsion and corrosion resistant and come with highly reliable <span className="text-blue-400 font-bold">IP67 rated junction box</span>. The high fill factor and positive power tolerance improves the energy conversion efficiency of these panels.
+                                </p>
+                                <p>
+                                    Tata design and manufacture highly efficient polycrystalline solar panels, wattage ranging from 50 to 330 watts. These panels are completely reliable under extreme weather conditions, certified to withstand <span className="text-red-400 font-bold">snow loads of up to 5,400 Pa</span>. The most satisfying thing with Tata solar panels are that you will get guaranteed peace of mind and <span className="text-green-400 font-bold">25 year linear module warranty</span>.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="w-full md:w-64 shrink-0 bg-white p-4 rounded-2xl">
+                            <img 
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Y6I7O5U7L8K9U1Y2B0G5V8R7J6Q4S9T5W6A&s" 
+                                alt="Tata Solar Logo" 
+                                className="w-full h-auto object-contain"
+                            />
+                        </div>
+                    </div>
+                  </section>
+
+                  <section className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <IndianRupee className="text-blue-400 w-5 h-5" />
+                        <h3 className="text-xl font-bold text-white pb-1 inline-block">Tata Models & Pricing</h3>
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-red-500 text-white font-black uppercase text-xs tracking-widest">
+                                    <th className="py-4 px-6">Solar Panel Model</th>
+                                    <th className="py-4 px-6">Selling Price</th>
+                                    <th className="py-4 px-6">Price per Watt</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white/5">
+                                {tataPricing.map((item, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/10 transition-colors">
+                                        <td className="py-3 px-6 text-blue-400 font-bold text-sm">{item.model}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.price}</td>
+                                        <td className="py-3 px-6 text-gray-300 font-mono text-sm">{item.perWatt}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
               {/* Default detailed view for other panels */}
-              {!selectedPanel.name.includes("Waaree") && (
+              {!selectedPanel.name.includes("Waaree") && !selectedPanel.name.includes("TATA") && (
                   <div className="text-center py-12">
                       <Sun className="w-20 h-20 text-orange-500 mx-auto mb-6 animate-pulse" />
                       <h3 className="text-2xl font-bold text-white mb-4">Detailed Specs for {selectedPanel.name}</h3>
