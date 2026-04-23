@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Phone, User, Clock, CheckCircle, XCircle, AlertCircle, FileText, ArrowRight, Zap } from 'lucide-react';
-import api from '../../api/axiosConfig';
+import api from '../api/axiosConfig';
 
 function AgentIncomingAppointments() {
     const [bookings, setBookings] = useState([]);
