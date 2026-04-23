@@ -284,8 +284,9 @@ const AgentDashboard = () => {
         });
         fetchAppointments();
     } catch(err) {
-        console.error(err);
-        alert("Failed to submit configuration.");
+        console.error("Config submit error:", err);
+        const errorMsg = err.response?.data?.error || err.response?.data?.detail || JSON.stringify(err.response?.data) || "Failed to submit configuration.";
+        alert("Submission Failed: " + (typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg));
     }
   };
 
