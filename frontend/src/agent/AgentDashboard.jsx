@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Wrench, MapPin, CheckCircle, Clock, Save, ShieldAlert, HardHat, PlusCircle, UserPlus, Zap, FileText, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Users, Wrench, MapPin, CheckCircle, Clock, Save, ShieldAlert, HardHat, PlusCircle, UserPlus, Zap, FileText, X, ArrowRight } from "lucide-react";
 import api from "../api/axiosConfig";
 import { useTickets } from "../context/TicketContext";
 import { useLiveTime } from "../hooks/useLiveTime";
@@ -571,11 +572,19 @@ const AgentDashboard = () => {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
             className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl mb-8"
         >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-cyan-500/10 rounded-xl">
-                 <Clock className="w-6 h-6 text-cyan-400" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-cyan-500/10 rounded-xl">
+                   <Clock className="w-6 h-6 text-cyan-400" />
+                </div>
+                <h2 className="text-2xl font-bold">Incoming Appointment Requests</h2>
               </div>
-              <h2 className="text-2xl font-bold">Incoming Appointment Requests</h2>
+              <Link 
+                to="/agent-dashboard/incoming-appointments" 
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 transition-colors group"
+              >
+                View Full List <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

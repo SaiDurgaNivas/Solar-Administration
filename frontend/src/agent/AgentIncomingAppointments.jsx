@@ -6,7 +6,15 @@ import api from '../api/axiosConfig';
 function AgentIncomingAppointments() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(null);
+    const [confirmDates, setConfirmDates] = useState({});
+    const [confirmTimes, setConfirmTimes] = useState({});
+
+    const timeSlots = [
+        "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
+        "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
+        "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
+        "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM"
+    ];
 
     const fetchIncoming = async (showLoader = true) => {
         try {
@@ -27,14 +35,30 @@ function AgentIncomingAppointments() {
     }, []);
 
     const handleAccept = async (bookingId) => {
+        const d = confirmDates[bookingId];
+        const t = confirmTimes[bookingId];
+        if (!d || !t) { alert("Please select both date and time before accepting."); return; }
+
         try {
             setActionLoading(bookingId);
             const user = JSON.parse(sessionStorage.getItem("solar_user"));
+
+            const convertTime = (timeStr) => {
+                if (!timeStr || !timeStr.includes(" ")) return timeStr;
+                const [time, modifier] = timeStr.split(' ');
+                let [hours, minutes] = time.split(':');
+                if (modifier === 'PM' && hours !== '12') hours = String(parseInt(hours, 10) + 12);
+                if (modifier === 'AM' && hours === '12') hours = '00';
+                return `${hours.padStart(2, '0')}:${minutes}:00`;
+            };
+
             await api.patch(`bookings/${bookingId}/`, { 
                 status: 'Accepted',
+                confirmed_date: d,
+                confirmed_time: convertTime(t),
                 agent: user.id
             });
-            alert("Appointment Accepted! It is now in your Assigned Customers list.");
+            alert("Appointment Accepted and Confirmation Sent to Client!");
             fetchIncoming();
         } catch (err) {
             alert("Failed to accept appointment.");
@@ -150,6 +174,31 @@ function AgentIncomingAppointments() {
                                     </div>
                                 )}
 
+                                <div className="space-y-4 mb-8">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Date</label>
+                                            <input 
+                                                type="date"
+                                                className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none transition-all"
+                                                value={confirmDates[booking.id] || ''}
+                                                onChange={(e) => setConfirmDates({...confirmDates, [booking.id]: e.target.value})}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Time</label>
+                                            <select
+                                                className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none appearance-none cursor-pointer transition-all"
+                                                value={confirmTimes[booking.id] || ''}
+                                                onChange={(e) => setConfirmTimes({...confirmTimes, [booking.id]: e.target.value})}
+                                            >
+                                                <option value="">Select Time</option>
+                                                {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="flex gap-4">
                                     <button 
                                         onClick={() => handleAccept(booking.id)}
@@ -160,7 +209,7 @@ function AgentIncomingAppointments() {
                                             <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                                         ) : (
                                             <>
-                                                Accept Request <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                                Confirm & Accept <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                                             </>
                                         )}
                                     </button>
