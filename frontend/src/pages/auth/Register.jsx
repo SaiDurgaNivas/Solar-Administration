@@ -27,6 +27,12 @@ function Register() {
       setError("Please fill in all identity fields.");
       return;
     }
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}[\]:;"'<>,.?~\\/-]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.");
+      return;
+    }
+
     if (password !== confirmPassword) {
         setError("Passwords do not match.");
         return;
@@ -178,7 +184,7 @@ function Register() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type={showPassword ? "text" : "password"}
-                    name="password" placeholder="Min. 6 characters"
+                    name="password" placeholder="Min. 8 characters"
                     className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm font-medium"
                     value={formData.password} onChange={handleChange}
                   />
@@ -186,6 +192,9 @@ function Register() {
                     {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
+                <p className="mt-2 ml-1 text-[10px] font-medium text-gray-400">
+                  Example: <span className="font-bold text-gray-600">Solar@123</span>
+                </p>
               </div>
 
               <div>
