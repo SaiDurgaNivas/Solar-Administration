@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, Loader2, User, Mail, Lock, ShieldCheck, Eye, EyeOff, Sun, Shield, Award, CloudUpload } from "lucide-react";
+import { Home, Loader2, User, Mail, Lock, ShieldCheck, Eye, EyeOff, Sun, Shield, Award, CloudUpload, Zap, Users } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Register() {
@@ -78,9 +78,41 @@ function Register() {
                </span>
              </h1>
           </div>
-          <p className="text-gray-200 text-lg leading-relaxed font-semibold">
+          <p className="text-gray-200 text-lg leading-relaxed font-semibold mb-12">
             Manage installations and monitor production with precision and ease.
           </p>
+
+          <div className="space-y-8">
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shrink-0 shadow-lg">
+                <Shield className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-base mb-1">Secure & Reliable</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">Your data is protected <br/> with top security.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shrink-0 shadow-lg">
+                <Zap className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-base mb-1">High Performance</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">Real-time monitoring <br/> and fast analytics.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-5">
+              <div className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center shrink-0 shadow-lg">
+                <Users className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-base mb-1">User Friendly</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">Easy to use dashboard <br/> and powerful tools.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* FORM CARD */}
