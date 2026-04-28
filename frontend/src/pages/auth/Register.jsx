@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Home, Loader2, User, Mail, Lock, ShieldCheck, Eye, EyeOff, Sun } from "lucide-react";
+import { Home, Loader2, User, Mail, Lock, ShieldCheck, Eye, EyeOff, Sun, Shield, Award, CloudUpload } from "lucide-react";
 import api from "../../api/axiosConfig";
 
 function Register() {
@@ -177,7 +177,39 @@ function Register() {
               </button>
             </form>
 
-            <p className="text-center mt-10 text-sm text-gray-500 font-bold uppercase tracking-widest">
+            <div className="mt-8">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-100"></div>
+                </div>
+                <div className="relative bg-white px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  We Protect Your Data
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <span className="text-[11px] font-bold text-gray-500">100% Secure</span>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <span className="text-[11px] font-bold text-gray-500">Trusted Platform</span>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                    <CloudUpload className="w-5 h-5 text-orange-500" />
+                  </div>
+                  <span className="text-[11px] font-bold text-gray-500">Data Backup</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-center mt-8 text-sm text-gray-500 font-bold uppercase tracking-widest">
               Ready to beam? <Link to="/login" className="text-orange-500 hover:underline hover:text-orange-600 ml-1">Login Here</Link>
             </p>
           </motion.div>
