@@ -177,6 +177,10 @@ function Register() {
               </button>
             </form>
 
+            <p className="text-center mt-8 text-sm text-gray-500 font-bold uppercase tracking-widest">
+              Ready to beam? <Link to="/login" className="text-orange-500 hover:underline hover:text-orange-600 ml-1">Login Here</Link>
+            </p>
+
             <div className="mt-8">
               <div className="relative flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center">
@@ -208,10 +212,6 @@ function Register() {
                 </div>
               </div>
             </div>
-
-            <p className="text-center mt-8 text-sm text-gray-500 font-bold uppercase tracking-widest">
-              Ready to beam? <Link to="/login" className="text-orange-500 hover:underline hover:text-orange-600 ml-1">Login Here</Link>
-            </p>
           </motion.div>
         </div>
       </div>
