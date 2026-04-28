@@ -66,15 +66,15 @@ function Register() {
       <div className="w-full max-w-5xl flex items-center justify-center relative z-10">
         
         {/* Branding (Hidden or Adjusted for overall background) */}
-        <div className="hidden lg:flex lg:w-1/2 text-white flex-col justify-center p-12">
-          <div className="flex items-center gap-6 mb-8">
-             <div className="shrink-0 inline-flex p-4 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
-                <Sun className="w-16 h-16 text-orange-500 drop-shadow-[0_0_20px_rgba(249,115,22,0.8)] fill-orange-500" />
+        <div className="hidden lg:flex lg:w-1/2 text-white flex-col justify-center p-8 lg:p-12 xl:pr-20">
+          <div className="flex items-center gap-5 mb-8">
+             <div className="shrink-0 inline-flex p-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
+                <Sun className="w-12 h-12 text-orange-500 drop-shadow-[0_0_20px_rgba(249,115,22,0.8)] fill-orange-500" />
              </div>
-             <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-tight">
+             <h1 className="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
                Welcome to <br />
                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
-                 SOLAR ADMINISTRATION SYSTEM
+                 SOLAR ADMINISTRATION
                </span>
              </h1>
           </div>
