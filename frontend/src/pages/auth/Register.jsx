@@ -67,12 +67,17 @@ function Register() {
         
         {/* Branding (Hidden or Adjusted for overall background) */}
         <div className="hidden lg:flex lg:w-1/2 text-white flex-col justify-center p-12">
-          <div className="mb-6">
-             <div className="inline-flex p-1 rounded-full bg-orange-100/10 mb-4">
-                <Sun className="w-20 h-20 text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.5)] fill-orange-500" />
+          <div className="flex items-center gap-6 mb-8">
+             <div className="shrink-0 inline-flex p-4 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
+                <Sun className="w-16 h-16 text-orange-500 drop-shadow-[0_0_20px_rgba(249,115,22,0.8)] fill-orange-500" />
              </div>
+             <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-tight">
+               Welcome to <br />
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
+                 SOLAR ADMINISTRATION SYSTEM
+               </span>
+             </h1>
           </div>
-          <h1 className="text-5xl font-black mb-6 tracking-tight leading-tight">Join Solar <br /> Administration</h1>
           <p className="text-gray-200 text-lg leading-relaxed font-semibold">
             Manage installations and monitor production with precision and ease.
           </p>
