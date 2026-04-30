@@ -156,7 +156,7 @@ function Login({ onLogin }) {
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSelectedPortal('sub_worker')} className="group text-left bg-[#0f172a]/60 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-500/50 p-8 rounded-3xl shadow-2xl transition-all duration-300 relative overflow-hidden flex flex-col w-full h-full">
                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                    <div className="p-4 bg-cyan-500/10 rounded-2xl w-fit mb-6 border border-cyan-500/20"><HardHat className="w-8 h-8 text-cyan-400" /></div>
-                   <h2 className="text-3xl font-bold mb-3">Field Ops</h2>
+                   <h2 className="text-3xl font-bold mb-3">Worker's Field</h2>
                    <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-grow">Task tracking, site photos, and daily attendance logs.</p>
                    <div className="font-bold text-cyan-400 uppercase tracking-widest text-xs flex items-center gap-2 mt-auto">Enter Portal <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></div>
                 </motion.button>
@@ -198,7 +198,7 @@ function Login({ onLogin }) {
                  <>
                     <h2 className={`text-4xl font-extrabold mb-2 tracking-tight ${selectedPortal === 'customer' ? 'text-blue-400' : selectedPortal === 'sub_worker' ? 'text-cyan-400' : 'text-orange-400'}`}>
                       {selectedPortal === 'customer' ? 'Customer Hub' : 
-                       selectedPortal === 'sub_worker' ? 'Field Ops Portal' : 
+                       selectedPortal === 'sub_worker' ? "Worker's Field" : 
                        selectedPortal === 'admin' ? 'Admin Login' : 'Agent Terminal'}
                     </h2>
                     <p className="text-gray-400 mb-8 text-sm font-semibold uppercase tracking-widest border-b border-white/10 pb-6">Secure Gateway Active</p>
