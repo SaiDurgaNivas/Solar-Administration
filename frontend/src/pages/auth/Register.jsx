@@ -15,13 +15,13 @@ function Register() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError(""); 
+    setError("");
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (loading) return;
-    
+
     const { firstName, lastName, email, password, confirmPassword } = formData;
     if (!firstName || !lastName || !email || !password) {
       setError("Please fill in all identity fields.");
@@ -34,12 +34,12 @@ function Register() {
     }
 
     if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        return;
+      setError("Passwords do not match.");
+      return;
     }
     setLoading(true);
     try {
-      await api.post('auth/register/', { 
+      await api.post('auth/register/', {
         username: email, email, password,
         first_name: firstName, last_name: lastName,
         role: 'customer'
@@ -54,7 +54,7 @@ function Register() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-6 bg-cover bg-center relative"
       style={{ backgroundImage: 'url("/images/register_side_bg.png")' }}
     >
@@ -62,27 +62,27 @@ function Register() {
       <div className="absolute inset-0 bg-[#0f172a]/70 pointer-events-none"></div>
 
       {/* Floating Home Button */}
-      <Link 
-        to="/" 
+      <Link
+        to="/"
         className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all shadow-lg z-[70]"
       >
         <Home className="w-5 h-5 text-white" />
       </Link>
 
       <div className="w-full max-w-5xl flex items-center justify-center relative z-10">
-        
+
         {/* Branding (Hidden or Adjusted for overall background) */}
         <div className="hidden lg:flex lg:w-1/2 text-white flex-col justify-center p-8 lg:p-12 xl:pr-20">
           <div className="flex items-center gap-5 mb-8">
-             <div className="shrink-0 inline-flex p-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
-                <Sun className="w-12 h-12 text-orange-500 drop-shadow-[0_0_20px_rgba(249,115,22,0.8)] fill-orange-500" />
-             </div>
-             <h1 className="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
-               Welcome to <br />
-               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
-                 SOLAR ADMINISTRATION
-               </span>
-             </h1>
+            <div className="shrink-0 inline-flex p-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
+              <Sun className="w-12 h-12 text-orange-500 drop-shadow-[0_0_20px_rgba(249,115,22,0.8)] fill-orange-500" />
+            </div>
+            <h3 className="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
+              Welcome to <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
+                SOLAR ADMINISTRATION
+              </span>
+            </h3>
           </div>
           <p className="text-gray-200 text-lg leading-relaxed font-semibold mb-12">
             Manage installations and monitor production with precision and ease.
@@ -95,7 +95,7 @@ function Register() {
               </div>
               <div>
                 <h3 className="text-white font-bold text-base mb-1">Secure & Reliable</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Your data is protected <br/> with top security.</p>
+                <p className="text-gray-400 text-sm leading-relaxed">Your data is protected <br /> with top security.</p>
               </div>
             </div>
 
@@ -105,7 +105,7 @@ function Register() {
               </div>
               <div>
                 <h3 className="text-white font-bold text-base mb-1">High Performance</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Real-time monitoring <br/> and fast analytics.</p>
+                <p className="text-gray-400 text-sm leading-relaxed">Real-time monitoring <br /> and fast analytics.</p>
               </div>
             </div>
 
@@ -115,7 +115,7 @@ function Register() {
               </div>
               <div>
                 <h3 className="text-white font-bold text-base mb-1">User Friendly</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Easy to use dashboard <br/> and powerful tools.</p>
+                <p className="text-gray-400 text-sm leading-relaxed">Easy to use dashboard <br /> and powerful tools.</p>
               </div>
             </div>
           </div>
@@ -123,9 +123,9 @@ function Register() {
 
         {/* FORM CARD */}
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }} 
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-md bg-white p-10 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.3)] border border-white/20"
           >
             <div className="mb-8">
@@ -140,7 +140,7 @@ function Register() {
             )}
 
             <form onSubmit={handleRegister} className="space-y-5">
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">First Name</label>
@@ -210,7 +210,7 @@ function Register() {
                 </div>
               </div>
 
-              <button 
+              <button
                 type="submit" disabled={loading}
                 className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-4 rounded-[1.5rem] font-black transition-all shadow-[0_10px_30px_rgba(249,115,22,0.3)] hover:shadow-[0_15px_40px_rgba(249,115,22,0.5)] hover:-translate-y-0.5 flex items-center justify-center gap-2 text-lg active:scale-95"
               >
