@@ -40,7 +40,9 @@ function Register() {
     setLoading(true);
     try {
       await api.post('auth/register/', {
-        username: email, email, password,
+        username: email.toLowerCase().trim(), 
+        email: email.toLowerCase().trim(), 
+        password,
         first_name: firstName, last_name: lastName,
         role: 'customer'
       });

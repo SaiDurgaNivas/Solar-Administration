@@ -31,7 +31,7 @@ function Login({ onLogin }) {
 
     try {
       // Send authentication request to Django API with role awareness
-      const response = await api.post('auth/login/', { email, password, role: selectedPortal });
+      const response = await api.post('auth/login/', { email: email.toLowerCase().trim(), password, role: selectedPortal });
       
       const { user, token } = response.data;
       
