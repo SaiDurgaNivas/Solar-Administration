@@ -14,7 +14,7 @@ def login_view(request):
     Dummy check representing our secure backend login. 
     In prod, this returns a JWT or sets a session cookie.
     """
-    email = request.data.get('email')
+    email = request.data.get('email', '').lower().strip()
     password = request.data.get('password')
 
     if not email or not password:
@@ -64,7 +64,13 @@ def register_view(request):
     """
     Register a new user account using the UserSerializer for consistency.
     """
-    serializer = UserSerializer(data=request.data)
+    data = request.data.copy()
+    if 'email' in data:
+        data['email'] = str(data['email']).lower().strip()
+    if 'username' in data:
+        data['username'] = str(data['username']).lower().strip()
+        
+    serializer = UserSerializer(data=data)
     if serializer.is_valid():
         try:
             user = serializer.save()
