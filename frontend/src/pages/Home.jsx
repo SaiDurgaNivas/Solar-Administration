@@ -365,9 +365,9 @@ function Home() {
               </div>
               <h3 className="text-xl font-bold mb-4">{loc.city}</h3>
               <p className="text-sm text-gray-400 mb-6 leading-relaxed min-h-[4rem]">{loc.address}</p>
-              <div className="flex items-center gap-2 font-mono text-orange-400 font-bold border-t border-white/10 pt-4 cursor-pointer hover:text-orange-300">
+              <a href={`tel:${loc.phone.replace(/ /g, '')}`} className="flex items-center gap-2 font-mono text-orange-400 font-bold border-t border-white/10 pt-4 cursor-pointer hover:text-orange-300">
                 <Phone className="w-4 h-4" /> {loc.phone}
-              </div>
+              </a>
             </div>
           ))}
         </div>
