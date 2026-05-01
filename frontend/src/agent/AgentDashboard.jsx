@@ -648,7 +648,7 @@ const AgentDashboard = () => {
                         {req.notes && <p className="italic text-gray-500">"{req.notes}"</p>}
                       </div>
                       
-                      {req.status === "Pending" ? (
+                      {req.status?.toLowerCase() === "pending" ? (
                           <div className="mt-auto space-y-4">
                               <div className="grid grid-cols-2 gap-3">
                                   <div>
