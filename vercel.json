@@ -30,19 +30,19 @@
     },
     {
       "source": "/assets/(.*)",
-      "destination": "frontend/assets/$1"
+      "destination": "/assets/$1"
     },
     {
       "source": "/images/(.*)",
-      "destination": "frontend/images/$1"
+      "destination": "/images/$1"
     },
     {
       "source": "/vite.svg",
-      "destination": "frontend/vite.svg"
+      "destination": "/vite.svg"
     },
     {
-      "source": "/((?!assets|images|vite.svg|api|admin|static|media).*)",
-      "destination": "frontend/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
