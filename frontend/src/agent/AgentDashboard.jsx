@@ -177,17 +177,22 @@ const AgentDashboard = () => {
       const user = getUser();
       if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
+      const apiUrl = `${api.defaults.baseURL}bookings/`;
       const res = await api.get('bookings/');
-      console.log("Agent Dashboard Raw Data:", res.data);
-      const filtered = res.data.filter(b => 
-          b.status === "Pending" || 
-          (b.status === "Accepted" && Number(b.agent) === Number(user.id)) || 
-          Number(b.agent) === Number(user.id) || 
-          b.status === "Loan Approved" || 
-          b.status === "Direct Pay Confirmed" || 
-          b.status === "Dispatched"
-      );
-      console.log("Agent Dashboard Filtered Data:", filtered);
+      console.log(`Connected to: ${apiUrl}`);
+      console.log("Raw Bookings from Server:", res.data);
+      
+      const filtered = res.data.filter(b => {
+          const status = (b.status || "").toLowerCase();
+          return status === "pending" || 
+                 Number(b.agent) === Number(user.id) || 
+                 status === "accepted" || 
+                 status === "loan approved" || 
+                 status === "direct pay confirmed" || 
+                 status === "dispatched" ||
+                 status === "awaiting admin";
+      });
+      console.log("Filtered Bookings for UI:", filtered);
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set
@@ -582,6 +587,16 @@ const AgentDashboard = () => {
             </div>
           ))}
         </motion.div>
+
+        {/* 🔥 Connection Debugger */}
+        <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 p-4 rounded-2xl">
+            <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Data Node:</span>
+                <code className="text-[10px] font-mono text-cyan-400 bg-cyan-400/10 px-2 py-0.5 rounded">{api.defaults.baseURL}</code>
+            </div>
+            <p className="text-[10px] text-gray-500 italic font-bold">Verify this matches your Customer Portal URL!</p>
+        </div>
 
         {/* 🔥 Incoming Appointments Section */}
         <motion.div 
