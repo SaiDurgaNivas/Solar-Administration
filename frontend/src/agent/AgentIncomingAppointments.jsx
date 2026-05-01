@@ -32,10 +32,11 @@ function AgentIncomingAppointments() {
             const response = await api.get('bookings/');
             console.log("Incoming Page Raw Data:", response.data);
             // Show Pending OR Accepted by this agent
-            const filtered = response.data.filter(b => 
-                b.status === "Pending" || 
-                (b.status === "Accepted" && Number(b.agent) === Number(user.id))
-            );
+            const filtered = response.data.filter(b => {
+                const status = (b.status || "").toLowerCase();
+                return status === "pending" || 
+                       (status === "accepted" && Number(b.agent) === Number(user.id));
+            });
             console.log("Incoming Page Filtered Data:", filtered);
             setBookings(filtered);
         } catch (error) {
