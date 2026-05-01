@@ -138,7 +138,7 @@ function AgentIncomingAppointments() {
             const user = JSON.parse(sessionStorage.getItem("solar_user"));
             await api.patch(`bookings/${configModal.bookingId}/`, {
                 status: "Awaiting Admin",
-                agent: user.id
+                agent: parseInt(user.id)
             });
             alert("Configuration uploaded and forwarded to admin for loan check!");
             setConfigModal({open:false, bookingId: null});
