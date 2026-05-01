@@ -524,7 +524,7 @@ const AgentDashboard = () => {
               {greeting}, <span className="text-orange-500">Agent</span>
             </h1>
             <p className="text-gray-400 text-lg">
-              Here is your daily dispatch, active sites, and installation queue. <span className="text-green-500 font-bold ml-2">[SAFE MODE ACTIVE]</span>
+              Here is your daily dispatch, active sites, and installation queue.
             </p>
           </div>
           <div className="flex bg-[#0f172a]/80 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-2xl min-w-[280px]">
@@ -601,6 +601,161 @@ const AgentDashboard = () => {
             </div>
             <p className="text-[9px] text-gray-400 italic">Connected to Vercel Cloud for Expo</p>
         </div>
+
+        {/* 🔥 Incoming Appointments Section */}
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl mb-8"
+        >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-cyan-500/10 rounded-xl">
+                   <Clock className="w-6 h-6 text-cyan-400" />
+                </div>
+                <h2 className="text-2xl font-bold">Incoming Appointment Requests</h2>
+              </div>
+              <Link 
+                to="/agent-dashboard/incoming-appointments" 
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 transition-colors group"
+              >
+                View Full List <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+               {appointments.length === 0 ? <p className="text-gray-500 col-span-full">No active appointment requests right now.</p> : appointments.map((req) => (
+                  <div key={req.id} className="bg-[#020617] border border-white/5 p-5 rounded-2xl flex flex-col group hover:border-cyan-500/30 transition-all relative">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-bold text-lg">{req.client_name}</h3>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : (req.status||'').toLowerCase() === 'pending' ? 'bg-orange-500 text-black border border-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : req.status === 'Awaiting Admin' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : req.status === 'Loan Approved' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : req.status === 'Loan Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
+                           {(req.status||'').toLowerCase() === 'pending' ? '🔥 NEW REQUEST' : req.status}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-400 space-y-1 mb-4 border-b border-white/5 pb-4">
+                        <p><MapPin className="inline w-3 h-3 mr-1"/>{req.address}</p>
+                        <p>Req Date: {req.requested_date} @ {req.requested_time}</p>
+                        <p>Phone: {req.phone}</p>
+                        {req.notes && <p className="italic text-gray-500">"{req.notes}"</p>}
+                      </div>
+                      
+                      {req.status === "Pending" ? (
+                          <div className="mt-auto space-y-4">
+                              <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Date</label>
+                                      <input 
+                                         type="date"
+                                         className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none transition-all"
+                                         value={confirmDates[req.id] || ''}
+                                         onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
+                                      />
+                                  </div>
+                                  <div>
+                                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Time</label>
+                                      <select
+                                         className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none appearance-none cursor-pointer transition-all"
+                                         value={confirmTimes[req.id] || ''}
+                                         onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
+                                      >
+                                          <option value="">Select Time</option>
+                                          {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                                      </select>
+                                  </div>
+                              </div>
+                              <button 
+                                  onClick={() => handleAcceptAppointment(req.id)} 
+                                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center justify-center gap-2 group/btn active:scale-95 transition-all"
+                              >
+                                  Confirm & Accept <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                              </button>
+                          </div>
+                      ) : req.status === "Accepted" ? (
+                          <div className="mt-auto space-y-3 border-t border-white/5 pt-4">
+                              <div className="bg-green-500/5 border border-green-500/20 p-3 rounded-xl flex items-center justify-between mx-1 mb-2">
+                                  <div className="flex items-center gap-3">
+                                      <CheckCircle className="w-4 h-4 text-green-400" />
+                                      <span className="text-xs font-bold text-green-400">Accepted ({req.confirmed_date} @ {formatDisplayTime(req.confirmed_time)})</span>
+                                  </div>
+                              </div>
+                              <button 
+                                 onClick={() => setConfigModal({open:true, bookingId:req.id})} 
+                                 className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 active:scale-95"
+                              >
+                                 <Zap className="w-4 h-4" /> Upload Config & Forward
+                              </button>
+                          </div>
+                      ) : req.status === "Awaiting Admin" ? (
+                          <div className="mt-auto bg-orange-500/5 border border-orange-500/20 p-3 rounded-xl flex flex-col gap-2">
+                              <span className="text-sm font-semibold text-orange-400 flex justify-between items-center">
+                                Awaiting Loan Check <Clock className="w-4 h-4" />
+                              </span>
+                              <p className="text-[10px] text-gray-400">Admin is reviewing hardware and financial documents.</p>
+                          </div>
+                      ) : req.status === "Loan Rejected" ? (
+                          <div className="mt-auto bg-red-500/5 border border-red-500/20 p-3 rounded-xl flex flex-col gap-2">
+                              <span className="text-sm font-semibold text-red-400 flex justify-between items-center">
+                                Loan Rejected <ShieldAlert className="w-4 h-4" />
+                              </span>
+                              <p className="text-[10px] text-gray-400">Waiting for user to confirm direct offline payment.</p>
+                          </div>
+                      ) : req.status === "Dispatched" || req.status === "In Progress" ? (
+                          <div className="mt-auto bg-cyan-500/5 border border-cyan-500/20 p-4 rounded-xl flex flex-col gap-3">
+                              <span className="text-sm font-semibold text-cyan-300 flex justify-between items-center">
+                                {req.status === 'Dispatched' ? 'Field Ops Dispatched' : 'Work In Progress'} <Zap className="w-4 h-4" />
+                              </span>
+                              <p className="text-[10px] text-gray-400">This request has been sent to the technician. Track completion from the worker dashboard.</p>
+                              <div className="flex flex-col gap-2 text-xs text-gray-200">
+                                <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 font-semibold">
+                                  Status: {req.status}
+                                </div>
+                                {req.team_tasks?.length > 0 ? (
+                                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-200">
+                                    Assigned Technician: <span className="text-cyan-300">{req.team_tasks[0].sub_worker_name}</span>
+                                  </div>
+                                ) : (
+                                  <div className="text-xs text-gray-400">Technician assignment is being processed.</div>
+                                )}
+                              </div>
+                          </div>
+                      ) : (req.status === "Loan Approved" || req.status === "Direct Pay Confirmed") ? (
+                          <div className="mt-auto space-y-3 border-t border-white/5 pt-4">
+                              <div className="bg-green-500/5 border border-green-500/20 p-2 rounded-xl flex items-center justify-between mx-1">
+                                  <span className="text-xs font-semibold text-green-400 uppercase tracking-widest">{req.status}</span>
+                                  <CheckCircle className="w-3 h-3 text-green-400" />
+                              </div>
+                              <div className="bg-white/5 p-3 rounded-xl border border-white/10 space-y-2">
+                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Dispatch Details</label>
+                                  <input 
+                                     placeholder="Google Maps link or address..."
+                                     className="w-full bg-[#020617] border border-white/10 p-2 outline-none focus:border-cyan-500 rounded text-xs text-white"
+                                     value={dispatchInfo[req.id]?.location_link || ''}
+                                     onChange={e => setDispatchInfo({...dispatchInfo, [req.id]: {...dispatchInfo[req.id], location_link: e.target.value}})}
+                                  />
+                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block pt-1">Assign Lead Technician</label>
+                                  <select 
+                                     className="w-full bg-[#020617] border border-white/10 p-2 outline-none focus:border-cyan-500 rounded text-xs text-white"
+                                     value={dispatchInfo[req.id]?.sub_worker_id || ''}
+                                     onChange={e => setDispatchInfo({...dispatchInfo, [req.id]: {...dispatchInfo[req.id], sub_worker_id: e.target.value}})}
+                                  >
+                                      <option value="">- Assign Worker -</option>
+                                      {team.map(w => <option key={w.id} value={w.id}>{w.username} ({w.subworker_profile?.job_title})</option>)}
+                                  </select>
+                                  
+                                  <button onClick={() => handleDispatchTeam(req.id)} className="w-full bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-white border border-cyan-500/30 font-bold text-xs py-2 rounded transition-all flex items-center justify-center gap-1 mt-2">
+                                     <Zap className="w-3 h-3" /> Dispatch Field Ops
+                                  </button>
+                              </div>
+                          </div>
+                      ) : (
+                          <div className="mt-auto bg-purple-500/5 border border-purple-500/20 p-3 rounded-xl flex items-center justify-between">
+                              <span className="text-sm font-semibold text-purple-400">Completed Installation</span>
+                              <CheckCircle className="w-4 h-4 text-purple-400" />
+                          </div>
+                      )}
+                  </div>
+               ))}
+            </div>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           

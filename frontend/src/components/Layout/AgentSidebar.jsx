@@ -45,6 +45,11 @@ function AgentSidebar({ user, onLogout }) {
           Dashboard
         </NavLink>
 
+        <NavLink to="/agent-dashboard/incoming-appointments" className={linkClass}>
+          <Calendar className="w-5 h-5" />
+          Incoming Appointments
+        </NavLink>
+
 
 
         <NavLink to="/agent-dashboard/customers" className={linkClass}>
