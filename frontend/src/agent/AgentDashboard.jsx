@@ -349,6 +349,8 @@ const AgentDashboard = () => {
   const handledTasks = completedInstalls + handledAppts + handledTickets;
   const shiftEfficiencyPerc = totalTasks > 0 ? Math.round((handledTasks / totalTasks) * 100) : 100;
 
+  const pendingDispatchCount = appointments.filter(a => a.status === "Loan Approved" || a.status === "Direct Pay Confirmed").length;
+
   const handleMetricClick = (stat) => {
     let content = null;
     if (stat.label === "Daily Targets") {
@@ -582,14 +584,15 @@ const AgentDashboard = () => {
           {[
             { label: "Daily Targets", value: `${dailyTargetPerc}%`, color: "text-blue-400" },
             { label: "Active Sites", value: activeInstalls, color: "text-orange-400" },
-            { label: "Completed", value: completedInstalls, color: "text-green-400" },
+            { label: "Ready to Dispatch", value: pendingDispatchCount, color: "text-cyan-400", pulse: pendingDispatchCount > 0 },
             { label: "Shift Efficiency", value: `${shiftEfficiencyPerc}%`, color: "text-purple-400" }
           ].map((stat, i) => (
             <div 
                key={i} 
                onClick={() => handleMetricClick(stat)}
-               className="bg-[#0f172a]/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col justify-center items-center text-center shadow-lg hover:bg-white/5 hover:border-orange-500/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.15)] transition cursor-pointer group"
+               className={`bg-[#0f172a]/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col justify-center items-center text-center shadow-lg hover:bg-white/5 hover:border-orange-500/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.15)] transition cursor-pointer group relative ${stat.pulse ? 'ring-2 ring-cyan-500/50 animate-pulse' : ''}`}
             >
+              {stat.pulse && <Zap className="absolute top-2 right-2 w-3 h-3 text-cyan-400 animate-bounce" />}
               <span className={`text-3xl font-black mb-1 group-hover:scale-110 transition-transform ${stat.color}`}>{stat.value}</span>
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{stat.label}</span>
             </div>
@@ -740,7 +743,7 @@ const AgentDashboard = () => {
                                   />
                                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block pt-1">Assign Lead Technician</label>
                                   <select 
-                                     className="w-full bg-[#020617] border border-white/10 p-2 outline-none focus:border-cyan-500 rounded text-xs text-white"
+                                     className="w-full bg-[#020617] border border-orange-500/30 p-3 outline-none focus:border-cyan-500 rounded-xl text-xs text-white shadow-inner appearance-none cursor-pointer"
                                      value={dispatchInfo[req.id]?.sub_worker_id || ''}
                                      onChange={e => setDispatchInfo({...dispatchInfo, [req.id]: {...dispatchInfo[req.id], sub_worker_id: e.target.value}})}
                                   >
@@ -748,8 +751,11 @@ const AgentDashboard = () => {
                                       {team.map(w => <option key={w.id} value={w.id}>{w.username} ({w.subworker_profile?.job_title})</option>)}
                                   </select>
                                   
-                                  <button onClick={() => handleDispatchTeam(req.id)} className="w-full bg-cyan-500/20 hover:bg-cyan-500 text-cyan-400 hover:text-white border border-cyan-500/30 font-bold text-xs py-2 rounded transition-all flex items-center justify-center gap-1 mt-2">
-                                     <Zap className="w-3 h-3" /> Dispatch Field Ops
+                                  <button 
+                                      onClick={() => handleDispatchTeam(req.id)} 
+                                      className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center justify-center gap-2 mt-4 active:scale-95"
+                                  >
+                                     <Zap className="w-4 h-4" /> DISPATCH TEAM NOW
                                   </button>
                               </div>
                           </div>
