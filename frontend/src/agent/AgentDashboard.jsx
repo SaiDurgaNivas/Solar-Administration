@@ -178,7 +178,14 @@ const AgentDashboard = () => {
       if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const res = await api.get('bookings/');
-      const filtered = res.data.filter(b => b.status === "Pending" || b.status === "Accepted" || Number(b.agent) === Number(user.id) || b.status === "Loan Approved" || b.status === "Direct Pay Confirmed" || b.status === "Dispatched");
+      const filtered = res.data.filter(b => 
+          b.status === "Pending" || 
+          (b.status === "Accepted" && Number(b.agent) === Number(user.id)) || 
+          Number(b.agent) === Number(user.id) || 
+          b.status === "Loan Approved" || 
+          b.status === "Direct Pay Confirmed" || 
+          b.status === "Dispatched"
+      );
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set
@@ -237,9 +244,14 @@ const AgentDashboard = () => {
          confirmed_time: convertTime(t),
          agent: user.id
       });
-      alert("Appointment Accepted and Confirmation Sent to Client!");
+      
+      // Sync background data
+      await fetchAppointments();
+      
+      // Automatically open next process
       setConfigModal({open: true, bookingId: id});
-      fetchAppointments();
+      
+      alert("Appointment Accepted and Confirmation Sent to Client!");
     } catch(err) {
       console.error("Accept appointment error:", err);
       const msg = err.response?.data?.error || err.response?.data?.detail || "Failed to accept appointment.";

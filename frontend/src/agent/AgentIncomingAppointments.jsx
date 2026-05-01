@@ -86,9 +86,14 @@ function AgentIncomingAppointments() {
                 confirmed_time: convertTime(t),
                 agent: user.id
             });
-            alert("Appointment Accepted and Confirmation Sent to Client!");
+            
+            // Update background data without full-page loader
+            await fetchIncoming(false);
+            
+            // Open next process
             setConfigModal({open: true, bookingId: bookingId});
-            fetchIncoming();
+            
+            alert("Appointment Accepted and Confirmation Sent to Client!");
         } catch (err) {
             console.error("Accept error:", err);
             const errorMsg = err.response?.data?.error || err.response?.data?.detail || "Failed to accept appointment.";
@@ -141,14 +146,6 @@ function AgentIncomingAppointments() {
             alert("Submission Failed: " + (typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg));
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto text-white">
@@ -274,6 +271,14 @@ function AgentIncomingAppointments() {
                 </div>
                 </div>
             )}
+
+            {loading ? (
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+                </div>
+            ) : (
+                <>
+
 
             <header className="mb-10">
                 <div className="flex items-center gap-4 mb-2">
@@ -432,6 +437,7 @@ function AgentIncomingAppointments() {
                         </motion.div>
                     ))}
                 </div>
+                </>
             )}
         </div>
     );
