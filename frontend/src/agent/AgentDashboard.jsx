@@ -178,6 +178,7 @@ const AgentDashboard = () => {
       if (!user) return;
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const res = await api.get('bookings/');
+      console.log("Agent Dashboard Raw Data:", res.data);
       const filtered = res.data.filter(b => 
           b.status === "Pending" || 
           (b.status === "Accepted" && Number(b.agent) === Number(user.id)) || 
@@ -186,6 +187,7 @@ const AgentDashboard = () => {
           b.status === "Direct Pay Confirmed" || 
           b.status === "Dispatched"
       );
+      console.log("Agent Dashboard Filtered Data:", filtered);
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set

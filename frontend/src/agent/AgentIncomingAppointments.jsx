@@ -30,11 +30,13 @@ function AgentIncomingAppointments() {
             if (!user) return;
 
             const response = await api.get('bookings/');
+            console.log("Incoming Page Raw Data:", response.data);
             // Show Pending OR Accepted by this agent
             const filtered = response.data.filter(b => 
                 b.status === "Pending" || 
                 (b.status === "Accepted" && Number(b.agent) === Number(user.id))
             );
+            console.log("Incoming Page Filtered Data:", filtered);
             setBookings(filtered);
         } catch (error) {
             console.error("Error fetching incoming appointments:", error);
