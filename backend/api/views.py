@@ -195,6 +195,27 @@ class BookingDocumentViewSet(viewsets.ModelViewSet):
     serializer_class = BookingDocumentSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            if 'Read-only file system' in str(e) or 'Errno 30' in str(e):
+                # Fallback for Vercel: Save the record without physical files to avoid crash
+                # This allows the workflow to proceed to 'Awaiting Admin'
+                data = request.data.copy()
+                # Remove file fields that cause the crash on read-only systems
+                for field in ['current_bill', 'aadhar_card', 'pan_card', 'bank_details', 'house_tax', 'bank_statement_6m']:
+                    if field in data: data.pop(field)
+                
+                serializer = self.get_serializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                return Response({
+                    "message": "Demo Mode: Documents recorded in database (Files not stored on Vercel disk)",
+                    **serializer.data
+                }, status=status.HTTP_201_CREATED)
+            raise e
+
     def get_queryset(self):
         booking_id = self.request.query_params.get('booking_id')
         if booking_id:
