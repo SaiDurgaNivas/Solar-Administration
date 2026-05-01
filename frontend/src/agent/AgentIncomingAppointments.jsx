@@ -48,7 +48,7 @@ function AgentIncomingAppointments() {
 
     useEffect(() => {
         fetchIncoming();
-        const interval = setInterval(() => fetchIncoming(false), 5000);
+        const interval = setInterval(() => fetchIncoming(false), 3000);
         return () => clearInterval(interval);
     }, []);
 

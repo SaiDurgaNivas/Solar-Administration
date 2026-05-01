@@ -86,6 +86,14 @@ function WorkerDashboard() {
   useEffect(() => {
     fetchTasks();
     fetchAttendance();
+    
+    // High-Speed Auto-Refresh for Workers (3 seconds)
+    const interval = setInterval(() => {
+        fetchTasks();
+        fetchAttendance();
+    }, 3000);
+    
+    return () => clearInterval(interval);
   }, [user?.id]);
 
   const handleTabClick = (id) => {

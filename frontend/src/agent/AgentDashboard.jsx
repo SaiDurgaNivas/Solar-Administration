@@ -36,13 +36,19 @@ const AgentDashboard = () => {
   const [teamAttendance, setTeamAttendance] = useState([]);
   const [metricsModal, setMetricsModal] = useState({ open: false, title: '', content: null });
 
-  // Fetch real data from Backend
+  // Fetch real data from Backend with High-Speed Auto-Refresh (Expo Mode)
   useEffect(() => {
-    fetchInstallations();
-    fetchAppointments();
-    fetchTeam();
-    fetchSelfAttendance();
-    fetchTeamAttendance();
+    const fetchAll = () => {
+      fetchInstallations();
+      fetchAppointments();
+      fetchTeam();
+      fetchSelfAttendance();
+      fetchTeamAttendance();
+    };
+
+    fetchAll();
+    const interval = setInterval(fetchAll, 3000); // 3-second high-speed sync
+    return () => clearInterval(interval);
   }, []);
 
   const fetchTeamAttendance = async () => {
