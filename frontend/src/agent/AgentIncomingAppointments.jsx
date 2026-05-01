@@ -447,6 +447,8 @@ function AgentIncomingAppointments() {
                     ))}
                 </div>
             )}
+            </>
+        )}
         </div>
     );
 }
