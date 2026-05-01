@@ -522,6 +522,11 @@ const AgentDashboard = () => {
           <div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight">
               {greeting}, <span className="text-orange-500">Agent</span>
+              {appointments.filter(a => (a.status||'').toLowerCase() === 'pending').length > 0 && (
+                <span className="ml-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-orange-500 text-black animate-bounce shadow-[0_0_15px_rgba(249,115,22,0.5)]">
+                  {appointments.filter(a => (a.status||'').toLowerCase() === 'pending').length} NEW REQUESTS
+                </span>
+              )}
             </h1>
             <p className="text-gray-400 text-lg">
               Here is your daily dispatch, active sites, and installation queue.
@@ -592,14 +597,14 @@ const AgentDashboard = () => {
           ))}
         </motion.div>
 
-        {/* 🔥 Connection Debugger */}
-        <div className="mb-6 flex items-center justify-between bg-white/5 border border-white/10 p-4 rounded-2xl">
+        {/* 🔥 Connection Debugger moved to top of section */}
+        <div className="mb-4 flex items-center justify-between bg-orange-500/10 border border-orange-500/30 p-3 rounded-2xl">
             <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Data Node:</span>
-                <code className="text-[10px] font-mono text-cyan-400 bg-cyan-400/10 px-2 py-0.5 rounded">{api.defaults.baseURL}</code>
+                <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest underline decoration-orange-500/50">Production Data Sync:</span>
+                <code className="text-[10px] font-mono text-white bg-black/40 px-2 py-0.5 rounded">{api.defaults.baseURL}</code>
             </div>
-            <p className="text-[10px] text-gray-500 italic font-bold">Verify this matches your Customer Portal URL!</p>
+            <p className="text-[9px] text-gray-400 italic">Connected to Vercel Cloud for Expo</p>
         </div>
 
         {/* 🔥 Incoming Appointments Section */}
@@ -627,8 +632,8 @@ const AgentDashboard = () => {
                   <div key={req.id} className="bg-[#020617] border border-white/5 p-5 rounded-2xl flex flex-col group hover:border-cyan-500/30 transition-all relative">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-bold text-lg">{req.client_name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : req.status === 'Awaiting Admin' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : req.status === 'Loan Approved' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : req.status === 'Loan Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
-                           {req.status}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : (req.status||'').toLowerCase() === 'pending' ? 'bg-orange-500 text-black border border-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : req.status === 'Awaiting Admin' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : req.status === 'Loan Approved' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : req.status === 'Loan Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
+                           {(req.status||'').toLowerCase() === 'pending' ? '🔥 NEW REQUEST' : req.status}
                         </span>
                       </div>
                       <div className="text-xs text-gray-400 space-y-1 mb-4 border-b border-white/5 pb-4">
