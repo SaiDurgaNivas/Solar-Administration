@@ -257,8 +257,9 @@ const AgentDashboard = () => {
          status: "Accepted",
          confirmed_date: d,
          confirmed_time: convertTime(t),
-         agent: user.id
+         agent: parseInt(user.id)
       });
+      console.log(`Booking ${id} accepted successfully by Agent ${user.id}`);
       
       // Sync background data
       await fetchAppointments();

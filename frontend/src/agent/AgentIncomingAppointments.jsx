@@ -90,8 +90,9 @@ function AgentIncomingAppointments() {
                 status: 'Accepted',
                 confirmed_date: d,
                 confirmed_time: convertTime(t),
-                agent: user.id
+                agent: parseInt(user.id)
             });
+            console.log(`Booking ${bookingId} accepted in management center by Agent ${user.id}`);
             
             // Update background data without full-page loader
             await fetchIncoming(false);
