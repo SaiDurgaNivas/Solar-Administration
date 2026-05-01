@@ -185,18 +185,22 @@ const AgentDashboard = () => {
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const apiUrl = `${api.defaults.baseURL}bookings/`;
       const res = await api.get('bookings/');
-      console.log("Expo Sync - Raw Data:", res.data);
+      console.log("Agent Dashboard - All Bookings:", res.data);
       
       // EXPO MODE: Show everything to ensure a smooth demo
       const filtered = res.data.filter(b => {
           const status = (b.status || "").toLowerCase();
-          return status === "pending" || 
+          const isPending = status === "pending" || status === "";
+          const isAssignedToMe = Number(b.agent) === Number(user.id);
+          
+          return isPending || 
                  status === "accepted" || 
                  status === "awaiting admin" ||
                  status === "loan approved" ||
                  status === "dispatched" ||
-                 Number(b.agent) === Number(user.id);
+                 isAssignedToMe;
       });
+      console.log("Agent Dashboard - Filtered Bookings:", filtered);
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set
@@ -609,16 +613,19 @@ const AgentDashboard = () => {
         >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-cyan-500/10 rounded-xl">
-                   <Clock className="w-6 h-6 text-cyan-400" />
+                <div className="p-3 bg-orange-500/20 rounded-xl animate-pulse">
+                   <Clock className="w-6 h-6 text-orange-400" />
                 </div>
-                <h2 className="text-2xl font-bold">Incoming Appointment Requests</h2>
+                <div>
+                  <h2 className="text-2xl font-bold">New & Active Requests</h2>
+                  <p className="text-xs text-gray-500 font-medium">Customer requests waiting for action</p>
+                </div>
               </div>
               <Link 
                 to="/agent-dashboard/incoming-appointments" 
-                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 transition-colors group"
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-orange-400 hover:text-orange-300 transition-colors group bg-orange-500/10 px-4 py-2 rounded-xl border border-orange-500/20 shadow-lg"
               >
-                View Full List <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                View Management Center <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             

@@ -30,14 +30,17 @@ function AgentIncomingAppointments() {
             if (!user) return;
 
             const response = await api.get('bookings/');
-            console.log("Incoming Page Raw Data:", response.data);
+            console.log("Incoming Page - All Data:", response.data);
             // Show Pending OR Accepted by this agent
             const filtered = response.data.filter(b => {
                 const status = (b.status || "").toLowerCase();
-                return status === "pending" || 
-                       (status === "accepted" && Number(b.agent) === Number(user.id));
+                const isPending = status === "pending" || status === "";
+                const isAssignedToMe = Number(b.agent) === Number(user.id);
+
+                return isPending || 
+                       (status === "accepted" && isAssignedToMe);
             });
-            console.log("Incoming Page Filtered Data:", filtered);
+            console.log("Incoming Page - Filtered Data:", filtered);
             setBookings(filtered);
         } catch (error) {
             console.error("Error fetching incoming appointments:", error);
@@ -285,12 +288,15 @@ function AgentIncomingAppointments() {
 
             <header className="mb-10">
                 <div className="flex items-center gap-4 mb-2">
-                    <div className="p-3 bg-orange-500/20 rounded-2xl shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+                    <div className="p-3 bg-orange-500/20 rounded-2xl shadow-[0_0_20px_rgba(249,115,22,0.2)] animate-pulse">
                         <Calendar className="text-orange-500 w-8 h-8" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight">Incoming Appointments</h1>
-                        <p className="text-gray-400 font-medium">New and accepted customer booking requests</p>
+                        <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
+                            Incoming Appointments
+                            <span className="text-[10px] bg-orange-500 text-black px-3 py-1 rounded-full animate-bounce">LIVE UPDATE</span>
+                        </h1>
+                        <p className="text-gray-400 font-medium text-lg">Accept new customer requests and schedule site visits</p>
                     </div>
                 </div>
             </header>

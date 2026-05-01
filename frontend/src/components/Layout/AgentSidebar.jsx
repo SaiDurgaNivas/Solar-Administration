@@ -47,10 +47,11 @@ function AgentSidebar({ user, onLogout }) {
 
         <NavLink to="/agent-dashboard/incoming-appointments" className={linkClass}>
           <Calendar className="w-5 h-5" />
-          Incoming Appointments
+          <div className="flex items-center gap-2">
+            Incoming Appointments
+            <span className="bg-orange-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">NEW</span>
+          </div>
         </NavLink>
-
-
 
         <NavLink to="/agent-dashboard/customers" className={linkClass}>
           <Users className="w-5 h-5" />
