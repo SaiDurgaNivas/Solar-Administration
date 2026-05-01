@@ -618,42 +618,49 @@ const AgentDashboard = () => {
                       </div>
                       
                       {req.status === "Pending" ? (
-                          <div className="mt-auto space-y-3">
-                              <div>
-                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Date</label>
-                                  <input 
-                                     type="date"
-                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg transition-all"
-                                     value={confirmDates[req.id] || ''}
-                                     onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
-                                  />
-                              </div>
-                              <div className="relative">
-                                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Confirm Time</label>
-                                  <select
-                                     className="w-full bg-white border-2 border-cyan-500/50 p-3 rounded-xl text-sm text-black font-bold outline-none focus:border-cyan-500 shadow-lg appearance-none cursor-pointer transition-all"
-                                     value={confirmTimes[req.id] || ''}
-                                     onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
-                                  >
-                                      <option value="">- Select AM/PM -</option>
-                                      {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
-                                  </select>
-                                  <div className="absolute right-4 top-[50px] pointer-events-none">
-                                      <Clock className="w-4 h-4 text-cyan-500" />
+                          <div className="mt-auto space-y-4">
+                              <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Date</label>
+                                      <input 
+                                         type="date"
+                                         className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none transition-all"
+                                         value={confirmDates[req.id] || ''}
+                                         onChange={(e) => setConfirmDates({...confirmDates, [req.id]: e.target.value})}
+                                      />
+                                  </div>
+                                  <div>
+                                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Confirm Time</label>
+                                      <select
+                                         className="w-full bg-[#020617] border border-white/10 p-3 rounded-xl text-xs text-white focus:border-orange-500 outline-none appearance-none cursor-pointer transition-all"
+                                         value={confirmTimes[req.id] || ''}
+                                         onChange={(e) => setConfirmTimes({...confirmTimes, [req.id]: e.target.value})}
+                                      >
+                                          <option value="">Select Time</option>
+                                          {timeSlots.map(ts => <option key={ts} value={ts}>{ts}</option>)}
+                                      </select>
                                   </div>
                               </div>
-                              <button onClick={() => handleAcceptAppointment(req.id)} className="w-full flex-1 bg-green-500/10 hover:bg-green-500 text-green-400 hover:text-white border border-green-500/30 font-bold text-xs py-3 rounded-lg transition-all text-center">
-                                 Accept Request
+                              <button 
+                                 onClick={() => handleAcceptAppointment(req.id)} 
+                                 className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center justify-center gap-2 group/btn active:scale-95 transition-all"
+                              >
+                                 Confirm & Accept <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                               </button>
                           </div>
                       ) : req.status === "Accepted" ? (
                           <div className="mt-auto space-y-3 border-t border-white/5 pt-4">
-                              <div className="bg-green-500/5 border border-green-500/20 p-2 rounded-xl flex items-center justify-between mx-1 mb-2">
-                                  <span className="text-xs font-semibold text-green-400">Accepted ({req.confirmed_date}{req.confirmed_time ? ` @ ${formatDisplayTime(req.confirmed_time)}` : ''})</span>
-                                  <CheckCircle className="w-3 h-3 text-green-400" />
+                              <div className="bg-green-500/5 border border-green-500/20 p-3 rounded-xl flex items-center justify-between mx-1 mb-2">
+                                  <div className="flex items-center gap-3">
+                                      <CheckCircle className="w-4 h-4 text-green-400" />
+                                      <span className="text-xs font-bold text-green-400">Accepted ({req.confirmed_date} @ {formatDisplayTime(req.confirmed_time)})</span>
+                                  </div>
                               </div>
-                              <button onClick={() => setConfigModal({open:true, bookingId:req.id})} className="w-full flex-1 bg-cyan-500/10 hover:bg-cyan-500 text-cyan-400 hover:text-white border border-cyan-500/30 font-bold text-xs py-3 rounded-lg transition-all text-center">
-                                 Upload Config & Forward to Admin
+                              <button 
+                                 onClick={() => setConfigModal({open:true, bookingId:req.id})} 
+                                 className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 active:scale-95"
+                              >
+                                 <Zap className="w-4 h-4" /> Upload Config & Forward
                               </button>
                           </div>
                       ) : req.status === "Awaiting Admin" ? (
