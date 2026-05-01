@@ -8,9 +8,8 @@ const isLocal = window.location.hostname === 'localhost' ||
 // Point directly to the Vercel backend using a relative route
 const PROD_API_URL = import.meta.env.VITE_API_BASE_URL || '/api/';
 
-const API_BASE_URL = isLocal
-    ? `http://${window.location.hostname}:8000/api/`
-    : PROD_API_URL;
+// EXPO MODE: Hardcoded to Vercel production to ensure Customer and Agent stay in sync
+const API_BASE_URL = 'https://solar-administration.vercel.app/api/';
 
 
 const api = axios.create({
