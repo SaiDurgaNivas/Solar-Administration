@@ -718,13 +718,15 @@ const AgentDashboard = () => {
                                 <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 font-semibold">
                                   Status: {req.status}
                                 </div>
-                                {req.team_tasks?.length > 0 ? (
-                                  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-200">
-                                    Assigned Technician: <span className="text-cyan-300">{req.team_tasks[0].sub_worker_name}</span>
+                                <div className="flex-1">
+                                {req.team_tasks && req.team_tasks.length > 0 ? (
+                                  <div className="text-xs font-bold text-cyan-400">
+                                    Assigned Technician: <span className="text-cyan-300">{req.team_tasks[0]?.sub_worker_name || 'Assigned'}</span>
                                   </div>
                                 ) : (
-                                  <div className="text-xs text-gray-400">Technician assignment is being processed.</div>
+                                  <div className="text-xs text-gray-400 italic">Technician assignment is being processed...</div>
                                 )}
+                              </div>
                               </div>
                           </div>
                       ) : (req.status === "Loan Approved" || req.status === "Direct Pay Confirmed") ? (
