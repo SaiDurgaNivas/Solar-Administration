@@ -87,6 +87,7 @@ function AgentIncomingAppointments() {
                 agent: user.id
             });
             alert("Appointment Accepted and Confirmation Sent to Client!");
+            setConfigModal({open: true, bookingId: bookingId});
             fetchIncoming();
         } catch (err) {
             console.error("Accept error:", err);

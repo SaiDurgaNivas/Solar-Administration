@@ -238,6 +238,7 @@ const AgentDashboard = () => {
          agent: user.id
       });
       alert("Appointment Accepted and Confirmation Sent to Client!");
+      setConfigModal({open: true, bookingId: id});
       fetchAppointments();
     } catch(err) {
       console.error("Accept appointment error:", err);
