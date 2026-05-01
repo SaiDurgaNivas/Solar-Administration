@@ -524,7 +524,7 @@ const AgentDashboard = () => {
               {greeting}, <span className="text-orange-500">Agent</span>
             </h1>
             <p className="text-gray-400 text-lg">
-              Here is your daily dispatch, active sites, and installation queue.
+              Here is your daily dispatch, active sites, and installation queue. <span className="text-green-500 font-bold ml-2">[SAFE MODE ACTIVE]</span>
             </p>
           </div>
           <div className="flex bg-[#0f172a]/80 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-2xl min-w-[280px]">

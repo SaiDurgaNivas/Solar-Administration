@@ -367,7 +367,6 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/agent-dashboard/installations" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentInstallations /></ProtectedLayout>} />
       <Route path="/agent-dashboard/tickets" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentTickets /></ProtectedLayout>} />
       <Route path="/agent-dashboard/reports" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentTeamReports /></ProtectedLayout>} />
-      <Route path="/agent-dashboard/incoming-appointments" element={<ProtectedLayout user={user} onLogout={onLogout} role="agent"><AgentIncomingAppointments /></ProtectedLayout>} />
 
       {/* 👷 WORKER */}
       <Route path="/worker-dashboard" element={<ProtectedLayout user={user} onLogout={onLogout} role="sub_worker"><WorkerDashboard /></ProtectedLayout>} />
