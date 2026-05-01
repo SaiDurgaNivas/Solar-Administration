@@ -446,7 +446,6 @@ function AgentIncomingAppointments() {
                         </motion.div>
                     ))}
                 </div>
-                </>
             )}
         </div>
     );
