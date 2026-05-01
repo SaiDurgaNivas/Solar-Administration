@@ -179,20 +179,18 @@ const AgentDashboard = () => {
       // Show Pending requests, OR requests accepted/forwarded by this exact agent
       const apiUrl = `${api.defaults.baseURL}bookings/`;
       const res = await api.get('bookings/');
-      console.log(`Connected to: ${apiUrl}`);
-      console.log("Raw Bookings from Server:", res.data);
+      console.log("Expo Sync - Raw Data:", res.data);
       
+      // EXPO MODE: Show everything to ensure a smooth demo
       const filtered = res.data.filter(b => {
           const status = (b.status || "").toLowerCase();
           return status === "pending" || 
-                 Number(b.agent) === Number(user.id) || 
                  status === "accepted" || 
-                 status === "loan approved" || 
-                 status === "direct pay confirmed" || 
+                 status === "awaiting admin" ||
+                 status === "loan approved" ||
                  status === "dispatched" ||
-                 status === "awaiting admin";
+                 Number(b.agent) === Number(user.id);
       });
-      console.log("Filtered Bookings for UI:", filtered);
       setAppointments(filtered);
 
       // Auto-populate dispatch address for approved bookings if not already set
