@@ -11,38 +11,14 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "backend/solar_api/wsgi.py"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "backend/solar_api/wsgi.py"
-    },
-    {
-      "source": "/static/(.*)",
-      "destination": "backend/solar_api/wsgi.py"
-    },
-    {
-      "source": "/media/(.*)",
-      "destination": "backend/solar_api/wsgi.py"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
-      "source": "/images/(.*)",
-      "destination": "/images/$1"
-    },
-    {
-      "source": "/vite.svg",
-      "destination": "/vite.svg"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "backend/solar_api/wsgi.py" },
+    { "src": "/admin/(.*)", "dest": "backend/solar_api/wsgi.py" },
+    { "src": "/static/(.*)", "dest": "backend/solar_api/wsgi.py" },
+    { "src": "/media/(.*)", "dest": "backend/solar_api/wsgi.py" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/vite.svg", "dest": "/vite.svg" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
