@@ -637,8 +637,8 @@ const AgentDashboard = () => {
                   <div key={req.id} className="bg-[#020617] border border-white/5 p-5 rounded-2xl flex flex-col group hover:border-cyan-500/30 transition-all relative">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-bold text-lg">{req.client_name}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : (req.status||'').toLowerCase() === 'pending' ? 'bg-orange-500 text-black border border-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : req.status === 'Awaiting Admin' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : req.status === 'Loan Approved' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : req.status === 'Loan Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
-                           {(req.status||'').toLowerCase() === 'pending' ? '🔥 NEW REQUEST' : req.status}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${req.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : (req.status||'').toLowerCase() === 'pending' ? 'bg-orange-500 text-black border border-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : req.status === 'Awaiting Admin' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : req.status === 'Loan Approved' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.2)]' : req.status === 'Loan Rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
+                           {(req.status||'').toLowerCase() === 'pending' ? '🔥 NEW REQUEST' : req.status === 'Accepted' ? '✅ SCHEDULED' : req.status}
                         </span>
                       </div>
                       <div className="text-xs text-gray-400 space-y-1 mb-4 border-b border-white/5 pb-4">
@@ -679,19 +679,22 @@ const AgentDashboard = () => {
                                   Confirm & Accept <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                               </button>
                           </div>
-                      ) : req.status === "Accepted" ? (
+                      ) : (req.status || "").toLowerCase() === 'accepted' ? (
                           <div className="mt-auto space-y-3 border-t border-white/5 pt-4">
-                              <div className="bg-green-500/5 border border-green-500/20 p-3 rounded-xl flex items-center justify-between mx-1 mb-2">
-                                  <div className="flex items-center gap-3">
-                                      <CheckCircle className="w-4 h-4 text-green-400" />
-                                      <span className="text-xs font-bold text-green-400">Accepted ({req.confirmed_date} @ {formatDisplayTime(req.confirmed_time)})</span>
+                              <div className="bg-green-500/5 border border-green-500/20 p-3 rounded-2xl flex items-center gap-3 mx-1 mb-2">
+                                  <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center border border-green-500/20">
+                                      <Clock className="w-4 h-4 text-green-400" />
+                                  </div>
+                                  <div>
+                                      <p className="text-[10px] font-bold text-green-400/50 uppercase tracking-widest">Visit Scheduled For</p>
+                                      <p className="text-xs font-bold text-green-400">{req.confirmed_date} @ {formatDisplayTime(req.confirmed_time)}</p>
                                   </div>
                               </div>
                               <button 
                                  onClick={() => setConfigModal({open:true, bookingId:req.id})} 
-                                 className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 active:scale-95"
+                                 className="w-full bg-cyan-500 hover:bg-cyan-400 text-black font-black py-4 rounded-2xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center justify-center gap-2 active:scale-95 uppercase text-[10px] tracking-widest"
                               >
-                                 <Zap className="w-4 h-4" /> Upload Config & Forward
+                                 <FileText className="w-4 h-4" /> Visit Client: Collect & Upload Docs
                               </button>
                           </div>
                       ) : req.status === "Awaiting Admin" ? (
