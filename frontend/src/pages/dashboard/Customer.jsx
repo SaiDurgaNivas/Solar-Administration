@@ -6,6 +6,7 @@ import api from "../../api/axiosConfig";
 function Customers() {
   const [customers, setCustomers] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [installations, setInstallations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +24,7 @@ function Customers() {
   useEffect(() => {
     fetchCustomers();
     fetchAgents();
+    fetchInstallations();
   }, []);
 
   const fetchCustomers = async () => {
@@ -43,6 +45,15 @@ function Customers() {
       setAgents(res.data);
     } catch (err) {
       console.error("Error fetching agents", err);
+    }
+  };
+
+  const fetchInstallations = async () => {
+    try {
+      const res = await api.get('installations/');
+      setInstallations(res.data);
+    } catch (err) {
+      console.error("Error fetching installations", err);
     }
   };
 
@@ -322,7 +333,21 @@ function Customers() {
                       </div>
                     </td>
                     <td className="py-5 px-6 text-center">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold border bg-green-500/10 text-green-400 border-green-500/20">Active</span>
+                      {(() => {
+                        const install = installations.find(i => i.client === item.id);
+                        const status = install ? install.status : "Active";
+                        
+                        return (
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                            status === 'Completed' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]' :
+                            status === 'In Progress' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            status === 'Pending' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                            'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                          }`}>
+                            {status}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="py-5 px-6 text-center">
                       <div className="flex items-center justify-center gap-2">
