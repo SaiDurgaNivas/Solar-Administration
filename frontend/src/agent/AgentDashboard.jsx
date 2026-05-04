@@ -232,6 +232,12 @@ const AgentDashboard = () => {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
+  // Derived: Workers currently clocked in
+  const activeWorkers = team.map(w => {
+    const attendance = teamAttendance.find(a => Number(a.worker) === Number(w.id));
+    return { ...w, is_active: attendance?.status === "Present" };
+  });
+
   const handleAcceptAppointment = async (id) => {
     const d = confirmDates[id];
     const t = confirmTimes[id];
@@ -753,8 +759,16 @@ const AgentDashboard = () => {
                                      value={dispatchInfo[req.id]?.sub_worker_id || ''}
                                      onChange={e => setDispatchInfo({...dispatchInfo, [req.id]: {...dispatchInfo[req.id], sub_worker_id: e.target.value}})}
                                   >
-                                      <option value="">- Assign Worker -</option>
-                                      {team.map(w => <option key={w.id} value={w.id}>{w.username} ({w.subworker_profile?.job_title})</option>)}
+                                      <option value="">- Select Active Worker -</option>
+                                      {activeWorkers.length === 0 ? (
+                                        <option disabled>No Workers Assigned to You</option>
+                                      ) : (
+                                        activeWorkers.map(w => (
+                                          <option key={w.id} value={w.id} disabled={!w.is_active}>
+                                            {w.username} ({w.subworker_profile?.job_title || 'Worker'}) {w.is_active ? '🟢 ACTIVE' : '🔴 OFFLINE'}
+                                          </option>
+                                        ))
+                                      )}
                                   </select>
                                   
                                   <button 
