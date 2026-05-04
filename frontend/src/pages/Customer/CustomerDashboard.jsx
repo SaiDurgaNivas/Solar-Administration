@@ -373,10 +373,10 @@ function CustomerDashboard() {
                          <h3 className="font-bold text-lg">{new Date(b.requested_date).toDateString()} at {formatDisplayTime(b.requested_time)}</h3>
                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
                              b.status === 'Pending' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 
-                             b.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                             'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                             b.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]' :
+                             b.status === 'Completed' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white border-transparent shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                          }`}>
-                             {b.status === 'Forwarded' ? 'Sent to Admin' : b.status}
+                             {b.status === 'Forwarded' ? 'Sent to Admin' : b.status === 'Completed' ? '🏆 COMPLETED' : b.status}
                          </span>
                      </div>
                      <p className="text-gray-400 text-sm mb-4"><MapPin className="inline w-3 h-3 mr-1" />{b.address}</p>
@@ -427,24 +427,39 @@ function CustomerDashboard() {
                      )}
 
                      {b.status === 'Completed' && (
-                         <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30 rounded-xl p-5 flex items-start gap-4 mt-4 shadow-[0_0_20px_rgba(34,197,94,0.15)]">
-                             <CheckCircle className="w-8 h-8 text-green-400 shrink-0 mt-1 animate-pulse" />
-                             <div>
-                                 <h4 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 mb-1">
-                                     You have successfully Completed Your solar installation
-                                 </h4>
-                                 <p className="text-xs text-gray-300 font-medium leading-relaxed mb-4">
-                                     Welcome to the future of clean energy! Your solar arrays are now active and generating power. You can track your real-time usage and efficiency telemetry from the Analytics module. Enjoy your sustainable independence!
-                                 </p>
-                                 <button 
-                                     onClick={() => setReviewModal({open: true, bookingId: b.id, rating: 5, comment: ""})}
-                                     className="bg-green-500/20 hover:bg-green-500 border border-green-500/50 text-green-400 hover:text-black font-bold py-1.5 px-4 rounded-lg text-xs tracking-wider transition uppercase"
-                                 >
-                                     Leave a Review
-                                 </button>
-                             </div>
-                         </div>
-                     )}
+                          <div className="bg-gradient-to-br from-green-500/10 via-blue-500/5 to-transparent border-2 border-green-500/30 rounded-2xl p-6 mt-6 shadow-[0_0_30px_rgba(34,197,94,0.1)] relative overflow-hidden group">
+                              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                  <CheckCircle className="w-24 h-24 text-green-400 rotate-12" />
+                              </div>
+                              <div className="relative z-10">
+                                  <div className="flex items-center gap-3 mb-3">
+                                      <div className="p-2 bg-green-500 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.4)]">
+                                          <CheckCircle className="w-5 h-5 text-white" />
+                                      </div>
+                                      <h4 className="text-xl font-black text-white tracking-tight">
+                                          Installation Successfully <span className="text-green-400 underline decoration-green-500/30">Completed</span>
+                                      </h4>
+                                  </div>
+                                  <p className="text-sm text-gray-300 font-medium leading-relaxed mb-6 max-w-md">
+                                      Congratulations! Your sustainable energy journey has officially begun. Your solar system is now fully commissioned and delivering clean power to your node. 
+                                  </p>
+                                  <div className="flex flex-wrap gap-3">
+                                      <button 
+                                          onClick={() => setReviewModal({open: true, bookingId: b.id, rating: 5, comment: ""})}
+                                          className="bg-green-500 hover:bg-green-400 text-black font-black py-2.5 px-6 rounded-xl text-xs tracking-widest transition uppercase shadow-[0_0_15px_rgba(34,197,94,0.3)] active:scale-95"
+                                      >
+                                          Leave a Review
+                                      </button>
+                                      <button 
+                                          onClick={() => navigate("/customer/usage")}
+                                          className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-2.5 px-6 rounded-xl text-xs tracking-widest transition uppercase active:scale-95"
+                                      >
+                                          View Live Analytics
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      )}
                  </div>
                  );
              })}
