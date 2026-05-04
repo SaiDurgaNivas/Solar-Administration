@@ -44,7 +44,7 @@ $proc1 = Start-Process -FilePath $pythonExe `
 $proc1.Id | Out-File (Join-Path $ProjectRoot ".backend.pid") -Force
 
 # --- Start React (Vite) Frontend as independent process ---
-Write-Host "[*] Starting React  frontend -> http://localhost:5173" -ForegroundColor Green
+Write-Host "[*] Starting React  frontend -> http://localhost:5174" -ForegroundColor Green
 $frontendLog = Join-Path $ProjectRoot "frontend.log"
 $proc2 = Start-Process -FilePath "cmd.exe" `
     -ArgumentList "/c npm run dev > `"$frontendLog`" 2>&1" `
@@ -58,7 +58,7 @@ Write-Host ""
 Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host "   Servers started! (Running in background)    " -ForegroundColor Green
 Write-Host ""
-Write-Host "   Frontend : http://localhost:5173             " -ForegroundColor White
+Write-Host "   Frontend : http://localhost:5174             " -ForegroundColor White
 Write-Host "   Backend  : http://localhost:8000             " -ForegroundColor White
 Write-Host ""
 Write-Host "   Backend PID  : $($proc1.Id)" -ForegroundColor Gray
